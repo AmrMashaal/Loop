@@ -61,7 +61,7 @@ const ChatNavbar = ({
   const friendsRequest = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user?._id}`,
+        `${import.meta.env.VITE_API_URL}/friends/friendRequest/${user._id}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -69,8 +69,9 @@ const ChatNavbar = ({
       );
 
       const data = await response.json();
-      setFriendRequestData(data.friendsRequest);
-      dispatch(setFriendsRequest({ friendsRequestState: data.friendsRequest }));
+
+      setFriendRequestData(data);
+      dispatch(setFriendsRequest({ friendsRequestState: data }));
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +111,6 @@ const ChatNavbar = ({
     });
 
     socket.on("friendNewPost", (data) => {
-      console.log(data);
       setNotificationsState((prev) =>
         notificationsState?.length === 0 ? data : [data, ...(prev || [])]
       );
