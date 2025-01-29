@@ -7,7 +7,9 @@ import {
   editPost,
   getPost,
   pinPost,
+  createPost,
 } from "../controllers/posts.js";
+import { upload } from "../config/multer.js";
 
 const router = express.Router();
 
@@ -18,6 +20,7 @@ router.get("/:postId", verifyToken, getPost);
 router.patch("/:postId/edit", verifyToken, editPost);
 router.patch("/:postId/pin", verifyToken, pinPost);
 
+router.post("/", verifyToken, upload.single("picture"), createPost);
 router.post("/:id/delete", verifyToken, deletePost);
 
 export default router;
