@@ -4,41 +4,21 @@ import sharp from "sharp";
 import { v4 } from "uuid";
 import path from "path";
 import bcrypt from "bcrypt";
-import Comment from "../models/Comment.js";
+import Friend from "../models/Friend.js";
 
 // ---------------------------------------------------------------
 
 export const getUser = async (req, res) => {
+  const id = req.params.id;
+
   try {
-    const id = req.params.id;
     let user = await User.findOne({ _id: id });
+
     const { password, ...dataWithoutPassword } = user.toObject();
+
     res.status(200).json(dataWithoutPassword);
   } catch (err) {
     return res.status(404).json({ message: err.message });
-  }
-};
-
-// ---------------------------------------------------------------
-
-export const getUserFriends = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
-    );
-
-    const formatted = friends.map(
-      ({ _id, firstName, lastName, location, occupation, picturePath }) => {
-        return { _id, firstName, lastName, location, occupation, picturePath };
-      }
-    );
-
-    res.status(200).json(formatted);
-  } catch (err) {
-    res.status(404).json({ message: err.message });
   }
 };
 
@@ -212,8 +192,21 @@ export const editUser = async (req, res) => {
 
   try {
     const { id, usernameParam } = req.params;
-    const { firstName, lastName, username, bio, location, occupation } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      username,
+      birthdate,
+      gender,
+      bio,
+      location,
+      occupation,
+      facebook,
+      instagram,
+      linkedin,
+      x,
+      youtube,
+    } = req.body;
 
     const user = await User.findById(id);
     const isUserName = await User.findOne({ username });
@@ -222,12 +215,22 @@ export const editUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (isUserName && isUserName.id.toString() !== id) {
-      return res.status(404).json({ message: "Username is existed" });
+    if (isUserName && isUserName._id.toString() !== id) {
+      return res.status(404).json({ message: "Username exists" });
     }
 
     user.firstName = firstName;
     user.lastName = lastName;
+    user.birthdate = birthdate;
+    user.gender = gender;
+    user.bio = bio;
+    user.location = location;
+    user.occupation = occupation;
+    user.links.facebook = facebook;
+    user.links.instagram = instagram;
+    user.links.linkedin = linkedin;
+    user.links.x = x;
+    user.links.youtube = youtube;
     if (usernameParam !== username) {
       user.username = username;
     } else if (background) {
@@ -235,9 +238,6 @@ export const editUser = async (req, res) => {
     } else if (picturePath) {
       user.picturePath = picturePath;
     }
-    user.bio = bio;
-    user.location = location;
-    user.occupation = occupation;
 
     if (picturePath) {
       await Post.updateMany(
@@ -250,32 +250,9 @@ export const editUser = async (req, res) => {
           },
         }
       );
-
-      await Comment.updateMany(
-        {
-          userId: id,
-        },
-        {
-          $set: {
-            userPicture: picturePath,
-          },
-        }
-      );
     }
 
     await Post.updateMany(
-      {
-        userId: id,
-      },
-      {
-        $set: {
-          firstName: firstName,
-          lastName: lastName,
-        },
-      }
-    );
-
-    await Comment.updateMany(
       {
         userId: id,
       },
@@ -426,18 +403,27 @@ export const getOnlineFriends = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findById(id);
+    const friends = await Friend.find({
+      $or: [{ sender: id }, { receiver: id }],
+      status: "accepted",
+    })
+      .populate(
+        "sender receiver",
+        "_id firstName lastName picturePath online occupation"
+      )
+      .limit(6);
 
-    const onlineFriendsData = await User.find({
-      _id: { $in: user.friends },
-      online: true,
-    }); // $in used to find multiple users in an array
-
-    if (!user) {
+    if (!friends) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(onlineFriendsData);
+    const onlineFriends = friends.filter(
+      (friend) =>
+        (friend.sender._id.toString() === id && friend.receiver.online) ||
+        (friend.receiver._id.toString() === id && friend.sender.online)
+    );
+
+    res.status(200).json(onlineFriends);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

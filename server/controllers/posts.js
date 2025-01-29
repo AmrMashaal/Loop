@@ -5,6 +5,7 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
 import Like from "../models/Like.js";
+import Friend from "../models/Friend.js";
 import Notification from "../models/notification.js";
 
 const compressImage = async (buffer) => {
@@ -38,7 +39,7 @@ export const createPost = async (req, res) => {
 
   try {
     // Destructure and set post details
-    const { userId, description } = req.body;
+    const { userId, description, textAddition } = req.body;
     const user = await User.findById(userId);
 
     const newPost = new Post({
@@ -50,6 +51,7 @@ export const createPost = async (req, res) => {
       userPicturePath: user.picturePath,
       location: user.location,
       verified: user.verified,
+      textAddition: textAddition,
       comments: [],
       likes: [],
     });
@@ -65,11 +67,33 @@ export const createPost = async (req, res) => {
 
 export const getFeedPosts = async (req, res) => {
   const { page, limit = 5 } = req.query;
+  const { id } = req.user;
+
   try {
-    const posts = await Post.find()
+    const friendsPromise = await Friend.find({
+      $or: [
+        { sender: id, status: "accepted" },
+        { receiver: id, status: "accepted" },
+      ],
+    });
+
+    const friendsIds = friendsPromise.map((fr) => {
+      return fr.sender.toString() === id
+        ? fr.receiver.toString()
+        : fr.sender.toString();
+    });
+
+    let posts = await Post.find({ userId: { $in: friendsIds } })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
+
+    if (posts.length === 0) {
+      posts = await Post.find({ userId: { $ne: id } })
+        .sort({ verified: -1, createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+    }
 
     const postsWithIsLiked = await Promise.all(
       posts.map(async (post) => {
@@ -109,7 +133,9 @@ export const getUserPosts = async (req, res) => {
       })
     );
 
-    res.status(200).json(postsWithIsLiked);
+    const postsCount = await Post.countDocuments({ userId });
+
+    res.status(200).json({ posts: postsWithIsLiked, count: postsCount });
   } catch (err) {
     res.status(404).json({ message: err.message });
   }

@@ -38,6 +38,6 @@ export const searchInfo = async (req, res) => {
       return res.status(200).json(posts);
     }
   } catch (error) {
-    res.status(404).json({ message: err.message });
+    res.status(404).json({ message: error.message });
   }
 };

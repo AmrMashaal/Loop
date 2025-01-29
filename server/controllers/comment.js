@@ -1,11 +1,18 @@
 import { v4 } from "uuid";
 import Comment from "../models/Comment.js";
+import Notification from "../models/notification.js";
+import Like from "../models/Like.js";
 import sharp from "sharp";
 import path from "path";
+import mongoose from "mongoose";
+import Post from "../models/Post.js";
+import Reply from "../models/Reply.js";
 
 export const getComments = async (req, res) => {
-  const { postId } = req.params;
+  const { postId, commentId } = req.params;
   const { limit = 5, page } = req.query;
+
+  let data;
 
   try {
     const comments = await Comment.find({ postId: postId })
@@ -13,6 +20,7 @@ export const getComments = async (req, res) => {
         pinned: -1,
         createdAt: -1,
       })
+      .populate("user", "_id verified firstName lastName picturePath")
       .limit(limit)
       .skip((page - 1) * limit);
 
@@ -20,7 +28,59 @@ export const getComments = async (req, res) => {
       return res.status(404).json({ message: "comments is not found" });
     }
 
-    res.status(200).json(comments);
+    const commentsWithIsLiked = await Promise.all(
+      comments.map(async (com) => {
+        const replyCount = await Reply.countDocuments({ comment: com._id });
+
+        const isLiked = await Like.findOne({
+          userId: req.user.id,
+          commentId: com._id,
+        });
+
+        return {
+          ...com._doc,
+          isLiked: Boolean(isLiked),
+          replyCount,
+        };
+      })
+    );
+
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(commentId);
+
+    const specificCom =
+      commentId && isValidObjectId
+        ? await Comment.findById(commentId).populate(
+            "user",
+            "_id verified firstName lastName picturePath"
+          )
+        : null;
+
+    if (commentId && isValidObjectId && page === "1" && specificCom) {
+      const specificComWithIsLiked = await Like.find({
+        userId: req.user.id,
+        commentId: specificCom._id,
+      });
+
+      const replyCount = await Reply.countDocuments({
+        comment: specificCom._id,
+      });
+
+      data = [
+        {
+          ...specificCom._doc,
+          isLiked: specificComWithIsLiked.length > 0,
+          highlight: true,
+          replyCount,
+        },
+        ...commentsWithIsLiked.filter(
+          (com) => com._id.toString() !== commentId
+        ),
+      ];
+    } else {
+      data = commentsWithIsLiked;
+    }
+
+    res.status(200).json(data);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -34,7 +94,7 @@ const compressImage = async (buffer) => {
 };
 
 export const postCommentOriginal = async (req, res) => {
-  const { postId, userId } = req.params;
+  const { postId } = req.params;
 
   let picturePath = null;
 
@@ -59,17 +119,24 @@ export const postCommentOriginal = async (req, res) => {
 
   try {
     const comment = new Comment({
-      userId: userId,
+      user: req.user.id,
       postId: postId,
       picturePath,
       text: req.body.text,
-      verified: req.body.verified,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      userPicture: req.body.userPicture,
+    });
+
+    await Post.findByIdAndUpdate(postId, {
+      $inc: {
+        commentCount: 1,
+      },
     });
 
     await comment.save();
+
+    await comment.populate(
+      "user",
+      "_id verified firstName lastName picturePath"
+    );
 
     res.status(200).json(comment);
   } catch (err) {
@@ -87,33 +154,21 @@ export const deleteComment = async (req, res) => {
       return res.status(404).json({ message: "comments is not found" });
     }
 
+    const replyCount = await Reply.countDocuments({ comment: commentId });
+
+    await Post.findByIdAndUpdate(comments.postId, {
+      $inc: {
+        commentCount: -(replyCount + 1),
+      },
+    });
+
+    await Notification.deleteOne({ commentId: commentId });
+
+    await Reply.deleteMany({ comment: commentId });
+
     res.status(200).json(comments);
   } catch (err) {
     res.status(404).json({ message: err.message });
-  }
-};
-
-export const likeComment = async (req, res) => {
-  const { commentId, userId } = req.params;
-
-  try {
-    const comment = await Comment.findById(commentId);
-
-    if (!comment) {
-      return res.status(404).json({ message: "comment is not found" });
-    }
-
-    if (comment.likes.includes(userId)) {
-      comment.likes = comment.likes.filter((like) => like !== userId);
-    } else {
-      comment.likes.push(userId);
-    }
-
-    const data = await comment.save();
-
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 };
 
@@ -132,6 +187,11 @@ export const editComment = async (req, res) => {
 
     await comment.save();
 
+    await comment.populate(
+      "user",
+      "_id verified firstName lastName picturePath"
+    );
+
     res.status(200).json(comment);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -140,7 +200,7 @@ export const editComment = async (req, res) => {
 
 export const pinComment = async (req, res) => {
   const { commentId } = req.params;
- 
+
   try {
     const comment = await Comment.findById(commentId);
 

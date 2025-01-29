@@ -43,6 +43,8 @@ export const register = async (req, res) => {
       friends,
       occupation,
       location,
+      birthdate,
+      gender,
     } = req.body;
 
     const isUsernameExisted = await User.findOne({ username });
@@ -65,6 +67,8 @@ export const register = async (req, res) => {
       friends,
       occupation,
       location,
+      birthdate,
+      gender,
     });
 
     const savedUser = await user.save();
@@ -83,7 +87,7 @@ export const login = async (req, res) => {
     const realPassword = await bcrypt.compare(password, user.password);
 
     if (!user) {
-      return res.status(400).json({ message: "User is not exist." });
+      return res.status(404).json({ message: "User does not exist." });
     }
 
     if (!realPassword && user) {

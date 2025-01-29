@@ -1,6 +1,8 @@
 import Like from "../models/Like.js";
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
+import User from "../models/User.js";
+import Reply from "../models/Reply.js";
 
 export const likePost = async (req, res) => {
   const { id, userId } = req.params;
@@ -37,7 +39,7 @@ export const likePost = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
+// ---------------------------------------------------------
 export const likeComment = async (req, res) => {
   const { id, userId } = req.params;
 
@@ -68,10 +70,101 @@ export const likeComment = async (req, res) => {
       newComment = { ...comment._doc, isLiked: true };
     }
 
-    console.log(newComment);
-
-    res.status(200).json({ comment: newComment, isLiked: !like }); // there is a bug here
+    res.status(200).json({ comment: newComment, isLiked: !like });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+// ---------------------------------------------------------
+export const likeReply = async (req, res) => {
+  const { id, userId } = req.params;
+
+  let newReply;
+
+  try {
+    const like = await Like.findOne({ userId, replyId: id });
+
+    if (like) {
+      await Like.deleteOne({ userId, replyId: id });
+
+      const reply = await Reply.findByIdAndUpdate(
+        id,
+        { $inc: { likesCount: -1 } },
+        { new: true }
+      );
+
+      newReply = { ...reply._doc, isLiked: false };
+    } else {
+      await new Like({ userId, replyId: id }).save();
+
+      const reply = await Reply.findByIdAndUpdate(
+        id,
+        { $inc: { likesCount: 1 } },
+        { new: true }
+      );
+
+      newReply = { ...reply._doc, isLiked: true };
+    }
+
+    res.status(200).json({ reply: newReply, isLiked: !like });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+// ---------------------------------------------------------
+export const whoLikedPost = async (req, res) => {
+  const { page, limit = 5 } = req.query;
+  const { postId } = req.params;
+
+  try {
+    const likes = await Like.find({ postId }).limit(10);
+
+    const users = await Promise.all(
+      likes?.map(async (ele) => {
+        return await User.findById(ele.userId);
+      })
+    );
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// ---------------------------------------------------------
+export const whoLikedComment = async (req, res) => {
+  const { page } = req.query;
+  const { commentId } = req.params;
+
+  try {
+    const likes = await Like.find({ commentId })
+      .populate("userId", "firstName lastName picturePath verified")
+      .limit(10)
+      .skip((page - 1) * 10)
+      .select("userId");
+
+    const extractedUsers = likes.map((ele) => ele.userId);
+
+    res.status(200).json(extractedUsers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// ---------------------------------------------------------
+export const whoLikedReply = async (req, res) => {
+  try {
+    const { page } = req.query;
+    const { replyId } = req.params;
+
+    const users = await Like.find({ replyId })
+      .populate("userId", "firstName lastName picturePath verified")
+      .limit(10)
+      .skip((page - 1) * 10)
+      .select("userId");
+
+    const extractedUsers = users.map((ele) => ele.userId);
+
+    res.status(200).json(extractedUsers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

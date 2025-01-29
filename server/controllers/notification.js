@@ -22,7 +22,7 @@ export const getNotification = async (req, res) => {
 };
 
 export const sendNotification = async (req, res) => {
-  const { senderId, receiverId } = req.params;
+  const { senderId } = req.params;
 
   try {
     const senderData = await User.findById(senderId);
