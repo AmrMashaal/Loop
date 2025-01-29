@@ -29,7 +29,6 @@ import { Link, useNavigate } from "react-router-dom";
 import FriendsRequest from "../widgets/FriendsRequest";
 import NotificationData from "../widgets/NotificationData";
 import socket from "../../components/socket";
-import { debounce } from "lodash";
 
 // eslint-disable-next-line react/prop-types
 const Navbar = ({ isProfile }) => {
@@ -64,7 +63,7 @@ const Navbar = ({ isProfile }) => {
   const friendsRequest = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user?._id}`,
+        `${import.meta.env.VITE_API_URL}/friends/friendRequest/${user._id}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -72,8 +71,9 @@ const Navbar = ({ isProfile }) => {
       );
 
       const data = await response.json();
-      setFriendRequestData(data.friendsRequest);
-      dispatch(setFriendsRequest({ friendsRequestState: data.friendsRequest }));
+
+      setFriendRequestData(data);
+      dispatch(setFriendsRequest({ friendsRequestState: data }));
     } catch (error) {
       console.log(error);
     }
@@ -154,13 +154,6 @@ const Navbar = ({ isProfile }) => {
 
   useEffect(() => {
     friendsRequest();
-    const focusSearch = (event) => {
-      if (event.key === "/") {
-        event.preventDefault();
-        searchRef.current?.focus();
-      }
-    };
-    document.addEventListener("keypress", focusSearch);
 
     const navScroll = () => {
       if (window.scrollY > 77) {
@@ -175,8 +168,6 @@ const Navbar = ({ isProfile }) => {
     }
 
     return () => {
-      document.removeEventListener("keypress", focusSearch);
-
       if (isProfile) {
         document.removeEventListener("scroll", navScroll);
       }
@@ -228,7 +219,7 @@ const Navbar = ({ isProfile }) => {
 
   const disconnectSocket = async () => {
     socket.disconnect();
-   
+
     try {
       await fetch(
         `${import.meta.env.VITE_API_URL}/users/${user._id}/onlineState`,
@@ -256,7 +247,7 @@ const Navbar = ({ isProfile }) => {
       top="-1px"
       left="0"
       width="100%"
-      zIndex="11"
+      zIndex="1111"
       sx={{
         boxShadow:
           isProfile && returnNavColor
