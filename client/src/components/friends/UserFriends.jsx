@@ -1,62 +1,144 @@
 /* eslint-disable react/prop-types */
-import { Box, Typography, Skeleton, Divider } from "@mui/material";
+import { VerifiedOutlined } from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import UserImage from "../UserImage";
-import FlexBetween from "../FlexBetween";
+import ProfileFriendsSkeleton from "../../scenes/skeleton/ProfileFriendsSkeleton";
 
-const UserFriends = ({ userFriends, loading, user, userId }) => {
+const UserFriends = ({
+  userFriends,
+  loading,
+  user,
+  userId,
+  isNonMobileScreens,
+}) => {
   return (
     <Box
       mt="10px"
-      maxHeight="390px"
       overflow="auto"
-      sx={{ scrollbarWidth: "none" }}
+      display="flex"
+      flexWrap="wrap"
+      alignContent="center"
+      justifyContent={
+        loading ||
+        (isNonMobileScreens &&
+          userFriends?.friends?.length < 6 &&
+          userFriends?.friends?.length !== 3)
+          ? "start"
+          : isNonMobileScreens &&
+            (userFriends?.friends?.length === 6 ||
+              userFriends?.friends?.length === 3)
+          ? "center"
+          : !isNonMobileScreens && userFriends?.friends?.length > 2
+          ? "center"
+          : undefined
+      }
+      gap={isNonMobileScreens ? "10px" : "20px"}
+      sx={{
+        scrollbarWidth: "none",
+      }}
     >
       {!loading ? (
-        userFriends && userFriends?.length > 0 ? (
-          userFriends?.map((friend, index) => {
+        userFriends.friends && userFriends?.friends?.length > 0 ? (
+          userFriends?.friends?.map((friend, index) => {
             // i trust in allah, i trust in myself
             return (
-              <Box key={index} mb="15px">
-                <Link to={`/profile/${friend?._id}`}>
-                  <FlexBetween
-                    pb="8px"
-                    sx={{
-                      cursor: "pointer",
-                      ":hover": {
-                        ".usernameFriends": {
-                          marginLeft: "6px",
-                        },
-                      },
-                    }}
+              <Box
+                key={index}
+                mb="15px"
+                className="opacityBox"
+                textAlign="center"
+              >
+                <Link
+                  to={`/profile/${
+                    friend?.sender?._id === userId
+                      ? friend?.receiver?._id
+                      : friend?.sender?._id
+                  }`}
+                >
+                  <Box
+                    display="flex"
+                    gap="12px"
+                    flexDirection="column"
+                    width={isNonMobileScreens ? "116px" : "80px"}
                   >
-                    <Box display="flex" gap="12px" alignItems="center">
-                      <UserImage image={friend?.picturePath} size="55px" />
-                      <Box>
+                    <img
+                      src={
+                        `${import.meta.env.VITE_API_URL}/assets/${
+                          friend?.sender?._id === userId
+                            ? friend?.receiver?.picturePath
+                            : friend?.sender?.picturePath
+                        }` || "/assets/loading-user.png"
+                      }
+                      alt={
+                        friend?.sender?._id === userId
+                          ? friend?.receiver?.picturePath
+                          : friend?.sender?.picturePath
+                      }
+                      style={{
+                        width: "100%",
+                        height: isNonMobileScreens ? "120px" : "80px",
+                        borderRadius: "7px",
+                        objectFit: "cover",
+                      }}
+                    />
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Box display="flex" gap="3px" alignItems="center">
                         <Typography
                           fontSize="14px"
-                          sx={{ transition: ".3s" }}
+                          sx={{
+                            maxWidth: isNonMobileScreens ? "100px" : "60px",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis",
+                            overflow: "hidden",
+                          }}
                           className="usernameFriends"
                         >
-                          {friend?.firstName} {friend?.lastName}
+                          {friend?.sender?._id === userId
+                            ? friend?.receiver?.firstName
+                            : friend?.sender?.firstName}{" "}
+                          {friend?.sender?._id === userId
+                            ? friend?.receiver?.lastName
+                            : friend?.sender?.lastName}
                         </Typography>
-                        <Typography
-                          color="#858585"
-                          whiteSpace="nowrap"
-                          maxWidth="115px"
-                          overflow="hidden"
-                          textOverflow="ellipsis"
-                          fontSize="12px"
-                        >
-                          {friend?.occupation}
-                        </Typography>
+
+                        {friend?.sender?._id === userId
+                          ? friend?.receiver?.verified && (
+                              <VerifiedOutlined
+                                sx={{ fontSize: "18px", color: "#00D5FA" }}
+                              />
+                            )
+                          : friend?.sender?.verified && (
+                              <VerifiedOutlined
+                                sx={{ fontSize: "18px", color: "#00D5FA" }}
+                              />
+                            )}
                       </Box>
+
+                      <Typography
+                        color="#858585"
+                        whiteSpace="nowrap"
+                        overflow="hidden"
+                        textOverflow="ellipsis"
+                        fontSize="12px"
+                        sx={{
+                          maxWidth: isNonMobileScreens ? "100px" : "80px",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {friend?.sender?._id === userId
+                          ? friend?.receiver?.occupation
+                          : friend?.sender?.occupation}
+                      </Typography>
                     </Box>
-                  </FlexBetween>
+                  </Box>
                 </Link>
-                {userFriends?.indexOf(friend) !== userFriends?.length - 1 && (
-                  <Divider />
-                )}
               </Box>
             );
           })
@@ -68,49 +150,7 @@ const UserFriends = ({ userFriends, loading, user, userId }) => {
           </Typography>
         )
       ) : (
-        <Box>
-          <Box
-            display="flex"
-            gap="10px"
-            alignItems="center"
-            mt="-10px"
-            pb="4px"
-          >
-            <Skeleton width="50px" height="80px" sx={{ borderRadius: "50%" }} />
-            <Box>
-              <Skeleton width="100px" />
-              <Skeleton />
-            </Box>
-          </Box>
-          <Divider />
-          <Box
-            display="flex"
-            gap="10px"
-            alignItems="center"
-            mt="-10px"
-            py="4px"
-          >
-            <Skeleton width="50px" height="80px" sx={{ borderRadius: "50%" }} />
-            <Box>
-              <Skeleton width="100px" />
-              <Skeleton />
-            </Box>
-          </Box>
-          <Divider />
-          <Box
-            display="flex"
-            gap="10px"
-            alignItems="center"
-            mt="-10px"
-            py="4px"
-          >
-            <Skeleton width="50px" height="80px" sx={{ borderRadius: "50%" }} />
-            <Box>
-              <Skeleton width="100px" />
-              <Skeleton />
-            </Box>
-          </Box>
-        </Box>
+        <ProfileFriendsSkeleton />
       )}
     </Box>
   );
