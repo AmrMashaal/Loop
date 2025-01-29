@@ -234,6 +234,7 @@ export const occupations = [
   "Digital Artist",
   "Voiceover Artist",
   "IDK",
+  "Engineer",
 ].sort();
 
 export const countries = [
