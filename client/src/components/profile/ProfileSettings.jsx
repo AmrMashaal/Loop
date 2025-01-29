@@ -7,6 +7,7 @@ import {
   IconButton,
   InputLabel,
   MenuItem,
+  Radio,
   Select,
   TextField,
   Typography,
@@ -19,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from "../../../state";
 import { useState } from "react";
 import FlexBetween from "../FlexBetween";
+import { Facebook, Instagram, LinkedIn, X, YouTube } from "@mui/icons-material";
 
 const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
   const [usernameError, setUsernameError] = useState(false);
@@ -36,11 +38,18 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
     firstName: user.firstName,
     lastName: user.lastName,
     username: user.username,
+    gender: user.gender,
+    birthdate: user.birthdate,
     bio: user.bio,
     location: user.location,
     occupation: user.occupation,
     background: "",
     picturePath: "",
+    facebook: user?.links?.facebook || "",
+    instagram: user?.links?.instagram || "",
+    x: user?.links?.x || "",
+    linkedin: user?.links?.linkedin || "",
+    youtube: user?.links?.youtube || "",
   };
 
   const schema = yup.object({
@@ -54,10 +63,34 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
       .string()
       .min(2)
       .max(20)
-      .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters")
-      .required("required"),
+      .matches(
+        /^\p{L}+(\s\p{L}+)*$/u,
+        "You can just add alphabetic characters"
+      ),
     username: yup.string().min(2).max(20).required("required"),
-    bio: yup.string().max(400),
+    gender: yup.string().min(2).max(20).required("required"),
+    birthdate: yup
+      .string()
+      .required("Birthdate is required")
+      .matches(
+        /^\d{4}-\d{2}-\d{2}$/,
+        "Birthdate must be in the format YYYY-MM-DD"
+      )
+      .test("is-valid-date", "Birthdate must be a valid date", (value) => {
+        const date = new Date(value);
+        return !isNaN(date.getTime());
+      })
+      .test(
+        "is-logical-date",
+        "Birthdate must be between 1900 and today",
+        (value) => {
+          const date = new Date(value);
+          const minDate = new Date(1900, 0, 1);
+          const maxDate = new Date();
+          return date >= minDate && date <= maxDate;
+        }
+      ),
+    bio: yup.string().max(101),
     location: yup.string().required("Please select a location"),
     occupation: yup.string().required("Please select a location"),
     background: yup
@@ -80,6 +113,11 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
             ["image/jpeg", "image/png", "image/webp"].includes(value.type))
         );
       }),
+    facebook: yup.string().url(),
+    instagram: yup.string().url(),
+    x: yup.string().url(),
+    linkedin: yup.string().url(),
+    youtube: yup.string().url(),
   });
 
   const handleFormSubmit = async (values) => {
@@ -89,9 +127,16 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
     formData.append("firstName", values.firstName);
     formData.append("lastName", values.lastName);
     formData.append("username", values.username);
+    formData.append("birthdate", values.birthdate);
+    formData.append("gender", values.gender);
     formData.append("bio", values.bio);
     formData.append("location", values.location);
     formData.append("occupation", values.occupation);
+    formData.append("facebook", values.facebook);
+    formData.append("instagram", values.instagram);
+    formData.append("x", values.x);
+    formData.append("linkedin", values.linkedin);
+    formData.append("youtube", values.youtube);
 
     if (values.background) {
       formData.append("picture", values.background);
@@ -120,7 +165,7 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
       if (response.ok) {
         dispatch(setLogin({ user: data, token: token }));
         setUsernameError(false);
-      } else if (data.message) {
+      } else if (data.message === "Username exists") {
         setUsernameError(true);
       }
     } catch (error) {
@@ -198,9 +243,10 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                   fontSize="12px"
                   whiteSpace="nowrap"
                 >
-                  the username is already existed
+                  the username already exists
                 </Typography>
               )}
+
               <TextField
                 label="Bio"
                 multiline
@@ -214,6 +260,67 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                   gridColumn: "span 4",
                 }}
               />
+
+              <Box sx={{ gridColumn: "span 4" }}>
+                <InputLabel>Gender</InputLabel>
+                <Box display="flex" alignItems="center" gap="10px" my="10px">
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap="5px"
+                    p="0 15px 0 20px"
+                    border={`2px solid ${palette.neutral.medium}`}
+                  >
+                    <Typography>Male</Typography>
+
+                    <Radio
+                      name="gender"
+                      value="male"
+                      onChange={handleChange}
+                      error={Boolean(touched.gender) && Boolean(errors.gender)}
+                      labelId="gender-label"
+                      checked={values.gender === "male" ? true : false}
+                    />
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap="5px"
+                    p="0 15px 0 20px"
+                    border={`2px solid ${palette.neutral.medium}`}
+                  >
+                    <Typography>Female</Typography>
+
+                    <Radio
+                      name="gender"
+                      value="female"
+                      onChange={handleChange}
+                      error={Boolean(touched.gender) && Boolean(errors.gender)}
+                      labelId="gender-label"
+                      checked={values.gender === "female" ? true : false}
+                    />
+                  </Box>
+                </Box>
+                {touched.gender && errors.gender && (
+                  <Typography color="error" fontSize="12px" whiteSpace="nowrap">
+                    {errors.gender}
+                  </Typography>
+                )}
+              </Box>
+
+              <TextField
+                label="Birthdate"
+                type="date"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.birthdate}
+                name="birthdate"
+                InputLabelProps={{ shrink: true }}
+                error={Boolean(touched.birthdate) && Boolean(errors.birthdate)}
+                helperText={touched.birthdate && errors.birthdate}
+                sx={{ gridColumn: "span 4", mt: "3px" }}
+              />
+
               <InputLabel id="location-lable" sx={{ mb: "-20px" }}>
                 Location
               </InputLabel>
@@ -385,6 +492,101 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                   {errors.background}
                 </Typography>
               )}
+
+              <TextField
+                label={
+                  <Box display="flex" alignItems="center" gap="5px">
+                    <Facebook />
+                    <Typography>Facebook Link</Typography>
+                  </Box>
+                }
+                multiline
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.facebook}
+                name="facebook"
+                error={Boolean(touched.facebook) && Boolean(errors.facebook)}
+                helperText={touched.facebook && errors.facebook}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+
+              <TextField
+                label={
+                  <Box display="flex" alignItems="center" gap="5px">
+                    <Instagram />
+                    <Typography>Instagram Link</Typography>
+                  </Box>
+                }
+                multiline
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.instagram}
+                name="instagram"
+                error={Boolean(touched.instagram) && Boolean(errors.instagram)}
+                helperText={touched.instagram && errors.instagram}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+
+              <TextField
+                label={
+                  <Box display="flex" alignItems="center" gap="5px">
+                    <LinkedIn />
+                    <Typography>Linkedin Link</Typography>
+                  </Box>
+                }
+                multiline
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.linkedin}
+                name="linkedin"
+                error={Boolean(touched.linkedin) && Boolean(errors.linkedin)}
+                helperText={touched.linkedin && errors.linkedin}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+
+              <TextField
+                label={
+                  <Box display="flex" alignItems="center" gap="5px">
+                    <X />
+                    <Typography>Link</Typography>
+                  </Box>
+                }
+                multiline
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.x}
+                name="x"
+                error={Boolean(touched.x) && Boolean(errors.x)}
+                helperText={touched.x && errors.x}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+
+              <TextField
+                label={
+                  <Box display="flex" alignItems="center" gap="5px">
+                    <YouTube />
+                    <Typography>Youtube Link</Typography>
+                  </Box>
+                }
+                multiline
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.youtube}
+                name="youtube"
+                error={Boolean(touched.youtube) && Boolean(errors.youtube)}
+                helperText={touched.youtube && errors.youtube}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
 
               <Typography
                 p="6px 9px"
