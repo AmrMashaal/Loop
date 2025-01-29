@@ -28,7 +28,7 @@ const PostClick = ({
   verified: initialVerified,
 }) => {
   const [postDetails, setPostDetails] = useState({
-    //  the idea is the state copy the value of the props if it does not have values and change it when fetching is existed
+    //  the idea is the state copy the value of the props if it does not have values and change it when fetching exists
     picturePath: initialPicturePath,
     firstName: initialFirstName,
     lastName: initialLastName,
@@ -39,8 +39,8 @@ const PostClick = ({
     verified: initialVerified,
   });
   const [isDeletedPost, setIsDeletedPost] = useState(false);
-
   const [loading, setLoading] = useState(false);
+  const [postId, setPostId] = useState(null);
 
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
@@ -50,10 +50,11 @@ const PostClick = ({
   const token = useSelector((state) => state.token);
 
   const { id } = useParams();
+
   const location = useLocation();
 
   const handlePostForLink = async () => {
-    if (location.pathname.split("/")[1] === "post") {
+    if (location.pathname.split("/")[1] === "post" && postId) {
       setLoading(true);
 
       setPostDetails({
@@ -69,7 +70,7 @@ const PostClick = ({
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/posts/${id}`,
+          `${import.meta.env.VITE_API_URL}/posts/${postId}`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
@@ -103,34 +104,13 @@ const PostClick = ({
   };
 
   useEffect(() => {
-    handlePostForLink();
+    setPostId(id?.split("-anotherId-")[0]);
   }, [id]);
 
-  const regexTextFunction = () => {
-    if (testBold || testUpper || testComma) {
-      return postDetails.description.slice(1, -1);
-    } else if (testColor && postDetails.description?.length < 180) {
-      return postDetails.description.split(" ").slice(0, -1).join(" ");
-    } else if (postDetails.description?.length > 180 && testColor) {
-      return postDetails.description.split(" ").slice(0, -1).join(" ");
-    } else {
-      return postDetails.description;
-    }
-  };
+  useEffect(() => {
+    handlePostForLink();
+  }, [postId]);
 
-  const regexBold = /^\*.*\*$/;
-  const testBold = regexBold?.test(postDetails.description);
-  // ----------------------------------------------------
-  const regexUpper = /^@.*@$/;
-  const testUpper = regexUpper?.test(postDetails.description);
-  // ----------------------------------------------------
-  const regexComma = /^".*"$/;
-  const testComma = regexComma.test(postDetails.description);
-  // ----------------------------------------------------
-  const regexColor =
-    /\((olive|red|blue|orange|coffee|green|palestine|زيتوني|احمر|ازرق|برتقالي|قهوة|اخضر|قهوه|فلسطين)\)$/i;
-  const testColor = regexColor.test(postDetails.description);
-  // ----------------------------------------------------
   const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const testArabic = regexArabic.test(postDetails.description);
 
@@ -276,14 +256,14 @@ const PostClick = ({
           <Typography
             fontSize="16px"
             lineHeight="27px"
+            my="10px"
             sx={{
               wordWrap: "break-word",
               overflowX: "auto",
               direction: testArabic ? "rtl" : "ltr",
             }}
-            my="10px"
           >
-            {regexTextFunction()}
+            {postDetails?.description}
           </Typography>
 
           <Divider />
@@ -300,7 +280,11 @@ const PostClick = ({
           )}
 
           {postDetails.firstName && !loading && (
-            <Comments _id={postDetails._id} userId={postDetails.userId} />
+            <Comments
+              _id={postDetails._id}
+              userId={postDetails.userId}
+              comIdParam={id?.split("-anotherId-")[1]}
+            />
           )}
 
           {location.pathname.split("/")[1] === "post" && isNonMobileScreens && (

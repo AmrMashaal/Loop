@@ -20,7 +20,7 @@ const WhoLiked = ({ likesLoding, likeList, setShowLikes, setLikeList }) => {
       left="0"
       display="flex"
       alignItems="center"
-      zIndex="111"
+      zIndex="111111111"
       justifyContent="center"
     >
       <Box
@@ -57,27 +57,19 @@ const WhoLiked = ({ likesLoding, likeList, setShowLikes, setLikeList }) => {
         >
           <CloseOutlined />
         </IconButton>
-        {likesLoding ? (
+        {!likesLoding ? (
           <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="100%"
-            height="100%"
             position="absolute"
-            top="50%"
+            top="38%"
             left="50%"
-            sx={{ transform: "translate(-50%,-50%)" }}
+            sx={{ transform: "translate(-50%)" }}
           >
-            <img
-              src={"../../../assets/kOnzy.gif"}
-              alt=""
-              width="87"
-              style={{
-                userSelect: "none",
-                filter: "sepia(1) hue-rotate(127deg)",
-              }}
-            />
+            <Box
+              className="loadingAnimation"
+              width="80px"
+              height="80px"
+              m="10px auto"
+            ></Box>
           </Box>
         ) : likeList.length < 1 ? (
           <Box

@@ -56,10 +56,16 @@ const PostEdited = ({ setIsEdit, image, description, handleEditPost }) => {
           <InputBase
             type="text"
             fullWidth
+            multiline
+            maxRows={10}
             inputRef={inputRef}
             placeholder="What do you want to change?"
             value={editText}
-            onChange={(e) => setEditText(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 1000) setEditText(e.target.value);
+              else if (e.target.value.length > 1000)
+                setEditText(e.target.value.slice(0, 1000));
+            }}
             sx={{
               p: "10px 0",
               width: "100%",

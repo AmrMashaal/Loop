@@ -10,6 +10,8 @@ const DeleteComponent = ({
   setIsDeleteComment,
   handleDeleteComment,
   handleRemoveFriend,
+  setIsDeleteReply,
+  handleDeleteReply,
 }) => {
   const { palette } = useTheme();
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
@@ -24,6 +26,9 @@ const DeleteComponent = ({
     } else if (type === "removeFriend") {
       handleRemoveFriend();
       setIsDelete(false);
+    } else if (type === "reply") {
+      handleDeleteReply();
+      setIsDeleteReply(false);
     }
   };
 
@@ -37,7 +42,7 @@ const DeleteComponent = ({
       display="flex"
       alignItems="center"
       justifyContent="center"
-      zIndex="111"
+      zIndex="1111"
     >
       <Box
         position="absolute"
@@ -98,6 +103,7 @@ const DeleteComponent = ({
               if (type === "post" || type === "removeFriend")
                 setIsDelete(false);
               else if (type === "comment") setIsDeleteComment(false);
+              else if (type === "reply") setIsDeleteReply(false);
             }}
           >
             Close

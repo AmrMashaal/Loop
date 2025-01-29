@@ -12,6 +12,8 @@ const PostImg = ({ setIsPostClicked, setPostClickData, ele }) => {
         cursor: "pointer",
         backgroundColor: "gray",
         userSelect: "none",
+        zIndex: "11",
+        position: "relative"
       }}
       width="100%"
       onClick={() => {

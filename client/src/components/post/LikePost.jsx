@@ -17,6 +17,17 @@ const LikePost = ({
   setPostClickData,
   loading,
 }) => {
+  function formatLikesCount(number) {
+    if (number < 1000) {
+      return number.toString();
+    } else if (number < 1000000) {
+      return (number / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+    } else if (number < 1000000000) {
+      return (number / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+    } else {
+      return (number / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+    }
+  }
 
   return (
     <FlexBetween>
@@ -32,16 +43,18 @@ const LikePost = ({
               <FavoriteBorderOutlined />
             )}
           </IconButton>
+
           <Typography
             sx={{ cursor: "pointer" }}
             onClick={() => {
               setShowLikes(true);
-              whoLikes(ele?.likes);
+              whoLikes(ele?._id);
             }}
           >
-            {ele?.likesCount}
+            {formatLikesCount(ele?.likesCount)}
           </Typography>
         </FlexBetween>
+
         <FlexBetween
           sx={{ cursor: "pointer" }}
           onClick={() => {
@@ -61,8 +74,11 @@ const LikePost = ({
           <IconButton>
             <ChatBubbleOutlineOutlined />
           </IconButton>
+
+          {formatLikesCount(ele?.commentCount)}
         </FlexBetween>
       </FlexBetween>
+
       <IconButton>
         <ShareOutlined />
       </IconButton>
