@@ -58,7 +58,7 @@ li {
 }
 
 .profileContainer {
-  max-width: 1000px;
+  max-width: 1150px;
   margin: 0 auto;
 }
 
@@ -135,4 +135,94 @@ li {
   -moz-transition: 0.3s;
   -ms-transition: 0.3s;
   -o-transition: 0.3s;
+}
+
+.myInputWidget .css-rhrbtd-MuiInputBase-input {
+  text-align: center !important;
+  text-transform: capitalize;
+  position: relative;
+}
+
+.myInputWidget .css-1y6has7-MuiInputBase-input {
+  text-align: center !important;
+  text-transform: capitalize;
+  position: relative;
+}
+
+.postText::before {
+  content: "❝";
+  margin-right: 5px;
+  font-size: 27px;
+}
+
+.postText::after {
+  content: "❞";
+  margin-left: 5px;
+  font-size: 27px;
+}
+
+.myInputWidgetUppercase .css-1y6has7-MuiInputBase-input,
+.myInputWidgetUppercase .css-rhrbtd-MuiInputBase-input {
+  text-transform: uppercase;
+}
+
+.loadingAnimation {
+  animation: loadingAnimation 0.7s linear infinite;
+  -webkit-animation: loadingAnimation 0.7s linear infinite;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border: #00d5fa 4px solid;
+  border-right: transparent 4px solid;
+}
+
+@keyframes loadingAnimation {
+  0% {
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+  }
+}
+
+.linkUnderline {
+  position: relative;
+}
+
+.linkUnderline::before {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #00d5fa;
+  transition: 0.2s;
+  -webkit-transition: 0.2s;
+  -moz-transition: 0.2s;
+  -ms-transition: 0.2s;
+  -o-transition: 0.2s;
+}
+
+.linkUnderline:hover::before {
+  width: 100%;
 }
