@@ -1,5 +1,5 @@
-import { Box, useMediaQuery } from "@mui/system";
-import { useNavigate, useParams } from "react-router-dom";
+import { Box, useMediaQuery, useTheme } from "@mui/system";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../navbar";
 import PostWidget from "../widgets/PostWidget";
 import { useEffect, useState } from "react";
@@ -8,18 +8,20 @@ import PostClick from "../../components/post/PostClick";
 import { debounce } from "lodash";
 import { setLogin, setPosts } from "../../../state";
 import ProfileInfo from "../../components/profile/ProfileInfo";
-import { Typography } from "@mui/material";
+import { Divider, Typography } from "@mui/material";
 import FriendsWidget from "../widgets/FriendsWidget";
 import MyPostWidget from "../widgets/MyPostWidget";
 import PostSkeleton from "../skeleton/PostSkeleton";
 import WrongPassword from "../../components/WrongPassword";
 import socket from "../../components/socket";
+import ProfileFriends from "../../components/friends/ProfileFriends";
+import ProfileAbout from "../../components/profile/ProfileAbout";
 
 const ProfilePage = () => {
-  const { userId } = useParams();
   const [page, setPage] = useState(1);
+  const [postsCount, setPostsCount] = useState(0);
   const [userInfo, setUserInfo] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [profileError, setProfileError] = useState(false);
   const [isPostClicked, setIsPostClicked] = useState(false);
   const [wrongPassword, setWrongPassword] = useState(false);
@@ -33,13 +35,22 @@ const ProfilePage = () => {
     userId: "",
     verified: "",
   });
+
+  const { userId } = useParams();
+
   const posts = useSelector((state) => state.posts);
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const mode = useSelector((state) => state.mode);
+
   const dispatch = useDispatch();
+
+  const { palette } = useTheme();
+
   const isNonMobileScreens = useMediaQuery("(min-width: 1060px)");
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   document.body.style.overflow = isPostClicked ? "hidden" : "unset";
 
@@ -61,10 +72,12 @@ const ProfilePage = () => {
       const newPosts = await response.json();
 
       if (reset) {
-        dispatch(setPosts({ posts: newPosts }));
+        dispatch(setPosts({ posts: newPosts.posts }));
       } else {
-        dispatch(setPosts({ posts: [...posts, ...newPosts] }));
+        dispatch(setPosts({ posts: [...posts, ...newPosts.posts] }));
       }
+
+      setPostsCount(newPosts.count);
     } catch (error) {
       console.log(error);
     } finally {
@@ -87,8 +100,9 @@ const ProfilePage = () => {
   useEffect(() => {
     const handleScroll = debounce(() => {
       if (
-        window.scrollY + window.innerHeight >=
-        document.body.offsetHeight - 3
+        window.scrollY + window.innerHeight >= document.body.offsetHeight - 3 &&
+        !isLoading &&
+        posts.length < postsCount
       ) {
         getMorePosts();
       }
@@ -98,7 +112,7 @@ const ProfilePage = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [postsCount, posts.length]);
 
   const userData = async () => {
     setUserInfo(null);
@@ -191,7 +205,7 @@ const ProfilePage = () => {
         boxShadow="0 0 20px 20px rgb(27 102 176 / 19%)"
         top="-200px"
         left="-172px"
-        zIndex="100"
+        zIndex="10"
         sx={{
           opacity: mode === "light" ? "0.1" : "0.07",
           background:
@@ -208,7 +222,7 @@ const ProfilePage = () => {
         boxShadow="0 0 20px 20px rgb(255 31 198 / 13%)"
         bottom="-200px"
         right="-172px"
-        zIndex="100"
+        zIndex="10"
         sx={{
           opacity: mode === "light" ? "0.1" : "0.1",
           background:
@@ -225,10 +239,7 @@ const ProfilePage = () => {
 
           <Box
             display="flex"
-            gap="10px"
-            justifyContent="space-between"
-            flexDirection={isNonMobileScreens ? "row" : "column"}
-            className="profileContainer"
+            flexDirection="column"
             mt={() => {
               if (!isNonMobileScreens && userInfo?.bio?.length >= 180) {
                 return "482px";
@@ -252,57 +263,148 @@ const ProfilePage = () => {
                 return "310px";
               }
             }}
-            padding="10px"
+            className="profileContainer"
           >
+            <Divider />
+
             <Box
-              width={isNonMobileScreens ? "400px" : "100%"}
-              height="100%"
-              position={isNonMobileScreens ? "sticky" : undefined}
-              top={isNonMobileScreens ? "93px" : undefined}
-              mt={isNonMobileScreens ? undefined : "10px"}
+              m="10px 25px"
+              display="flex"
+              gap="30px"
+              justifyContent={isNonMobileScreens ? "start" : "center"}
             >
-              <FriendsWidget
-                type="friends"
-                userId={userId}
-                description={
-                  userId === user._id ? "my friends" : "user friends"
-                }
-              />
+              <Link to={`/profile/${userId}`}>
+                <Typography
+                  fontSize="18px"
+                  color={
+                    !location.pathname.split("/")[3]
+                      ? "#00D5FA"
+                      : palette.neutral.medium
+                  }
+                  p="3px"
+                  borderBottom={
+                    !location.pathname.split("/")[3] && "3px solid #00D5FA"
+                  }
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                  className="opacityBox"
+                >
+                  Posts
+                </Typography>
+              </Link>
+
+              <Link to={`/profile/${userId}/about`}>
+                <Typography
+                  fontSize="18px"
+                  p="3px"
+                  color={
+                    location.pathname.split("/")[3] === "about"
+                      ? "#00D5FA"
+                      : palette.neutral.medium
+                  }
+                  borderBottom={
+                    location.pathname.split("/")[3] === "about" &&
+                    "3px solid #00D5FA"
+                  }
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                  className="opacityBox"
+                  onClick={() => setPage(1)}
+                >
+                  About
+                </Typography>
+              </Link>
+
+              <Link to={`/profile/${userId}/friends`}>
+                <Typography
+                  fontSize="18px"
+                  p="3px"
+                  color={
+                    location.pathname.split("/")[3] === "friends"
+                      ? "#00D5FA"
+                      : palette.neutral.medium
+                  }
+                  borderBottom={
+                    location.pathname.split("/")[3] === "friends" &&
+                    "3px solid #00D5FA"
+                  }
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                  className="opacityBox"
+                  onClick={() => setPage(1)}
+                >
+                  Friends
+                </Typography>
+              </Link>
             </Box>
 
-            <Box width="100%">
-              {userId === user._id && (
-                <MyPostWidget picturePath={user.picturePath} socket={socket} />
+            <Box
+              display={!location.pathname.split("/")[3] && "flex"}
+              gap="10px"
+              justifyContent="space-between"
+              flexDirection={isNonMobileScreens ? "row" : "column"}
+              padding="10px"
+            >
+              {location.pathname.split("/")[3] === "about" && (
+                <ProfileAbout userParam={userId} userInfo={userInfo} />
               )}
 
-              <Box mt={isNonMobileScreens ? undefined : "-87px"}>
-                <Box zIndex="1" mt={!isNonMobileScreens ? "95px" : "0"}>
-                  {isLoading ? (
-                    <PostSkeleton />
-                  ) : (
-                    <>
-                      <PostWidget
-                        posts={posts}
-                        postClickData={postClickData}
-                        setPostClickData={setPostClickData}
-                        isPostClicked={isPostClicked}
-                        setIsPostClicked={setIsPostClicked}
-                      />
-                      {isPostClicked && (
-                        <PostClick
-                          picturePath={postClickData.picturePath}
-                          firstName={postClickData.firstName}
-                          lastName={postClickData.lastName}
-                          userPicturePath={postClickData.userPicturePath}
-                          description={postClickData.description}
-                          setIsPostClicked={setIsPostClicked}
-                          _id={postClickData._id}
-                          userId={postClickData.userId}
-                          verified={postClickData.verified}
-                        />
-                      )}
-                    </>
-                  )}
+              {location.pathname.split("/")[3] === "friends" && (
+                <ProfileFriends userParam={userId} />
+              )}
+
+              <Box
+                width={isNonMobileScreens ? "730px" : "100%"}
+                height="100%"
+                position={isNonMobileScreens ? "sticky" : undefined}
+                top={isNonMobileScreens ? "93px" : undefined}
+                mt={isNonMobileScreens ? undefined : "10px"}
+              >
+                {!location.pathname.split("/")[3] && (
+                  <FriendsWidget
+                    type="friends"
+                    userId={userId}
+                    description="Friends"
+                    isNonMobileScreens={isNonMobileScreens}
+                  />
+                )}
+              </Box>
+
+              <Box width="100%">
+                {userId === user._id && !location.pathname.split("/")[3] && (
+                  <MyPostWidget
+                    picturePath={user.picturePath}
+                    socket={socket}
+                  />
+                )}
+
+                <Box mt={isNonMobileScreens ? undefined : "-87px"}>
+                  <Box zIndex="1" mt={!isNonMobileScreens ? "95px" : "0"}>
+                    {!location.pathname.split("/")[3] &&
+                      (isLoading ? (
+                        <PostSkeleton />
+                      ) : (
+                        <>
+                          <PostWidget
+                            posts={posts}
+                            postClickData={postClickData}
+                            setPostClickData={setPostClickData}
+                            isPostClicked={isPostClicked}
+                            setIsPostClicked={setIsPostClicked}
+                          />
+                          {isPostClicked && (
+                            <PostClick
+                              picturePath={postClickData.picturePath}
+                              firstName={postClickData.firstName}
+                              lastName={postClickData.lastName}
+                              userPicturePath={postClickData.userPicturePath}
+                              description={postClickData.description}
+                              setIsPostClicked={setIsPostClicked}
+                              _id={postClickData._id}
+                              userId={postClickData.userId}
+                              verified={postClickData.verified}
+                            />
+                          )}
+                        </>
+                      ))}
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -348,7 +450,7 @@ const ProfilePage = () => {
             textTransform="capitalize"
             color="white"
           >
-            this profile is not existed or has been deleted
+            this profile does not exist or has been deleted
             {returnToHome()}
           </Typography>
         </Box>
