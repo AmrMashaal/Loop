@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 
 const likeSchema = new mongoose.Schema({
-  userId: { type: String, required: true }, // we do not have to put user information because we can fetch it after that
-  postId: String,
-  commentId: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
+  postId: { type: mongoose.Schema.Types.ObjectId, ref: "post" },
+  commentId: { type: mongoose.Schema.Types.ObjectId, ref: "comment" },
+  replyId: { type: mongoose.Schema.Types.ObjectId, ref: "reply" },
 });
 
 const Like = mongoose.model("like", likeSchema);

@@ -6,10 +6,11 @@ const userSchema = new mongoose.Schema(
     lastName: { type: String, default: "", min: 2, max: 20 },
     username: { type: String, required: true, unique: true, max: 20 },
     password: { type: String, required: true, min: 8 },
+    gender: { type: String, required: true },
+    birthdate: { type: String, required: true },
     picturePath: { type: String, default: "" },
     background: { type: String, default: "" },
     bio: { type: String, default: "" },
-    friends: { type: Array, default: [] },
     friendsRequest: { type: Array, default: [] },
     verified: { type: Boolean, default: false },
     online: { type: Boolean, default: false },
@@ -18,6 +19,12 @@ const userSchema = new mongoose.Schema(
     notifications: { type: Array, default: [] },
     occupation: String,
     location: String,
+    links: {
+      facebook: String,
+      x: String,
+      instagram: String,
+      linkedin: String,
+    },
   },
   { timestamps: true }
 );
