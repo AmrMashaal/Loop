@@ -22,9 +22,11 @@ import { Link } from "react-router-dom";
 const UserWidget = ({ userId, picturePath }) => {
   const [theUser, setTheUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
-  const { palette } = useTheme();
+  
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+  
+  const { palette } = useTheme();
   const medium = palette.neutral.medium;
 
   const getUser = async () => {

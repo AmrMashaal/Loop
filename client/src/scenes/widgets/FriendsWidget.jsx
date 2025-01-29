@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { setFriends } from "../../../state";
 import OnlineFriends from "../../components/friends/OnlineFriends";
 import UserFriends from "../../components/friends/UserFriends";
+import FlexBetween from "../../components/FlexBetween";
+import { Link } from "react-router-dom";
 
 // eslint-disable-next-line react/prop-types
 const FriendsWidget = ({
@@ -15,56 +17,64 @@ const FriendsWidget = ({
   onlineFriends,
   type,
   setOnlineFriends,
+  isNonMobileScreens,
 }) => {
   const [loading, setLoading] = useState(true);
   const [userFriends, setUserFriends] = useState([]);
+
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
 
   const dispatch = useDispatch();
 
   const handleUserFriend = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}/friends`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
+    if (type === "friends") {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_URL
+          }/friends/${userId}/friends?isProfile=true`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const friends = await response.json();
+
+        if (user._id === userId) {
+          dispatch(setFriends({ friends: friends }));
         }
-      );
 
-      const friends = await response.json();
-
-      if (user._id === userId) {
-        dispatch(setFriends({ friends: friends }));
+        setUserFriends(friends);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
       }
-
-      setUserFriends(friends);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleOnlineFriends = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}/onlineFriends`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    if (type === "onlineFriends") {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/users/${userId}/onlineFriends`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-      const onlineFriends = await response.json();
-      setOnlineFriends(onlineFriends);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+        const onlineFriends = await response.json();
+        setOnlineFriends(onlineFriends);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -78,8 +88,49 @@ const FriendsWidget = ({
 
   return (
     <WidgetWrapper position="sticky" top="87px">
-      <Typography color="#a9a4a4" fontSize="13px" sx={{ userSelect: "none" }}>
-        {description}
+      <FlexBetween>
+        <Typography
+          fontSize={isNonMobileScreens ? "20px" : "16px"}
+          fontWeight="500"
+          sx={{ userSelect: "none", textTransform: "capitalize" }}
+        >
+          {description}
+        </Typography>
+
+        {!loading &&
+          userFriends?.count !== 0 &&
+          description !== "online friends" && (
+            <Link
+              style={{
+                userSelect: "none",
+                textTransform: "capitalize",
+                fontWeight: "500",
+                fontSize: isNonMobileScreens ? "15px" : "14px",
+                color: "#00D5FA",
+              }}
+              className="linkUnderline"
+              to={`/profile/${userId}/friends`}
+            >
+              see all friends
+            </Link>
+          )}
+      </FlexBetween>
+
+      <Typography
+        mt="1px"
+        fontSize={isNonMobileScreens ? "14px" : "12px"}
+        color="#a9a4a4"
+        fontWeight="500"
+        sx={{ userSelect: "none" }}
+      >
+        {!loading &&
+          userFriends?.count !== 0 &&
+          description !== "online friends" &&
+          userFriends?.count}{" "}
+        {!loading &&
+          userFriends?.count !== 0 &&
+          description !== "online friends" &&
+          (userFriends?.count > 1 ? "friends" : "friend")}
       </Typography>
 
       {type === "onlineFriends" && (
@@ -96,7 +147,8 @@ const FriendsWidget = ({
           userFriends={userFriends}
           loading={loading}
           user={user}
-          userId={user._id}
+          userId={userId}
+          isNonMobileScreens={isNonMobileScreens}
         />
       )}
     </WidgetWrapper>

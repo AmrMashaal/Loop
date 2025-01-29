@@ -3,6 +3,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   ImageOutlined,
+  FormatQuote,
 } from "@mui/icons-material";
 import {
   Box,
@@ -12,6 +13,7 @@ import {
   Button,
   IconButton,
   Divider,
+  useMediaQuery,
 } from "@mui/material";
 import Dropzone from "react-dropzone";
 import UserImage from "../../components/UserImage";
@@ -26,29 +28,46 @@ import { Link } from "react-router-dom";
 const MyPostWidget = ({ picturePath, socket }) => {
   const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showColors, setShowColors] = useState(false);
   const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState(null);
   const [post, setPost] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [textAddition, setTextAddition] = useState({ type: "", value: "" });
 
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const posts = useSelector((state) => state.posts);
   const user = useSelector((state) => state.user);
 
+  const isMobileScreens = useMediaQuery("(max-width: 389px)");
+
   const { palette } = useTheme();
+
+  const backgroundColors = [
+    "#a1bb58",
+    "#bb5858",
+    "linear-gradient(to right, #89003054, #007a3342, #00000000)",
+    "#586bbb",
+    "#bb8558",
+    "#906649",
+    "#58bb6b",
+  ];
 
   const handlePost = async (e) => {
     e.preventDefault();
     if (
-      post ||
-      image
+      (post && !loading) ||
+      (image && !loading)
       /* !post.split(" ").some((word) => badWords.includes(word)) */
     ) {
       const formData = new FormData();
       formData.append("userId", _id);
       formData.append("description", post);
+      formData.append("textAddition", JSON.stringify(textAddition));
       setIsError(false);
+      setLoading(true);
 
       if (image) {
         formData.append("picture", image);
@@ -64,65 +83,326 @@ const MyPostWidget = ({ picturePath, socket }) => {
 
         const post = await response.json();
 
-        setPost("");
-        setImage(null);
-        setIsImage(false);
+        if (response.ok) {
+          setPost("");
+          setTextAddition({ type: "", value: "" });
+          setImage(null);
+          setIsImage(false);
 
-        dispatch(setPosts({ posts: [post, ...posts] }));
+          dispatch(setPosts({ posts: [post, ...posts] }));
 
-        socket.emit("newPost", post);
+          socket.emit("newPost", post);
 
-        socket.emit("notifications", {
-          notification: {
-            type: "newPost",
-          },
-          friends: user.friends,
-          _id: user._id,
-          token: token,
-          firstName: user.firstName,
-          postId: post._id,
-        });
+          socket.emit("notifications", {
+            notification: {
+              type: "newPost",
+            },
+            friends: user.friends,
+            _id: user._id,
+            token: token,
+            firstName: user.firstName,
+            postId: post._id,
+          });
+        }
       } catch (err) {
         console.log(`Error: ${err}`);
+      } finally {
+        setLoading(false);
       }
     } else {
       setIsError(true);
-      console.log("You Have to write or upload an image");
     }
   };
+
+  useEffect(() => {
+    if (image) {
+      setTextAddition({ type: "", value: "" });
+    }
+  }, [image]);
 
   useEffect(() => {
     isError && post.length !== 0 && setIsError(false);
   }, [post]);
 
+  document.addEventListener("click", (event) => {
+    const backgroundColorsParent = document.getElementById(
+      "backgroundColorsParent"
+    );
+
+    if (event.target !== backgroundColorsParent) {
+      setShowColors(false);
+    }
+  });
+
+  const testArabic = (description) => {
+    const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+    return regexArabic.test(description);
+  };
+
   return (
     <WidgetWrapper mb="10px">
-      <Box display="flex" alignItems="center" gap="20px">
-        <Link to={`/profile/${_id}`}>
-          <Box sx={{ cursor: "pointer" }}>
-            <UserImage image={picturePath} />
-          </Box>
-        </Link>
+      <Box display="flex" gap="20px">
+        {!post && (
+          <Link to={`/profile/${_id}`}>
+            <Box sx={{ cursor: "pointer" }}>
+              <UserImage image={picturePath} />
+            </Box>
+          </Link>
+        )}
+
         <Box width="100%">
           <form onSubmit={(e) => handlePost(e)}>
             <InputBase
+              multiline // make the input like Textarea
+              maxRows={10}
               type="text"
+              className={`${
+                textAddition.value === "quotation" && "myInputWidget"
+              } ${
+                textAddition.value === "uppercase" && "myInputWidgetUppercase"
+              }`}
               fullWidth
               sx={{
-                bgcolor: palette.neutral.light,
-                borderRadius: "50px",
-                p: "10px 10px 10px 18px",
+                fontWeight: textAddition.value === "bold" && "bold",
+
+                bgcolor:
+                  textAddition.value !== "quotation" && palette.neutral.light,
+                borderRadius:
+                  !post && textAddition.value !== "quotation" && "50px",
+                p: "14px 10px 14px 18px",
+                transition: ".3s",
+                border: textAddition.value === "quotation" && "2px solid ",
+                direction: testArabic(post) && "rtl",
+                "::before": {
+                  content: textAddition.value === "quotation" && "'❝'",
+                  position: "absolute",
+                  fontSize: "20px",
+                  left: "6px",
+                  top: "4px",
+                },
+                "::after": {
+                  content: textAddition.value === "quotation" && "'❞'",
+                  position: "absolute",
+                  fontSize: "20px",
+                  right: "6px",
+                  top: "4px",
+                },
               }}
               placeholder="What is on your mind?"
               value={post}
               onClick={() => isError && setIsError(false)}
-              onChange={(e) => setPost(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 1000) setPost(e.target.value);
+                else if (e.target.value.length > 1000)
+                  setPost(e.target.value.slice(0, 1000));
+              }}
             />
           </form>
 
-          <FlexBetween></FlexBetween>
+          <Box
+            mt="10px"
+            display="flex"
+            justifyContent="space-between"
+            flexWrap="wrap"
+            gap="10px"
+            sx={{ transition: ".3s" }}
+            id="textAdditionsParent"
+          >
+            <Box display="flex" flexWrap="wrap" gap="6px">
+              <Box
+                width="50px"
+                p="2px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                textAlign="center"
+                borderRadius="10px"
+                bgcolor={
+                  textAddition.value === "quotation"
+                    ? "white"
+                    : palette.neutral.light
+                }
+                color={textAddition.value === "quotation" && "black"}
+                sx={{
+                  userSelect: "none",
+                  cursor: "pointer",
+                  outline:
+                    textAddition.value === "quotation" && "1px solid gray",
+                  ":hover": {
+                    outline: "1px solid gray",
+                  },
+                }}
+                onClick={() =>
+                  setTextAddition(
+                    textAddition.value !== "quotation" && !image
+                      ? { type: "text", value: "quotation" }
+                      : { type: "", value: "" }
+                  )
+                }
+                id="quotation"
+              >
+                <FormatQuote
+                  sx={{ transform: "rotate(180deg)", mr: "0 3px" }}
+                />
+                <FormatQuote sx={{ mr: "0 3px" }} />
+              </Box>
+
+              <Box
+                p="2px 6px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                width="50px"
+                textAlign="center"
+                borderRadius="10px"
+                bgcolor={
+                  textAddition.value === "bold"
+                    ? "white"
+                    : palette.neutral.light
+                }
+                color={textAddition.value === "bold" && "black"}
+                fontWeight="bold"
+                sx={{
+                  userSelect: "none",
+                  cursor: "pointer",
+                  outline: textAddition.value === "bold" && "1px solid gray",
+                  ":hover": {
+                    outline: "1px solid gray",
+                  },
+                }}
+                onClick={() =>
+                  setTextAddition(
+                    textAddition.value !== "bold" && !image
+                      ? { type: "text", value: "bold" }
+                      : { type: "", value: "" }
+                  )
+                }
+                id="bold"
+              >
+                Bold
+              </Box>
+
+              <Box
+                p="2px 6px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                textAlign="center"
+                borderRadius="10px"
+                bgcolor={
+                  textAddition.value === "uppercase"
+                    ? "white"
+                    : palette.neutral.light
+                }
+                color={textAddition.value === "uppercase" && "black"}
+                sx={{
+                  userSelect: "none",
+                  cursor: "pointer",
+                  outline:
+                    textAddition.value === "uppercase" && "1px solid gray",
+                  ":hover": {
+                    outline: "1px solid gray",
+                  },
+                }}
+                onClick={() =>
+                  setTextAddition(
+                    textAddition.value !== "uppercase" && !image
+                      ? { type: "text", value: "uppercase" }
+                      : { type: "", value: "" }
+                  )
+                }
+                id="uppercase"
+              >
+                UPPERCASE
+              </Box>
+            </Box>
+
+            <Box position="relative">
+              <Box
+                p="2px 6px"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                textAlign="center"
+                borderRadius="10px"
+                color={
+                  backgroundColors.find(
+                    (color) => color === textAddition.value
+                  ) && "white"
+                }
+                sx={{
+                  userSelect: "none",
+                  cursor: "pointer",
+                  background:
+                    backgroundColors.find(
+                      (color) => color === textAddition.value
+                    ) &&
+                    backgroundColors.find(
+                      (color) => color === textAddition.value
+                    ),
+                  outline:
+                    backgroundColors.find(
+                      (color) => color === textAddition.value
+                    ) && "1px solid gray",
+                  ":hover": {
+                    outline: "1px solid gray",
+                  },
+                }}
+                onClick={() => setShowColors(!showColors)}
+                id="backgroundColorsParent"
+              >
+                background
+              </Box>
+
+              {showColors && (
+                <Box
+                  width="200px"
+                  position="absolute"
+                  top="35px"
+                  left={!isMobileScreens && "9%"}
+                  display="flex"
+                  gap="10px"
+                  bgcolor={palette.neutral.light}
+                  zIndex="1"
+                  flexWrap="wrap"
+                  justifyContent="center"
+                  padding="13px"
+                  borderRadius="9px"
+                  sx={{ transform: !isMobileScreens && "translateX(-50%)" }}
+                >
+                  {backgroundColors?.map((color, index) => {
+                    return (
+                      <Box
+                        key={index}
+                        sx={{
+                          background: color,
+                          cursor: "pointer",
+                          outline:
+                            textAddition.value === color &&
+                            `3px solid ${palette.primary.main}`,
+                          ":hover": {
+                            outline: `2px dashed ${palette.primary.main}`,
+                          },
+                        }}
+                        p="14px"
+                        borderRadius="5px"
+                        onClick={() =>
+                          setTextAddition(
+                            textAddition.value !== color && !image
+                              ? { type: "color", value: color }
+                              : { type: "", value: "" }
+                          )
+                        }
+                      ></Box>
+                    );
+                  })}
+                </Box>
+              )}
+            </Box>
+          </Box>
         </Box>
       </Box>
+
       {isError && (
         <Typography color="error" mt="8px" ml="20px">
           You have to write or share a photo
@@ -223,7 +503,18 @@ const MyPostWidget = ({ picturePath, socket }) => {
           <Typography>Image</Typography>
         </FlexBetween>
         <Button onClick={handlePost} type="submit">
-          Share
+          {loading ? (
+            <Box display="flex" gap="4px">
+              loading
+              <Box
+                className="loadingAnimation"
+                width="20px"
+                height="20px"
+              ></Box>
+            </Box>
+          ) : (
+            "Share"
+          )}
         </Button>
       </FlexBetween>
     </WidgetWrapper>

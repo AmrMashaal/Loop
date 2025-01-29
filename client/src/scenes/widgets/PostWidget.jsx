@@ -1,9 +1,8 @@
 /* eslint-disable react/prop-types */
-import { Divider, IconButton, Typography } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 import {
   VerifiedOutlined,
   MoreHoriz,
-  FormatQuote,
   PushPinOutlined,
 } from "@mui/icons-material";
 import { Box, useMediaQuery, useTheme } from "@mui/system";
@@ -23,6 +22,7 @@ import PostImg from "../../components/post/PostImg";
 import PostEdited from "../../components/post/PostEdited";
 import PostSkeleton from "../skeleton/PostSkeleton";
 import socket from "../../components/socket";
+import DOMPurify from "dompurify";
 
 const PostWidget = ({
   posts,
@@ -30,7 +30,6 @@ const PostWidget = ({
   isPostClicked,
   setIsPostClicked,
   postLoading,
-  // socket,
 }) => {
   const [showLikes, setShowLikes] = useState(false);
   const [likesLoding, setLikesLoding] = useState(false);
@@ -38,21 +37,21 @@ const PostWidget = ({
   const [isDelete, setIsDelete] = useState(false);
   const [isDots, setIsDots] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [postInfo, setPostInfo] = useState({ postId: null, userId: null });
+  const [likeList, setLikeList] = useState([]);
   const [clickLikeLoading, setClickLikeLoading] = useState({
     postId: null,
     loading: false,
   });
-  const [postInfo, setPostInfo] = useState({ postId: null, userId: null });
-  const [likeList, setLikeList] = useState([]);
 
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
 
-  const token = useSelector((state) => state.token);
-  const mode = useSelector((state) => state.mode);
-  const user = useSelector((state) => state.user);
-
   const dispatch = useDispatch();
+
+  const token = useSelector((state) => state.token);
+  const user = useSelector((state) => state.user);
+  const mode = useSelector((state) => state.mode);
 
   const location = useLocation();
 
@@ -63,228 +62,60 @@ const PostWidget = ({
       ? "hidden"
       : "unset";
 
-  // const convertTextLink = (text) => {
-  //   const urlPattern = /(https?:\/\/[^\s]+)/g;
-  //   return text.replace(urlPattern, (url) => {
-  //     return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
-  //   });
-  // };
+  const convertTextLink = (text) => {
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
 
-  const howIsText = (text, img) => {
-    if (!img && text?.length < 30) return "24px";
+    text = text.replace(urlPattern, (url) => {
+      return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
+    });
+
+    return text;
+  };
+
+  const howIsText = (text, img, txtad) => {
+    if (!img && text?.length < 50 && txtad?.type !== "color") return "24px";
+    else if (txtad?.value === "quotation" && text?.length < 100) return "24px";
+    else if (
+      txtad?.type === "color" &&
+      text?.length < 100 &&
+      isNonMobileScreens
+    )
+      return "26px";
+    else if (
+      txtad?.type === "color" &&
+      text?.length < 100 &&
+      !isNonMobileScreens
+    )
+      return "19px";
+    else if (
+      txtad?.type === "color" &&
+      text?.length > 100 &&
+      isNonMobileScreens
+    )
+      return "19px";
+    else if (
+      txtad?.type === "color" &&
+      text?.length > 100 &&
+      !isNonMobileScreens
+    )
+      return "15px";
     else return "15px";
   };
 
-  const isMore = (
-    firstName,
-    lastName,
-    picturePath,
-    userPicturePath,
-    description,
-    _id,
-    userId,
-    verified
-  ) => {
-    const handleText =
-      description?.length > 180 ? description.slice(0, 180) : description;
-    // ----------------------------------------------------
-    const regexBold = /^\*.*\*$/;
-    const testBold = regexBold?.test(description);
-    // ----------------------------------------------------
-    const regexUpper = /^@.*@$/;
-    const testUpper = regexUpper?.test(description);
-    // ----------------------------------------------------
-    const regexAll = /^(@\*.*\*@|\*@.*@\*)$/;
-    const testAll = regexAll.test(description);
-    // ----------------------------------------------------
-    const regexPalestine = /#(free_palestine|palestine|فلسطين)\b/i;
-    const testPalestine = regexPalestine.test(description);
-    // ----------------------------------------------------
-    const regexComma = /^".*"$/;
-    const testComma = regexComma.test(description);
-    // ----------------------------------------------------
-    const regexColor =
-      /\((olive|red|blue|orange|coffee|green|palestine|زيتوني|احمر|ازرق|برتقالي|قهوة|اخضر|قهوه|فلسطين)\)$/i;
-    const testColor = regexColor.test(description);
-    // ----------------------------------------------------
-    const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
-    const testArabic = regexArabic.test(description);
-
-    const regexTextFunction = () => {
-      if (testBold || testUpper || testComma) {
-        return handleText.slice(1, -1);
-      } else if (testColor && description?.length < 180) {
-        return description?.split(" ").slice(0, -1).join(" ");
-      } else if (description?.length > 180 && testColor) {
-        return handleText.split(" ").slice(0, -1).join(" ");
-      } else {
-        return handleText;
-      }
-    };
-
-    const backgroundFunction = () => {
-      if (testPalestine && !testColor && !testComma) {
-        return `linear-gradient(${
-          mode === "dark"
-            ? "to right, #89003054, #007a3342, #00000000"
-            : "to right, #8900301c, #007a332b, #00000000"
-        })`;
-      } else if (
-        (testColor && description?.split(" ").includes("(olive)")) ||
-        (testColor && description?.split(" ").includes("(زيتوني)"))
-      ) {
-        return "#a1bb58";
-      } else if (
-        (testColor && description?.split(" ").includes("(red)")) ||
-        (testColor && description?.split(" ").includes("(احمر)"))
-      ) {
-        return "#bb5858";
-      } else if (
-        (testColor && description?.split(" ").includes("(blue)")) ||
-        (testColor && description?.split(" ").includes("(ازرق)"))
-      ) {
-        return "#586bbb";
-      } else if (
-        (testColor && description?.split(" ").includes("(orange)")) ||
-        (testColor && description?.split(" ").includes("(برتقالي)"))
-      ) {
-        return "#bb8558";
-      } else if (
-        (testColor && description?.split(" ").includes("(coffee)")) ||
-        (testColor && description?.split(" ").includes("(قهوة)")) ||
-        (testColor && description?.split(" ").includes("(قهوه)"))
-      ) {
-        return "#906649";
-      } else if (
-        (testColor && description?.split(" ").includes("(green)")) ||
-        (testColor && description?.split(" ").includes("(اخضر)"))
-      ) {
-        return "#58bb6b";
-      } else if (
-        (testColor && description?.split(" ").includes("(palestine)")) ||
-        (testColor && description?.split(" ").includes("(فلسطين)"))
-      ) {
-        return `linear-gradient(${
-          mode === "dark"
-            ? "to right, #89003054, #007a3342, #00000000"
-            : "to right, #890000b8, #007a33f2, #000000f0"
-        })`;
-      }
-    };
-
-    const regexPadding = () => {
-      if (testPalestine && !testColor) {
-        return "8px";
-      } else if (testComma) {
-        return "10px";
-      } else if (
-        testColor &&
-        description?.length <= 180 &&
-        isNonMobileScreens
-      ) {
-        return "180px 50px";
-      } else if (testColor && description?.length <= 180) {
-        return "150px 50px";
-      } else if (
-        testColor &&
-        description?.length > 180 &&
-        !isNonMobileScreens
-      ) {
-        return "70px 15px";
-      } else if (testColor && description?.length > 180 && isNonMobileScreens) {
-        return "180px 20px";
-      }
-    };
-
-    const regexBorderRadius = () => {
-      if (testPalestine && !testColor) {
-        return "16px 0 0 0";
-      } else if (testColor) {
-        return "0.75rem";
-      }
-    };
-
-    return (
-      <Typography
-        mt={picturePath ? "10px" : "14px"}
-        sx={{
-          wordBreak: "break-word",
-          fontWeight: testBold || testAll || testComma ? "bold" : undefined,
-          textTransform: testUpper || testAll ? "uppercase" : undefined,
-          background: backgroundFunction(),
-          padding: regexPadding(),
-          borderRadius: regexBorderRadius(),
-          fontSize:
-            (testColor && !picturePath) || (testComma && !picturePath)
-              ? "24px"
-              : howIsText(description, picturePath),
-          textAlign:
-            (testComma && !picturePath) || testColor ? "center" : undefined,
-          color: testColor ? "white" : undefined,
-          lineHeight: testColor ? "33px" : undefined,
-          direction: testArabic && !testComma && !testColor ? "rtl" : "ltr",
-        }}
-        fontSize={howIsText(description, picturePath)}
-      >
-        {testComma && (
-          <FormatQuote sx={{ transform: "rotate(180deg)", mr: "3px" }} />
-        )}
-        {regexTextFunction()}
-        {testComma && description?.length <= 180 && (
-          <FormatQuote sx={{ ml: "3px" }} />
-        )}
-        {description?.length > 180 && (
-          <span
-            style={{
-              fontWeight: "600",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
-            onClick={() => {
-              setIsPostClicked(true),
-                setPostClickData({
-                  firstName,
-                  lastName,
-                  picturePath,
-                  userPicturePath,
-                  description,
-                  _id,
-                  userId,
-                  verified,
-                });
-            }}
-          >
-            ...more
-          </span>
-        )}
-        {testComma && (
-          <Divider
-            sx={{ m: "10px auto 0", width: "300px", maxWidth: "100%" }}
-          />
-        )}
-      </Typography>
-    );
-  };
-
-  const whoLikes = async (likes) => {
+  const whoLikes = async (postId) => {
     setLikesLoding(true);
     try {
-      const usersWhoLiked = await Promise.all(
-        likes.map(async (userId) => {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/users/${userId}`,
-            {
-              method: "GET",
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          const user = await response.json();
-          return user;
-        })
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/likes/${postId}/post`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
 
-      setLikeList(usersWhoLiked);
+      const users = await response.json();
+
+      setLikeList(users);
     } catch (error) {
       console.log(error);
     } finally {
@@ -417,12 +248,30 @@ const PostWidget = ({
     }
   };
 
+  const testArabic = (description) => {
+    const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+    return regexArabic.test(description);
+  };
+
+  const escapeHtml = (str) => {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
   // eslint-disable-next-line react/prop-types
   return (
     <>
       {!postLoading ? (
         <>
           {posts?.map((ele, index) => {
+            const textAddition = ele?.textAddition
+              ? JSON.parse(ele?.textAddition)
+              : "";
+
             return (
               <WidgetWrapper mb="10px" key={index}>
                 <FlexBetween>
@@ -487,14 +336,116 @@ const PostWidget = ({
                   )}
                 </FlexBetween>
 
-                {isMore(
-                  ele.firstName,
-                  ele.lastName,
-                  ele.picturePath,
-                  ele.userPicturePath,
-                  ele.description,
-                  ele._id
-                )}
+                <Box
+                  border={textAddition?.value === "quotation" && "2px solid "}
+                  p={textAddition?.value === "quotation" && "15px"}
+                  m={
+                    textAddition?.value === "quotation"
+                      ? "15px 0 8px"
+                      : ele?.picturePath && ele?.description
+                      ? "10px 0 0"
+                      : ele?.description && !ele?.picturePath
+                      ? "14px 00 0"
+                      : undefined
+                  }
+                  textAlign={
+                    (textAddition?.value === "quotation" ||
+                      textAddition.type === "color") &&
+                    "center"
+                  }
+                  sx={{
+                    p: textAddition.type === "color" && "160px 25px",
+                    background:
+                      textAddition.type === "color" && textAddition.value,
+                    cursor: textAddition.type === "color" && "pointer",
+                  }}
+                  onClick={() => {
+                    if (textAddition?.type === "color") {
+                      setIsPostClicked(true),
+                        setPostClickData({
+                          firstName: ele?.firstName,
+                          lastName: ele?.lastName,
+                          picturePath: ele?.picturePath,
+                          userPicturePath: ele?.userPicturePath,
+                          description: ele?.description,
+                          _id: ele?._id,
+                          userId: ele?.userId,
+                          verified: ele?.verified,
+                        });
+                    }
+                  }}
+                >
+                  <Typography
+                    position="relative"
+                    fontWeight={textAddition?.value === "bold" && "bold"}
+                    fontSize={howIsText(
+                      ele?.description,
+                      ele?.picturePath,
+                      textAddition
+                    )}
+                    color={
+                      textAddition?.value ===
+                        "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
+                      mode === "light" &&
+                      "black"
+                    }
+                    textTransform={
+                      textAddition?.value === "quotation"
+                        ? "capitalize"
+                        : textAddition?.value === "uppercase"
+                        ? "uppercase"
+                        : undefined
+                    }
+                    sx={{
+                      wordBreak: "break-word",
+                      direction: testArabic(ele?.description) && "rtl",
+                      textAlign: textAddition.type === "color",
+                      p: textAddition?.value === "quotation" && "25px",
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(
+                        escapeHtml(
+                          convertTextLink(
+                            ele?.description?.length > 180
+                              ? ele?.description.slice(0, 179)
+                              : ele?.description
+                          )
+                        ),
+                        {
+                          ADD_ATTR: ["target", "rel"],
+                        }
+                      ),
+                    }}
+                    className={
+                      textAddition?.value === "quotation" && "postText"
+                    }
+                  />
+
+                  {ele?.description?.length > 180 && (
+                    <span
+                      style={{
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        userSelect: "none",
+                      }}
+                      onClick={() => {
+                        setIsPostClicked(true),
+                          setPostClickData({
+                            firstName: ele?.firstName,
+                            lastName: ele?.lastName,
+                            picturePath: ele?.picturePath,
+                            userPicturePath: ele?.userPicturePath,
+                            description: ele?.description,
+                            _id: ele?._id,
+                            userId: ele?.userId,
+                            verified: ele?.verified,
+                          });
+                      }}
+                    >
+                      ...more
+                    </span>
+                  )}
+                </Box>
 
                 {ele.picturePath && (
                   <PostImg
@@ -527,7 +478,7 @@ const PostWidget = ({
               display="flex"
               alignItems="center"
               justifyContent="center"
-              zIndex="111"
+              zIndex="11111"
             >
               <Box
                 position="absolute"
@@ -538,6 +489,7 @@ const PostWidget = ({
                 }}
                 bgcolor="#00000066"
               ></Box>
+
               <Box
                 bgcolor={palette.neutral.light}
                 p="10px 28px"

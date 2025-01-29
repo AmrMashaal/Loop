@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import TasksComponent from "../../components/TasksComponent";
 import FlexBetween from "../../components/FlexBetween";
 import UserImage from "../../components/UserImage";
@@ -8,7 +8,6 @@ import { Box } from "@mui/system";
 import { Button, Typography } from "@mui/material";
 import { VerifiedOutlined } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-import { setFriends, setFriendsRequest } from "../../../state";
 
 // eslint-disable-next-line react/prop-types
 const FriendsRequest = ({
@@ -18,114 +17,50 @@ const FriendsRequest = ({
   setIsMobileMenuToggled,
   setFriendRequestData,
 }) => {
-  const [requestLoading, setRequestLoading] = useState(true);
-  const [requestList, setRequestList] = useState([]);
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const dispatch = useDispatch();
-
-  const friendsRequestInfo = async () => {
-    setRequestLoading(true);
-    try {
-      const requests = await Promise.all(
-        friendsRequestData?.map(async (userId) => {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/users/${userId}`,
-            {
-              method: "GET",
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          const user = await response.json();
-          if (!user.message) {
-            return user;
-          } else {
-            return;
-          }
-        })
-      );
-
-      setRequestList(requests);
-      dispatch(setFriendsRequest({ friendsRequestState: friendsRequestData }));
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setRequestLoading(false);
-    }
-  };
-
-  // -------------------------------------------------------
-  const friendsRequest = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user?._id}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      const data = await response.json();
-      setFriendRequestData(data.friendsRequest);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // -------------------------------------------------------
-  useEffect(() => {
-    friendsRequest();
-  }, []);
-
-  // -------------------------------------------------------
-  useEffect(() => {
-    friendsRequestInfo();
-  }, [friendsRequestData]);
 
   // -------------------------------------------------------
   const acceptFriend = async (friendId) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user?._id}/${friendId}/accept`,
+        `${import.meta.env.VITE_API_URL}/friends/${friendId}/accept`,
         {
           method: "PATCH",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setRequestList(
-        requestList.filter((request) => {
-          return request?._id !== friendId;
-        })
-      );
-
-      const friends = await response.json();
-      setFriendRequestData(friends.friendsRequest);
-      dispatch(setFriends({ friends: friends }));
-      friendsRequest();
+      if (response.ok) {
+        setFriendRequestData((prev) =>
+          prev.filter((ele) => {
+            return ele._id !== friendId;
+          })
+        );
+      }
     } catch (error) {
       console.log(error);
     }
   };
   // -------------------------------------------------------
+
   const refuseFriend = async (friendId) => {
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user?._id}/${friendId}/refuse`,
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${friendId}`,
         {
-          method: "PATCH",
+          method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setRequestList(
-        requestList.filter((request) => {
-          return request?._id !== friendId;
-        })
-      );
-
-      friendsRequest();
+      if (response.ok) {
+        setFriendRequestData((prev) =>
+          prev.filter((ele) => {
+            return ele._id !== friendId;
+          })
+        );
+      }
     } catch (error) {
       console.log(error);
     }
@@ -137,8 +72,9 @@ const FriendsRequest = ({
       setOpen={setOpenRequests}
       description="Friend Request"
     >
-      {requestList.length !== 0 &&
-        requestList?.map((request) => {
+      {friendsRequestData.length !== 0 &&
+        friendsRequestData?.map((request) => {
+          console.log(request);
           if (request?._id === undefined) {
             return;
           }
@@ -216,7 +152,7 @@ const FriendsRequest = ({
             </Box>
           );
         })}
-      {requestList.length === 0 && !requestLoading && (
+      {friendsRequestData.length === 0 && (
         <Box
           display="flex"
           justifyContent="center"

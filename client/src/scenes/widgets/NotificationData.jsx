@@ -9,10 +9,13 @@ import {
   FavoriteOutlined,
   MessageOutlined,
   Newspaper,
+  Comment,
+  Reply,
 } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 import { useEffect } from "react";
 import { debounce } from "lodash";
+import _ from "lodash";
 
 const NotificationData = ({
   openNotification,
@@ -127,15 +130,16 @@ const NotificationData = ({
       )}
 
       {notificationsState?.length > 0 &&
-        notificationsState?.map((ntf) => {
+        _.uniqBy(notificationsState, "linkId")?.map((ntf) => {
           return (
             <Link
               to={
                 ntf?.type === "message"
-                  ? `/chat/${ntf?.linkId}`
+                  ? `/chat/${ntf?.link}`
                   : ntf?.type === "newPost" ||
                     ntf?.type === "like" ||
-                    ntf?.type === "comment"
+                    ntf?.type === "comment" ||
+                    ntf?.type === "reply"
                   ? `/post/${ntf?.linkId}`
                   : ""
               }
@@ -175,6 +179,36 @@ const NotificationData = ({
 
                   {ntf?.type === "newPost" && (
                     <Newspaper
+                      sx={{
+                        position: "absolute",
+                        bottom: "-4px",
+                        right: "0",
+                        fontSize: "27px",
+                        color: "white",
+                        bgcolor: "#0095fa",
+                        borderRadius: "50%",
+                        p: "4px",
+                      }}
+                    />
+                  )}
+
+                  {ntf?.type === "comment" && (
+                    <Comment
+                      sx={{
+                        position: "absolute",
+                        bottom: "-4px",
+                        right: "0",
+                        fontSize: "27px",
+                        color: "white",
+                        bgcolor: "#7000ff",
+                        borderRadius: "50%",
+                        p: "4px",
+                      }}
+                    />
+                  )}
+
+                  {ntf?.type === "reply" && (
+                    <Reply
                       sx={{
                         position: "absolute",
                         bottom: "-4px",
