@@ -187,7 +187,13 @@ const SearchThings = ({
                             alignItems="center"
                             gap="2px"
                           >
-                            <Typography fontSize="17px">
+                            <Typography
+                              fontSize="17px"
+                              width="90px"
+                              whiteSpace="nowrap"
+                              overflow="hidden"
+                              textOverflow="ellipsis"
+                            >
                               {user.firstName} {user.lastName}
                             </Typography>
                             {user.verified && (
