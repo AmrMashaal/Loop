@@ -29,7 +29,7 @@ const TasksComponent = ({ children, open, setOpen, description, id = "" }) => {
       left="0"
       display="flex"
       alignItems="center"
-      zIndex="1111"
+      zIndex="11111"
       justifyContent="center"
     >
       <Box

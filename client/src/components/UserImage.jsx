@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useTheme } from "@emotion/react";
-import { Box } from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -46,15 +46,17 @@ const UserImage = ({
       />
 
       {isOnline && user?._id !== userId && (
-        <Box
-          bgcolor="#00D5FA"
-          width={isProfile ? "15px" : "10px"}
-          height={isProfile ? "15px" : "10px"}
-          borderRadius="50%"
-          position="absolute"
-          bottom="0"
-          right={isProfile ? "5px" : "3px"}
-        ></Box>
+        <Tooltip arrow placement="top" title="Online">
+          <Box
+            bgcolor="#00D5FA"
+            width={isProfile ? "15px" : "10px"}
+            height={isProfile ? "15px" : "10px"}
+            borderRadius="50%"
+            position="absolute"
+            bottom="0"
+            right={isProfile ? "5px" : "3px"}
+          ></Box>
+        </Tooltip>
       )}
     </Box>
   );
