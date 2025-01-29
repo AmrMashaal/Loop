@@ -10,6 +10,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Radio,
 } from "@mui/material";
 import EditOutLinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
@@ -46,6 +47,28 @@ const registerSchema = yup.object().shape({
       (value) =>
         value && ["image/jpeg", "image/png", "image/webp"].includes(value.type)
     ),
+  gender: yup.string().required("required"),
+  birthdate: yup
+    .string()
+    .required("required")
+    .matches(
+      /^\d{4}-\d{2}-\d{2}$/,
+      "Birthdate must be in the format YYYY-MM-DD"
+    )
+    .test("is-valid-date", "Birthdate must be a valid date", (value) => {
+      const date = new Date(value);
+      return !isNaN(date.getTime());
+    })
+    .test(
+      "is-logical-date",
+      "Birthdate must be between 1900 and today",
+      (value) => {
+        const date = new Date(value);
+        const minDate = new Date(1900, 0, 1);
+        const maxDate = new Date();
+        return date >= minDate && date <= maxDate;
+      }
+    ),
 });
 
 const loginSchema = yup.object().shape({
@@ -61,6 +84,8 @@ const initialValuesRegister = {
   location: "",
   occupation: "",
   picture: "",
+  gender: "",
+  birthdate: "",
 };
 
 const initialValuesLogin = {
@@ -133,11 +158,14 @@ const Form = () => {
         formData.append(value, values[value]);
       }
 
-      const loggedInResponse = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
+      const loggedInResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        }
+      );
 
       const loggedIn = await loggedInResponse.json();
 
@@ -245,7 +273,7 @@ const Form = () => {
 
               {dataExisted.username && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  this username is already existed
+                  this username already exists
                 </Typography>
               )}
 
@@ -308,6 +336,66 @@ const Form = () => {
                   gridColumn: "span 4",
                 }}
               />
+              <Box sx={{ gridColumn: "span 4" }}>
+                <InputLabel>Gender</InputLabel>
+                <Box display="flex" alignItems="center" gap="10px" my="10px">
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap="5px"
+                    p="0 15px 0 20px"
+                    border={`2px solid ${palette.neutral.medium}`}
+                  >
+                    <Typography>Male</Typography>
+
+                    <Radio
+                      name="gender"
+                      value="male"
+                      onChange={handleChange}
+                      error={Boolean(touched.gender) && Boolean(errors.gender)}
+                      labelId="gender-label"
+                      checked={values.gender === "male" ? true : false}
+                    />
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap="5px"
+                    p="0 15px 0 20px"
+                    border={`2px solid ${palette.neutral.medium}`}
+                  >
+                    <Typography>Female</Typography>
+
+                    <Radio
+                      name="gender"
+                      value="female"
+                      onChange={handleChange}
+                      error={Boolean(touched.gender) && Boolean(errors.gender)}
+                      labelId="gender-label"
+                      checked={values.gender === "female" ? true : false}
+                    />
+                  </Box>
+                </Box>
+                {touched.gender && errors.gender && (
+                  <Typography color="error" fontSize="12px" whiteSpace="nowrap">
+                    {errors.gender}
+                  </Typography>
+                )}
+              </Box>
+
+              <TextField
+                label="Birthdate"
+                type="date"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.birthdate}
+                name="birthdate"
+                InputLabelProps={{ shrink: true }}
+                error={Boolean(touched.birthdate) && Boolean(errors.birthdate)}
+                helperText={touched.birthdate && errors.birthdate}
+                sx={{ gridColumn: "span 4", mt: "3px" }}
+              />
+
               <InputLabel id="location-lable">Location</InputLabel>
               <Select
                 name="location"
@@ -397,7 +485,7 @@ const Form = () => {
               />
               {loginError.username && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  the username is not existed
+                  the username does not exist
                 </Typography>
               )}
               <TextField
@@ -419,6 +507,18 @@ const Form = () => {
                 </Typography>
               )}
             </Box>
+          )}
+
+          {location.pathname === "/signup" && (
+            <Typography
+              color={palette.neutral.medium}
+              fontSize="12px"
+              mt=".75rem"
+              mb="-.45rem"
+              sx={{ userSelect: "none" }}
+            >
+              You can change all of your information later
+            </Typography>
           )}
 
           {/* Button */}
