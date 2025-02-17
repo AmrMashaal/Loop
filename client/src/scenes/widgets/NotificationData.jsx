@@ -15,6 +15,7 @@ import {
 import { useTheme } from "@emotion/react";
 import { useEffect } from "react";
 import { debounce } from "lodash";
+import { useSelector } from "react-redux";
 import _ from "lodash";
 
 const NotificationData = ({
@@ -26,6 +27,8 @@ const NotificationData = ({
 }) => {
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
+
+  const user = useSelector((state) => state.user);
 
   const timeAgo = (postDate) => {
     const timeNow = new Date();
@@ -135,7 +138,7 @@ const NotificationData = ({
             <Link
               to={
                 ntf?.type === "message"
-                  ? `/chat/${ntf?.link}`
+                  ? `/chat/${ntf?.linkId}`
                   : ntf?.type === "newPost" ||
                     ntf?.type === "like" ||
                     ntf?.type === "comment" ||
@@ -149,7 +152,13 @@ const NotificationData = ({
             >
               <Box display="flex" alignItems="center" gap="10px" my="5px">
                 <Box position="relative">
-                  <UserImage image={ntf?.picturePath} />
+                  <UserImage
+                    image={
+                      ntf?.senderId === user._id
+                        ? ntf?.receiverId?.picturePath
+                        : ntf?.senderId?.picturePath
+                    }
+                  />
                   {ntf?.type === "like" && (
                     <FavoriteOutlined
                       sx={{

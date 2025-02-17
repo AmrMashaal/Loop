@@ -3,20 +3,18 @@ import Navbar from "../navbar";
 import SearchThings from "../../components/search/SearchThings";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "../../../state";
+import { useSelector } from "react-redux";
 import WrongPassword from "../../components/WrongPassword";
 
 const SearchPage = () => {
-  const [type, setType] = useState("users");
-  const [data, setData] = useState([]);
+  const [type, setType] = useState("user");
+  const [users, setUsers] = useState({});
+  const [posts, setPosts] = useState({});
   const [loading, setLoading] = useState(true);
   const [wrongPassword, setWrongPassword] = useState(false);
   const [page, setPage] = useState(1);
 
   const controllerRef = useRef(null);
-  const dispatch = useDispatch();
-  const posts = useSelector((state) => state.posts);
 
   const { searchValue } = useParams();
   const encodedSearch = encodeURIComponent(searchValue);
@@ -40,7 +38,7 @@ const SearchPage = () => {
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL
-        }/search/${type}/${encodedSearch}?page=${page}`,
+        }/search/${type}s/${encodedSearch}?page=${page}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -50,19 +48,35 @@ const SearchPage = () => {
 
       const dataResponsed = await response.json();
 
-      if (type === "posts") {
+      if (type === "post") {
         if (reset) {
-          dispatch(setPosts({ posts: dataResponsed }));
+          setPosts(dataResponsed);
         } else {
-          dispatch(setPosts({ posts: [...posts, ...dataResponsed] }));
+          setPosts((prevPosts) => {
+            return {
+              data: [...prevPosts.data, ...dataResponsed.data],
+              count: dataResponsed.count,
+            };
+          });
         }
-      } else if (type === "users") {
-        setData((prevData) => [
-          ...prevData,
-          ...dataResponsed.filter((user) => {
-            return !prevData.some((oldUser) => oldUser._id === user._id);
-          }),
-        ]);
+      } else if (type === "user") {
+        if (reset) {
+          setUsers(dataResponsed);
+        } else {
+          setUsers((prevData) => {
+            return {
+              data: [
+                ...prevData.data,
+                ...dataResponsed.data.filter((user) => {
+                  return !prevData.data.some(
+                    (oldUser) => oldUser._id === user._id
+                  );
+                }),
+              ],
+              count: dataResponsed.count,
+            };
+          });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -80,7 +94,8 @@ const SearchPage = () => {
   }, [searchValue, type, page]);
 
   useEffect(() => {
-    setData([]);
+    setPosts({});
+    setUsers({});
     setPage(1);
   }, [searchValue, type]);
 
@@ -151,11 +166,12 @@ const SearchPage = () => {
       ></Box>
 
       <Navbar />
+
       <SearchThings
         searchValue={searchValue}
         type={type}
         setType={setType}
-        data={type === "users" ? data : posts}
+        data={type === "user" ? users : posts}
         loading={loading}
         setPage={setPage}
       />

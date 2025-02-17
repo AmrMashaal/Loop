@@ -8,6 +8,7 @@ import {
   getPost,
   pinPost,
   createPost,
+  getPostClickInfo
 } from "../controllers/posts.js";
 import { upload } from "../config/multer.js";
 
@@ -16,6 +17,7 @@ const router = express.Router();
 router.get("/feed", verifyToken, getFeedPosts);
 router.get("/:userId/posts", verifyToken, getUserPosts);
 router.get("/:postId", verifyToken, getPost);
+router.get("/:postId/clickInfo", verifyToken, getPostClickInfo);
 
 router.patch("/:postId/edit", verifyToken, editPost);
 router.patch("/:postId/pin", verifyToken, pinPost);

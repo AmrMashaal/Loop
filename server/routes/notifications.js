@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.get("/:id", verifyToken, getNotification);
 
-router.patch("/:id", verifyToken, watchAllNotifications);
-
 router.post("/:senderId/:receiverId", verifyToken, sendNotification);
+
+router.patch("/:id", verifyToken, watchAllNotifications);
 
 router.delete("/:id", verifyToken, deleteAllNotifications);
 

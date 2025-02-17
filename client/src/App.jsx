@@ -3,7 +3,7 @@ import HomePage from "./scenes/homePage";
 import LoginPage from "./scenes/loginPage";
 import ProfilePage from "./scenes/profilePage";
 import { useEffect, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
@@ -11,11 +11,23 @@ import SearchPage from "./scenes/searchPage/SearchPage";
 import ChatPage from "./scenes/chatPage/ChatPage";
 import socket from "./components/socket";
 import PostClick from "./components/post/PostClick";
+import { setFriends } from "../state";
+
+export let isOverflow;
+export let setIsOverFlow;
 
 const App = () => {
   const [newPosts, setNewPosts] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
-  const [userFriends, setUserFriends] = useState([]);
+  [isOverflow, setIsOverFlow] = useState(false);
+
+  useEffect(() => {
+    if (isOverflow) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  }, [isOverflow]);
 
   const isAuth = Boolean(useSelector((state) => state.user));
 
@@ -25,10 +37,12 @@ const App = () => {
 
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
 
+  const dispatch = useDispatch();
+
   const handleUserFriend = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/friends/${user._id}/friends`,
+        `${import.meta.env.VITE_API_URL}/friends/${user?._id}/friends?app=true`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -37,27 +51,37 @@ const App = () => {
 
       const friends = await response.json();
 
-      setUserFriends(friends);
+      const friendsIds = friends.map((ele) => {
+        return ele.sender === user._id ? ele.receiver : ele.sender;
+      });
+
+      dispatch(setFriends({ friends: friendsIds }));
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    handleUserFriend();
+    if (user) {
+      handleUserFriend();
+    }
   }, []);
 
   useEffect(() => {
-    socket.on("notification", (data) => {
-      setNewPosts((prevPosts) => (prevPosts ? [...prevPosts, data] : data));
-    });
+    if (user) {
+      socket.on("notification", (data) => {
+        setNewPosts((prevPosts) => (prevPosts ? [...prevPosts, data] : data));
+      });
 
-    socket.emit("userOnline", { userId: user?._id, friends: userFriends });
+      if (user?.friends?.length !== 0) {
+        socket.emit("userOnline", { userId: user?._id, friends: user.friends });
+      }
 
-    return () => {
-      socket.off("notification");
-      socket.off("userOnline");
-    };
+      return () => {
+        socket.off("notification");
+        socket.off("userOnline");
+      };
+    }
   }, [socket]);
 
   return (

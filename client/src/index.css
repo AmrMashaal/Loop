@@ -93,9 +93,17 @@ li {
   color: transparent;
   background: radial-gradient(circle, #00d5fa, #a40fe9a3);
   background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -ms-background-clip: text;
   background-size: 200% 200%;
+  -webkit-background-size: 200% 200%;
+  -moz-background-size: 200% 200%;
+  -ms-background-size: 200% 200%;
   animation: loopAnimation 10s infinite;
   -webkit-animation: loopAnimation 10s infinite;
+  -moz-animation: loopAnimation 10s infinite;
+  -ms-animation: loopAnimation 10s infinite;
 }
 
 @keyframes wrongImage {
@@ -225,4 +233,32 @@ li {
 
 .linkUnderline:hover::before {
   width: 100%;
+}
+
+.upAnimation {
+  position: relative;
+  left: -100px;
+  opacity: 0;
+  animation: upAnimation 0.4s ease forwards;
+  -webkit-animation: upAnimation 0.4s ease forwards;
+}
+
+@keyframes upAnimation {
+  0% {
+    left: -100px;
+    opacity: 0;
+  }
+
+  100% {
+    left: 0;
+    opacity: 1;
+  }
+}
+
+.hoverScale:hover {
+  transform: scale(1.3);
+  -webkit-transform: scale(1.3);
+  -moz-transform: scale(1.3);
+  -ms-transform: scale(1.3);
+  -o-transform: scale(1.3);
 }

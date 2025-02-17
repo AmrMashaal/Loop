@@ -17,7 +17,8 @@ export const getMessages = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
+      .populate("senderId receiverId", "picturePath _id");
 
     if (!messages) {
       return res.status(404).json({ message: "There is no message" });
@@ -68,11 +69,13 @@ export const sendMessage = async (req, res) => {
     const message = new Message({
       receiverId: receiverId,
       senderId: senderId,
-      text: encryptMessage(req.body.text).toString(),
+      text: req.body.text,
       picturePath,
     });
 
     const data = await message.save();
+
+    await data.populate("senderId receiverId", "picturePath _id");
 
     res.status(200).json(data);
   } catch (error) {

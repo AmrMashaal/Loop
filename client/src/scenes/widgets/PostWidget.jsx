@@ -6,8 +6,8 @@ import {
   PushPinOutlined,
 } from "@mui/icons-material";
 import { Box, useMediaQuery, useTheme } from "@mui/system";
-import { useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import FlexBetween from "../../components/FlexBetween";
@@ -17,12 +17,13 @@ import { setPost, setDeletePost } from "../../../state";
 import DeleteComponent from "../../components/post/DeleteComponent";
 import UserDot from "../../components/post/UserDot";
 import LikePost from "../../components/post/LikePost";
-import WhoLiked from "../../components/post/WhoLiked";
+import WhoLiked from "../../components/WhoLiked";
 import PostImg from "../../components/post/PostImg";
 import PostEdited from "../../components/post/PostEdited";
 import PostSkeleton from "../skeleton/PostSkeleton";
 import socket from "../../components/socket";
 import DOMPurify from "dompurify";
+import { setIsOverFlow } from "../../App";
 
 const PostWidget = ({
   posts,
@@ -32,17 +33,18 @@ const PostWidget = ({
   postLoading,
 }) => {
   const [showLikes, setShowLikes] = useState(false);
-  const [likesLoding, setLikesLoding] = useState(false);
-  const [postWhoDeleted, setPostWhoDeleted] = useState(null);
+  const [likesLoading, setLikesLoading] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [isDots, setIsDots] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [postWhoDeleted, setPostWhoDeleted] = useState(null);
   const [postInfo, setPostInfo] = useState({ postId: null, userId: null });
-  const [likeList, setLikeList] = useState([]);
+  const [likeList, setLikeList] = useState({});
   const [clickLikeLoading, setClickLikeLoading] = useState({
     postId: null,
     loading: false,
   });
+  const [page, setPage] = useState(1);
 
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
@@ -55,17 +57,31 @@ const PostWidget = ({
 
   const location = useLocation();
 
+  const { userId } = useParams();
+
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
-  document.body.style.overflow =
-    showLikes || isPostClicked || isDelete || isDots || isEdit
-      ? "hidden"
-      : "unset";
+  useEffect(() => {
+    if (showLikes || isPostClicked || isDelete || isDots || isEdit) {
+      setIsOverFlow(true);
+    } else {
+      setIsOverFlow(false);
+    }
+  }, [showLikes, isPostClicked, isDelete, isDots, isEdit]);
+
+  const escapeHtml = (str) => {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
 
   const convertTextLink = (text) => {
     const urlPattern = /(https?:\/\/[^\s]+)/g;
 
-    text = text.replace(urlPattern, (url) => {
+    text = escapeHtml(text).replace(urlPattern, (url) => {
       return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
     });
 
@@ -102,24 +118,29 @@ const PostWidget = ({
     else return "15px";
   };
 
-  const whoLikes = async (postId) => {
-    setLikesLoding(true);
+  const whoLikes = async (postId, initial = false) => {
+    setLikesLoading(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${postId}/post`,
+        `${import.meta.env.VITE_API_URL}/likes/${postId}/post?page=${page}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      const users = await response.json();
-
-      setLikeList(users);
+      const data = await response.json();
+      if (initial) {
+        setLikeList(data);
+      } else {
+        setLikeList((prev) => {
+          return { likes: [...prev.likes, ...data.likes], count: data.count };
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {
-      setLikesLoding(false);
+      setLikesLoading(false);
     }
   };
 
@@ -253,19 +274,16 @@ const PostWidget = ({
     return regexArabic.test(description);
   };
 
-  const escapeHtml = (str) => {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  };
+  useEffect(() => {
+    if (!showLikes) {
+      setLikeList({});
+    }
+  }, [showLikes]);
 
   // eslint-disable-next-line react/prop-types
   return (
     <>
-      {!postLoading ? (
+      {posts && (
         <>
           {posts?.map((ele, index) => {
             const textAddition = ele?.textAddition
@@ -358,6 +376,11 @@ const PostWidget = ({
                     background:
                       textAddition.type === "color" && textAddition.value,
                     cursor: textAddition.type === "color" && "pointer",
+                    color:
+                      textAddition.type === "color" &&
+                      textAddition.value !==
+                        "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
+                      "white",
                   }}
                   onClick={() => {
                     if (textAddition?.type === "color") {
@@ -404,12 +427,10 @@ const PostWidget = ({
                     }}
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(
-                        escapeHtml(
-                          convertTextLink(
-                            ele?.description?.length > 180
-                              ? ele?.description.slice(0, 179)
-                              : ele?.description
-                          )
+                        convertTextLink(
+                          ele?.description?.length > 180
+                            ? ele?.description.slice(0, 179)
+                            : ele?.description
                         ),
                         {
                           ADD_ATTR: ["target", "rel"],
@@ -460,10 +481,10 @@ const PostWidget = ({
                   user={user}
                   setShowLikes={setShowLikes}
                   handleLike={handleLike}
-                  whoLikes={whoLikes}
                   setIsPostClicked={setIsPostClicked}
                   setPostClickData={setPostClickData}
                   loading={clickLikeLoading}
+                  setPostInfo={setPostInfo}
                 />
               </WidgetWrapper>
             );
@@ -536,14 +557,21 @@ const PostWidget = ({
               handleEditPost={handleEditPost}
             />
           )}
+
           {showLikes && (
             <WhoLiked
-              likesLoding={likesLoding}
+              likesLoading={likesLoading}
               likeList={likeList}
+              showLikes={showLikes}
               setShowLikes={setShowLikes}
               setLikeList={setLikeList}
+              WhoLikes={whoLikes}
+              page={page}
+              setPage={setPage}
+              elementId={postInfo.postId}
             />
           )}
+
           {isDelete && (
             <DeleteComponent
               setIsDelete={setIsDelete}
@@ -552,9 +580,44 @@ const PostWidget = ({
             />
           )}
         </>
-      ) : (
-        <PostSkeleton />
       )}
+
+      {postLoading && <PostSkeleton />}
+
+      {!postLoading &&
+        posts?.length === 0 &&
+        location.pathname.split("/")[1] === "profile" && (
+          <Box
+            display="flex"
+            gap="15px"
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+            mb="10px"
+          >
+            <img
+              src="\public\assets\5784488_2968170-removebg-preview.png"
+              alt=""
+              width="280"
+              style={{ userSelect: "none", maxWidth: "100%" }}
+            />
+
+            <Typography
+              fontSize={isNonMobileScreens ? "18px" : "14px"}
+              textTransform="uppercase"
+            >
+              {user._id === userId ? (
+                <>You haven&apos;t</>
+              ) : (
+                <>
+                  <span>This user </span>
+                  hasn&apos;t
+                </>
+              )}{" "}
+              shared anything yet
+            </Typography>
+          </Box>
+        )}
     </>
   );
 };

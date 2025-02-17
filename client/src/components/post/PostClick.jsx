@@ -4,17 +4,18 @@ import { Box, useMediaQuery, useTheme } from "@mui/system";
 import UserImage from "./../UserImage";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
-  // ChatBubbleOutlineOutlined,
-  // FavoriteBorderOutlined,
-  // FavoriteOutlined,
   // ShareOutlined,
   CloseOutlined,
+  Comment,
+  FavoriteBorderOutlined,
   VerifiedOutlined,
 } from "@mui/icons-material";
 import Comments from "./Comments";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../../scenes/navbar";
+import { formatLikesCount } from "../../frequentFunctions";
+import WhoLiked from "../WhoLiked";
 
 const PostClick = ({
   setIsPostClicked,
@@ -40,12 +41,17 @@ const PostClick = ({
   });
   const [isDeletedPost, setIsDeletedPost] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [countCheckLoading, setCountCheckLoading] = useState(true);
+  const [likesLoading, setLikesLoading] = useState(false);
+  const [showLikes, setShowLikes] = useState(false);
   const [postId, setPostId] = useState(null);
+  const [countCheck, setCountCheck] = useState(null);
+  const [likeList, setLikeList] = useState([]);
+  const [page, setPage] = useState(1);
 
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const { palette } = useTheme();
-  const medium = palette.neutral.medium;
 
   const token = useSelector((state) => state.token);
 
@@ -103,6 +109,58 @@ const PostClick = ({
     }
   };
 
+  const getPostClickInfo = async () => {
+    setCountCheckLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/posts/${postDetails._id}/clickInfo`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await response.json();
+
+      setCountCheck(data);
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setCountCheckLoading(false);
+    }
+  };
+
+  const whoLikes = async (_, initial) => {
+    setLikesLoading(true);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/likes/${
+          postDetails._id
+        }/post?page=${page}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await response.json();
+
+      if (initial) {
+        setLikeList(data);
+      } else {
+        setLikeList((prev) => {
+          return { likes: [...prev.likes, ...data.likes], count: data.count };
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLikesLoading(false);
+    }
+  };
+
   useEffect(() => {
     setPostId(id?.split("-anotherId-")[0]);
   }, [id]);
@@ -110,6 +168,16 @@ const PostClick = ({
   useEffect(() => {
     handlePostForLink();
   }, [postId]);
+
+  useEffect(() => {
+    getPostClickInfo();
+  }, [postDetails._id]);
+
+  useEffect(() => {
+    if (!showLikes) {
+      setLikeList({ likes: [], count: 0 });
+    }
+  }, [showLikes]);
 
   const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const testArabic = regexArabic.test(postDetails.description);
@@ -266,31 +334,74 @@ const PostClick = ({
             {postDetails?.description}
           </Typography>
 
-          <Divider />
-          {postDetails.firstName && (
-            <Typography
-              m="9px 0px 5px"
-              color={medium}
-              fontSize="12px"
-              fontWeight="bold"
-              sx={{ userSelect: "none" }}
+          <Box
+            display="flex"
+            alignItems="center"
+            gap="20px"
+            mb="5px"
+            sx={{ userSelect: "none" }}
+          >
+            <Box
+              display="flex"
+              gap="5px"
+              alignItems="center"
+              sx={{ cursor: "pointer" }}
+              onClick={() => {
+                setShowLikes(true), whoLikes();
+              }}
             >
-              comments
-            </Typography>
-          )}
+              <FavoriteBorderOutlined sx={{ fontSize: "17px" }} />
+
+              <Typography>
+                {formatLikesCount(countCheck?.likesCount || 0)}
+              </Typography>
+            </Box>
+
+            <Box
+              display="flex"
+              gap="5px"
+              alignItems="center"
+              sx={{ cursor: "pointer" }}
+            >
+              <Comment sx={{ fontSize: "17px" }} />
+              <Typography>
+                {formatLikesCount(countCheck?.commentsCount || 0)}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Divider />
 
           {postDetails.firstName && !loading && (
             <Comments
               _id={postDetails._id}
               userId={postDetails.userId}
               comIdParam={id?.split("-anotherId-")[1]}
+              getPostClickInfo={getPostClickInfo}
+              countCheckLoading={countCheckLoading}
+              countCheck={countCheck}
+              setCountCheck={setCountCheck}
             />
           )}
 
           {location.pathname.split("/")[1] === "post" && isNonMobileScreens && (
             <Navbar />
           )}
+
           {isDeletedPost && <Typography>This post has been deleted</Typography>}
+
+          {showLikes && (
+            <WhoLiked
+              likeList={likeList}
+              likesLoading={likesLoading}
+              setShowLikes={setShowLikes}
+              showLikes={showLikes}
+              WhoLikes={whoLikes}
+              elementId={postId}
+              page={page}
+              setPage={setPage}
+            />
+          )}
         </Box>
       </Box>
     </Box>

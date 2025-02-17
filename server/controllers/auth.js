@@ -80,8 +80,9 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  const { username, password } = req.body;
+  
   try {
-    const { username, password } = req.body;
     const user = await User.findOne({ username });
 
     const realPassword = await bcrypt.compare(password, user.password);

@@ -185,26 +185,30 @@ export const deletePost = async (req, res) => {
 
 export const editPost = async (req, res) => {
   const { postId } = req.params;
-  const post = await Post.findById(postId);
-
-  if (!post) {
-    return res.status(404).json({ message: "Post is not found" });
-  }
 
   try {
-    post.description = req.body.description;
-    post.edited = true;
+    const post = await Post.findById(postId);
+    if (req.user.id === post.userId.toString()) {
+      if (!post) {
+        return res.status(404).json({ message: "Post is not found" });
+      }
 
-    const result = await post.save();
+      post.description = req.body.description;
+      post.edited = true;
 
-    const isLiked = await Like.findOne({
-      userId: req.user.id,
-      postId: post._id,
-    });
+      const result = await post.save();
 
-    const postWithIsLiked = { ...result._doc, isLiked: Boolean(isLiked) };
+      const isLiked = await Like.findOne({
+        userId: req.user.id,
+        postId: post._id,
+      });
 
-    res.status(200).json(postWithIsLiked);
+      const postWithIsLiked = { ...result._doc, isLiked: Boolean(isLiked) };
+
+      res.status(200).json(postWithIsLiked);
+    } else {
+      res.status(403).json({ message: "Forbidden!" });
+    }
   } catch (error) {
     res.status(500).json({ message: err.message });
   }
@@ -216,27 +220,57 @@ export const pinPost = async (req, res) => {
   try {
     const post = await Post.findById(postId);
 
-    if (!post) {
-      return res.status(404).json({ message: "Post is not found" });
-    }
+    if (req.user.id === post.userId.toString()) {
+      if (!post) {
+        return res.status(404).json({ message: "Post is not found" });
+      }
 
-    if (post.pinned) {
-      post.pinned = false;
+      if (post.pinned) {
+        post.pinned = false;
+      } else {
+        post.pinned = true;
+      }
+
+      await post.save();
+
+      const isLiked = await Like.findOne({
+        userId: req.user.id,
+        postId: post._id,
+      });
+
+      const postWithIsLiked = { ...post._doc, isLiked: Boolean(isLiked) };
+
+      res.status(200).json(postWithIsLiked);
     } else {
-      post.pinned = true;
+      res.status(403).json({ message: "Forbidden!" });
     }
-
-    await post.save();
-
-    const isLiked = await Like.findOne({
-      userId: req.user.id,
-      postId: post._id,
-    });
-
-    const postWithIsLiked = { ...post._doc, isLiked: Boolean(isLiked) };
-
-    res.status(200).json(postWithIsLiked);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const getPostClickInfo = async (req, res) => {
+  const { postId } = req.params;
+  let isLiked;
+
+  try {
+    const { likesCount, commentCount } = await Post.findById(postId).select(
+      "likesCount commentCount"
+    );
+
+    const checkLike = await Like.findOne({
+      userId: req.user.id,
+      postId: postId,
+    });
+
+    if (checkLike) {
+      isLiked = true;
+    } else {
+      isLiked = false;
+    }
+
+    res.status(200).json({ likesCount, commentsCount: commentCount, isLiked });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

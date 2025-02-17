@@ -12,6 +12,7 @@ import OpenPhoto from "../OpenPhoto";
 import DeleteComponent from "../post/DeleteComponent";
 import { setFriends } from "../../../state";
 import ChangePassword from "./ChangePassword";
+import { setIsOverFlow } from "../../App";
 
 const ProfileInfo = ({ userInfo, userId }) => {
   const [profileSettings, setProfileSettings] = useState(false);
@@ -36,7 +37,13 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   const dispatch = useDispatch();
 
-  document.body.style.overflow = isImgOpen ? "hidden" : "unset";
+  useEffect(() => {
+    if (isImgOpen) {
+      setIsOverFlow(true);
+    } else {
+      setIsOverFlow(false);
+    }
+  }, [isImgOpen]);
 
   // useEffect(() => {
   //   setWaitingFriendRequest(userInfo?.friendsRequest);

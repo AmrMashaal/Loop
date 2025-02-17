@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
+import Like from "../models/Like.js";
 
 export const searchInfo = async (req, res) => {
   const page = req.query.page * 1 || 1;
@@ -8,15 +9,16 @@ export const searchInfo = async (req, res) => {
 
   try {
     if (type === "users") {
-      let users = await User.find({
-        $or: [
-          { firstName: { $regex: firstWord, $options: "i" } },
-          ...(secondWord
-            ? [{ lastName: { $regex: secondWord, $options: "i" } }]
-            : []),
-          { username: { $regex: firstWord, $options: "i" } },
-        ],
-      })
+      let users = await user
+        ?.find({
+          $or: [
+            { firstName: { $regex: firstWord, $options: "i" } },
+            ...(secondWord
+              ? [{ lastName: { $regex: secondWord, $options: "i" } }]
+              : []),
+            { username: { $regex: firstWord, $options: "i" } },
+          ],
+        })
         .limit(10)
         .skip((page - 1) * 10)
         .sort({ verified: -1, firstName: 1 });
@@ -26,7 +28,17 @@ export const searchInfo = async (req, res) => {
         return dataWithoutPassword;
       });
 
-      return res.status(200).json(usersWithoutPassword);
+      const count = await user.countDocuments({
+        $or: [
+          { firstName: { $regex: firstWord, $options: "i" } },
+          ...(secondWord
+            ? [{ lastName: { $regex: secondWord, $options: "i" } }]
+            : []),
+          { username: { $regex: firstWord, $options: "i" } },
+        ],
+      });
+
+      return res.status(200).json({ data: usersWithoutPassword, count });
     } else if (type === "posts") {
       const posts = await Post.find({
         description: { $regex: info, $options: "i" },
@@ -35,7 +47,22 @@ export const searchInfo = async (req, res) => {
         .skip((page - 1) * 5)
         .sort({ description: 1 });
 
-      return res.status(200).json(posts);
+      const count = await Post.countDocuments({
+        description: { $regex: info, $options: "i" },
+      });
+
+      const postsWithIsLiked = await Promise.all(
+        posts.map(async (post) => {
+          const isLiked = await Like.findOne({
+            userId: req.user.id,
+            postId: post._id,
+          });
+
+          return { ...post._doc, isLiked: Boolean(isLiked) };
+        })
+      );
+
+      return res.status(200).json({ data: postsWithIsLiked, count });
     }
   } catch (error) {
     res.status(404).json({ message: error.message });

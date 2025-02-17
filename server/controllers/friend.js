@@ -3,29 +3,38 @@ import Friend from "../models/Friend.js";
 export const getFriends = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page } = req.query;
+    const { page, app } = req.query;
 
-    const friends = await Friend.find({
-      $or: [{ sender: userId }, { receiver: userId }],
-      status: "accepted",
-    })
-      .populate(
-        "sender receiver",
-        "firstName lastName username occupation _id picturePath verified"
-      )
-      .skip((page - 1) * 6)
-      .limit(6)
-      .sort({ createdAt: -1 });
-
-    if (req.query.isProfile) {
-      const friendsCount = await Friend.countDocuments({
+    if (app) {
+      const friends = await Friend.find({
         $or: [{ sender: userId }, { receiver: userId }],
         status: "accepted",
       });
 
-      res.status(200).json({ friends, count: friendsCount });
-    } else {
       res.status(200).json(friends);
+    } else {
+      const friends = await Friend.find({
+        $or: [{ sender: userId }, { receiver: userId }],
+        status: "accepted",
+      })
+        .populate(
+          "sender receiver",
+          "firstName lastName username occupation _id picturePath verified"
+        )
+        .skip((page - 1) * 6)
+        .limit(6)
+        .sort({ createdAt: -1 });
+
+      if (req.query.isProfile) {
+        const friendsCount = await Friend.countDocuments({
+          $or: [{ sender: userId }, { receiver: userId }],
+          status: "accepted",
+        });
+
+        res.status(200).json({ friends, count: friendsCount });
+      } else {
+        res.status(200).json(friends);
+      }
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -33,10 +42,10 @@ export const getFriends = async (req, res) => {
 };
 
 export const addFriend = async (req, res) => {
-  try {
-    const { receiverId } = req.params;
-    const senderId = req.user.id;
+  const senderId = req.user.id;
+  const { receiverId } = req.params;
 
+  try {
     const newFriend = new Friend({
       sender: senderId,
       receiver: receiverId,

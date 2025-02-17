@@ -22,28 +22,30 @@ import { Link } from "react-router-dom";
 const UserWidget = ({ userId, picturePath }) => {
   const [theUser, setTheUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
-  
+
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  
+
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
 
   const getUser = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await response.json();
-      setTheUser(data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setUserLoading(false);
+    if (userId) {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/users/${userId}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const data = await response.json();
+        setTheUser(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setUserLoading(false);
+      }
     }
   };
 

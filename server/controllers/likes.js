@@ -1,7 +1,6 @@
 import Like from "../models/Like.js";
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
-import User from "../models/User.js";
 import Reply from "../models/Reply.js";
 
 export const likePost = async (req, res) => {
@@ -113,19 +112,18 @@ export const likeReply = async (req, res) => {
 };
 // ---------------------------------------------------------
 export const whoLikedPost = async (req, res) => {
-  const { page, limit = 5 } = req.query;
+  const { page } = req.query;
   const { postId } = req.params;
 
   try {
-    const likes = await Like.find({ postId }).limit(10);
+    const likes = await Like.find({ postId })
+      .limit(10)
+      .skip((page - 1) * 10)
+      .populate("userId", "firstName lastName picturePath verified _id");
 
-    const users = await Promise.all(
-      likes?.map(async (ele) => {
-        return await User.findById(ele.userId);
-      })
-    );
+    const count = await Like.countDocuments({ postId });
 
-    res.status(200).json(users);
+    res.status(200).json({ likes, count });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -142,9 +140,9 @@ export const whoLikedComment = async (req, res) => {
       .skip((page - 1) * 10)
       .select("userId");
 
-    const extractedUsers = likes.map((ele) => ele.userId);
+    const count = await Like.countDocuments({ commentId });
 
-    res.status(200).json(extractedUsers);
+    res.status(200).json({ likes, count });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -155,15 +153,15 @@ export const whoLikedReply = async (req, res) => {
     const { page } = req.query;
     const { replyId } = req.params;
 
-    const users = await Like.find({ replyId })
+    const likes = await Like.find({ replyId })
       .populate("userId", "firstName lastName picturePath verified")
       .limit(10)
       .skip((page - 1) * 10)
       .select("userId");
 
-    const extractedUsers = users.map((ele) => ele.userId);
+    const count = await Like.countDocuments({ replyId });
 
-    res.status(200).json(extractedUsers);
+    res.status(200).json({ likes, count });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

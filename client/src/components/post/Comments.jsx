@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
-import { Divider, IconButton, InputBase, Typography } from "@mui/material";
+import { IconButton, InputBase, Typography } from "@mui/material";
 import { Box, useMediaQuery } from "@mui/system";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import UserImage from "../UserImage";
@@ -23,15 +23,23 @@ import { useTheme } from "@emotion/react";
 import DOMPurify from "dompurify";
 import EditThing from "./EditThing";
 import DeleteComponent from "./DeleteComponent";
-import TasksComponent from "../TasksComponent";
 import FlexBetween from "../FlexBetween";
 import OpenPhoto from "../OpenPhoto";
 import Dropzone from "react-dropzone";
 import { debounce } from "lodash";
 import socket from "../../components/socket";
 import Replies from "./Replies";
+import WhoLiked from "./../WhoLiked";
+import { formatLikesCount } from "../../frequentFunctions";
 
-const Comments = ({ _id, userId, comIdParam }) => {
+const Comments = ({
+  _id,
+  userId,
+  comIdParam,
+  countCheckLoading,
+  countCheck,
+  setCountCheck,
+}) => {
   const token = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
   const mode = useSelector((state) => state.mode);
@@ -42,28 +50,34 @@ const Comments = ({ _id, userId, comIdParam }) => {
   const [imageError, setImageError] = useState("");
   const [openPhotoImage, setOpenPhotoImage] = useState("");
   const [inputType, setInputType] = useState("comment");
+  const [showLikesType, setShowLikesType] = useState("");
   const [replyData, setReplyData] = useState({ name: "", id: "", userId: "" });
   const [likeList, setLikeList] = useState([]);
   const [commentsState, setCommentsState] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
+  const [likesPage, setLikesPage] = useState(1);
   const [CommentUserId, setCommentUserId] = useState(null);
   const [commentId, setCommentId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPinnedComment, setIsPinnedComment] = useState(false);
+  const [postLikeLoading, setPostLikeLoading] = useState(false);
   const [commentEditOpen, setCommentEditOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [isImage, setIsImage] = useState(false);
   const [isDeleteComment, setIsDeleteComment] = useState(false);
+  const [isOpenPhoto, setIsOpenPhoto] = useState(false);
+  const [showLikes, setShowLikes] = useState(false);
   const [likesLoading, setLikesLoading] = useState(true);
   const [commentLikeLoading, setCommentLikeLoading] = useState({
     loading: true,
     commentId: null,
   });
-  const [showLikes, setShowLikes] = useState(false);
-  const [isOpenPhoto, setIsOpenPhoto] = useState(false);
+  const [showLikesId, setShowLikesId] = useState(null);
 
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const { palette } = useTheme();
+
+  const inputRef = useRef(null);
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -75,7 +89,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
       const formData = new FormData();
 
       formData.append("text", commentInfo);
-      formData.append("user", user._id);
+      formData.append("user", user?._id);
 
       if (image) {
         formData.append("picture", image);
@@ -101,10 +115,10 @@ const Comments = ({ _id, userId, comIdParam }) => {
         setCommentInfo("");
         setImage("");
 
-        if (userId !== user._id) {
+        if (userId && userId !== user?._id) {
           const response2 = await fetch(
             `${import.meta.env.VITE_API_URL}/notifications/${
-              user._id
+              user?._id
             }/${userId}`,
             {
               method: "POST",
@@ -114,10 +128,10 @@ const Comments = ({ _id, userId, comIdParam }) => {
               },
               body: JSON.stringify({
                 type: "comment",
-                description: `${user.firstName} commented on your post`,
+                description: `${user?.firstName} commented on your post`,
                 linkId: `${_id}-anotherId-${data?._id}`,
                 receiverId: userId,
-                senderId: user._id,
+                senderId: user?._id,
               }),
             }
           );
@@ -168,34 +182,28 @@ const Comments = ({ _id, userId, comIdParam }) => {
     }
   };
 
-  const whoLikes = async (id, type = "") => {
+  const whoLikes = async (id, initial) => {
     setLikesLoading(true);
 
     try {
-      if (type !== "reply") {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/likes/${id}/comment`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/likes/${id}/${showLikesType}?page=${likesPage}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-        const users = await response.json();
+      const data = await response.json();
 
-        setLikeList(users);
+      if (initial) {
+        setLikeList(data);
       } else {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/likes/${id}/reply`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const users = await response.json();
-
-        setLikeList(users);
+        setLikeList((prev) => {
+          return { likes: [...prev.likes, ...data.likes], count: data.count };
+        });
       }
     } catch (error) {
       console.log(error);
@@ -212,11 +220,23 @@ const Comments = ({ _id, userId, comIdParam }) => {
     }
   }, [pageNumber]);
 
+  const escapeHtml = (str) => {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
   const convertTextLink = (text) => {
     const urlPattern = /(https?:\/\/[^\s]+)/g;
-    return text?.replace(urlPattern, (url) => {
+
+    text = escapeHtml(text).replace(urlPattern, (url) => {
       return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
     });
+
+    return text;
   };
 
   const handleDeleteComment = async () => {
@@ -248,7 +268,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/likes/${commentId}/${
-          user._id
+          user?._id
         }/likeComment`,
         {
           method: "PATCH",
@@ -273,10 +293,14 @@ const Comments = ({ _id, userId, comIdParam }) => {
         )
       );
 
-      if (comment.comment.userId !== user._id && comment.isLiked) {
+      if (
+        comment.comment.user &&
+        comment.comment.user !== user?._id &&
+        comment.isLiked
+      ) {
         const response2 = await fetch(
-          `${import.meta.env.VITE_API_URL}/notifications/${user._id}/${
-            comment.comment.userId
+          `${import.meta.env.VITE_API_URL}/notifications/${user?._id}/${
+            comment.comment.user
           }`,
           {
             method: "POST",
@@ -286,10 +310,10 @@ const Comments = ({ _id, userId, comIdParam }) => {
             },
             body: JSON.stringify({
               type: "like",
-              description: `${user.firstName} liked your comment`,
+              description: `${user?.firstName} liked your comment`,
               linkId: `${comment.comment.postId}-anotherId-${comment.comment._id}`,
-              receiverId: comment.comment.userId,
-              senderId: user._id,
+              receiverId: comment.comment.user,
+              senderId: user?._id,
             }),
           }
         );
@@ -297,7 +321,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
         const notification = await response2.json();
 
         socket.emit("notifications", {
-          receiverId: comment.userId,
+          receiverId: comment.user,
           notification: notification,
         });
       }
@@ -305,6 +329,63 @@ const Comments = ({ _id, userId, comIdParam }) => {
       console.log(error);
     } finally {
       setCommentLikeLoading({ loading: false, commentId });
+    }
+  };
+
+  const handleLikePost = async () => {
+    setPostLikeLoading(true);
+
+    try {
+      const response1 = await fetch(
+        `${import.meta.env.VITE_API_URL}/likes/${_id}/${user?._id}/like`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const updatedPost = await response1.json();
+
+      setCountCheck((prev) => {
+        return { ...(prev || {}), isLiked: updatedPost.isLiked };
+      });
+
+      // -------------------Notificatons-------------------
+
+      if (userId && userId !== user?._id && updatedPost.isLiked) {
+        const response2 = await fetch(
+          `${import.meta.env.VITE_API_URL}/notifications/${
+            user?._id
+          }/${userId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              type: "like",
+              description: `${user?.firstName} liked your post`,
+              linkId: _id,
+              receiverId: userId,
+              senderId: user?._id,
+            }),
+          }
+        );
+
+        const notification = await response2.json();
+
+        socket.emit("notifications", {
+          receiverId: userId,
+          notification: notification,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setPostLikeLoading(false);
     }
   };
 
@@ -441,9 +522,9 @@ const Comments = ({ _id, userId, comIdParam }) => {
           )
         );
 
-        if (replyData.userId !== user._id) {
+        if (replyData.userId && replyData.userId !== user?._id) {
           const response2 = await fetch(
-            `${import.meta.env.VITE_API_URL}/notifications/${user._id}/${
+            `${import.meta.env.VITE_API_URL}/notifications/${user?._id}/${
               replyData.userId
             }`,
             {
@@ -454,10 +535,10 @@ const Comments = ({ _id, userId, comIdParam }) => {
               },
               body: JSON.stringify({
                 type: "reply",
-                description: `${user.firstName} replied to your comment`,
+                description: `${user?.firstName} replied to your comment`,
                 linkId: `${_id}-anotherId-${replyData?.id}`,
                 receiverId: replyData.userId,
-                senderId: user._id,
+                senderId: user?._id,
               }),
             }
           );
@@ -531,28 +612,17 @@ const Comments = ({ _id, userId, comIdParam }) => {
     }
   };
 
-  const escapeHtml = (str) => {
-    if (str) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  useEffect(() => {
+    if (inputType === "reply") {
+      inputRef.current.children[0].focus();
     }
-  };
+  }, [inputType]);
 
-  function formatLikesCount(number) {
-    if (number < 1000) {
-      return number.toString();
-    } else if (number < 1000000) {
-      return (number / 1000).toFixed(1).replace(/\.0$/, "") + "k";
-    } else if (number < 1000000000) {
-      return (number / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
-    } else {
-      return (number / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
+  useEffect(() => {
+    if (!showLikes) {
+      setLikeList({});
     }
-  }
+  }, [showLikes]);
 
   return (
     <Box position="relative">
@@ -662,7 +732,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                           </Typography>
                         </Box>
 
-                        {(user._id === userId && (
+                        {(user?._id === userId && (
                           <IconButton
                             onClick={() => {
                               setCommentId(com?._id),
@@ -675,7 +745,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                             <MoreHoriz />
                           </IconButton>
                         )) ||
-                          (user._id === com?.user?._id && (
+                          (user?._id === com?.user?._id && (
                             <IconButton
                               onClick={() => {
                                 setCommentId(com?._id),
@@ -698,7 +768,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                         }}
                         dangerouslySetInnerHTML={{
                           __html: DOMPurify.sanitize(
-                            escapeHtml(convertTextLink(com?.text)),
+                            convertTextLink(com?.text),
                             {
                               ADD_ATTR: ["target", "rel"],
                             }
@@ -758,7 +828,9 @@ const Comments = ({ _id, userId, comIdParam }) => {
                         <Typography
                           sx={{ cursor: "pointer", userSelect: "none" }}
                           onClick={() => {
-                            setShowLikes(true), whoLikes(com?._id);
+                            setShowLikes(true);
+                            setShowLikesId(com?._id);
+                            setShowLikesType("comment");
                           }}
                         >
                           {formatLikesCount(com?.likesCount)}
@@ -798,7 +870,6 @@ const Comments = ({ _id, userId, comIdParam }) => {
                         timeAgo={timeAgo}
                         user={user}
                         testArabic={testArabic}
-                        escapeHtml={escapeHtml}
                         convertTextLink={convertTextLink}
                         setOpenPhotoImage={setOpenPhotoImage}
                         setIsOpenPhoto={setIsOpenPhoto}
@@ -809,6 +880,8 @@ const Comments = ({ _id, userId, comIdParam }) => {
                         setReplyData={setReplyData}
                         palette={palette}
                         isNonMobileScreens={isNonMobileScreens}
+                        setShowLikesType={setShowLikesType}
+                        setShowLikesId={setShowLikesId}
                       />
                     )}
 
@@ -855,66 +928,18 @@ const Comments = ({ _id, userId, comIdParam }) => {
         })}
 
         {showLikes && (
-          <TasksComponent
-            setOpen={setShowLikes}
-            description="Likes Info"
-            open={showLikes}
-          >
-            {likesLoading ? (
-              <Box
-                className="loadingAnimation"
-                width="20px"
-                height="20px"
-                ml="8px"
-              ></Box>
-            ) : likeList?.length < 1 ? (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                width="100%"
-                height="100%"
-                position="absolute"
-                top="50%"
-                left="50%"
-                sx={{
-                  transform: "translate(-50%,-50%)",
-                }}
-              >
-                <Typography fontSize="25px">There are no likes yet</Typography>
-              </Box>
-            ) : (
-              likeList?.map((user, index) => {
-                return (
-                  <>
-                    <Link to={`/profile/${user._id}`} className="opacityBox">
-                      <FlexBetween key={index} sx={{ cursor: "pointer" }}>
-                        <Box display="flex" alignItems="center" gap="10px">
-                          <UserImage image={user.picturePath} />
-                          <Box display="flex" alignItems="center" gap="4px">
-                            <Typography>
-                              {user.firstName || "Undefined"} {user.lastName}
-                            </Typography>
-                            {user.verified && (
-                              <VerifiedOutlined
-                                sx={{
-                                  fontSize: "20px",
-                                  color: "#00D5FA",
-                                }}
-                              />
-                            )}
-                          </Box>
-                        </Box>
-                      </FlexBetween>
-                    </Link>
-                    {likeList?.indexOf(user) !== likeList?.length - 1 && (
-                      <Divider />
-                    )}
-                  </>
-                );
-              })
-            )}
-          </TasksComponent>
+          <WhoLiked
+            likeList={likeList}
+            likesLoading={likesLoading}
+            setLikeList={setLikeList}
+            setShowLikes={setShowLikes}
+            showLikes={showLikes}
+            WhoLikes={whoLikes}
+            page={likesPage}
+            setPage={setLikesPage}
+            postId={_id}
+            elementId={showLikesId}
+          />
         )}
 
         {commentEditOpen && (
@@ -962,7 +987,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                 gap="10px"
                 width="100%"
               >
-                {user._id === CommentUserId && (
+                {user?._id === CommentUserId && (
                   <IconButton
                     sx={{
                       borderRadius: "8px",
@@ -981,7 +1006,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                   </IconButton>
                 )}
 
-                {user._id === userId && (
+                {user?._id === userId && (
                   <IconButton
                     sx={{
                       borderRadius: "8px",
@@ -1072,8 +1097,8 @@ const Comments = ({ _id, userId, comIdParam }) => {
         {loading && (
           <Box
             className="loadingAnimation"
-            width="70px"
-            height="70px"
+            width="30px"
+            height="30px"
             m="10px auto"
           ></Box>
         )}
@@ -1085,6 +1110,25 @@ const Comments = ({ _id, userId, comIdParam }) => {
         width="100%"
         bgcolor={palette.neutral.light}
       >
+        <Box my="4px">
+          <IconButton
+            sx={{ borderRadius: "3px" }}
+            onClick={handleLikePost}
+            disabled={postLikeLoading || countCheckLoading}
+          >
+            <Box display="flex" alignItems="center" gap="5px">
+              {countCheck?.isLiked ? (
+                <FavoriteOutlined style={{ fontSize: "23px", color: "red" }} />
+              ) : (
+                <FavoriteBorderOutlined style={{ fontSize: "23px" }} />
+              )}
+              <Typography fontWeight="500">
+                {countCheckLoading ? "Loading..." : "Like"}
+              </Typography>
+            </Box>
+          </IconButton>
+        </Box>
+
         <form
           action=""
           onSubmit={(e) => {
@@ -1114,6 +1158,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                   : "7px 66px 7px 18px",
               direction: testArabic(commentInfo) && "rtl",
             }}
+            ref={inputRef}
           />
 
           {inputType === "reply" && (
@@ -1195,6 +1240,7 @@ const Comments = ({ _id, userId, comIdParam }) => {
                           ? `${image.name.slice(0, 20) + "..."}`
                           : image.name}
                       </Typography>
+
                       <IconButton
                         onClick={(e) => {
                           e.stopPropagation();

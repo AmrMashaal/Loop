@@ -15,6 +15,7 @@ import notificationRoutes from "./routes/notifications.js";
 import likeRoutes from "./routes/likes.js";
 import friendRoutes from "./routes/friends.js";
 import replyRoutes from "./routes/reply.js";
+import lastMessageRoutes from "./routes/lastMessage.js";
 
 dotenv.config();
 
@@ -44,5 +45,6 @@ app.use("/notifications", notificationRoutes);
 app.use("/likes", likeRoutes);
 app.use("/friends", friendRoutes);
 app.use("/replies", replyRoutes);
+app.use("/lastMessages", lastMessageRoutes);
 
 export default app;

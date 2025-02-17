@@ -7,6 +7,7 @@ import PostWidget from "./PostWidget";
 import { setPosts } from "../../../state/index";
 import { debounce } from "lodash";
 import _ from "lodash";
+import { setIsOverFlow } from "../../App";
 
 // eslint-disable-next-line react/prop-types
 const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
@@ -27,7 +28,13 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
   const token = useSelector((state) => state.token);
   const dispatch = useDispatch();
 
-  document.body.style.overflow = isPostClicked ? "hidden" : "unset";
+  useEffect(() => {
+    if (isPostClicked) {
+      setIsOverFlow(true);
+    } else {
+      setIsOverFlow(false);
+    }
+  }, [isPostClicked]);
 
   useEffect(() => {
     dispatch(setPosts({ posts: [] }));

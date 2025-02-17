@@ -75,7 +75,7 @@ const OnlineFriends = ({ onlineFriends, loading }) => {
                           fontSize={isNonMobileScreens ? "14px" : "10px"}
                           sx={{ transition: ".3s" }}
                           className="usernameFriends"
-                          maxWidth="115px"
+                          maxWidth="88px"
                           overflow="hidden"
                           textOverflow="ellipsis"
                           whiteSpace="nowrap"

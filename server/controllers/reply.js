@@ -103,19 +103,23 @@ export const deleteReply = async (req, res) => {
 
     const reply = await Reply.findById(replyId).populate("comment", "postId");
 
-    if (!reply) {
-      return res.status(404).json({ message: "Reply not found" });
+    if (req.user.id === reply.user.toString()) {
+      if (!reply) {
+        return res.status(404).json({ message: "Reply not found" });
+      }
+
+      await Post.findByIdAndUpdate(reply.comment.postId, {
+        $inc: {
+          commentCount: -1,
+        },
+      });
+
+      await Reply.findByIdAndDelete(replyId);
+
+      return res.status(200).json({ message: "Reply deleted" });
+    } else {
+      res.status(403).json({ message: "Forbidden!" });
     }
-
-    await Post.findByIdAndUpdate(reply.comment.postId, {
-      $inc: {
-        commentCount: -1,
-      },
-    });
-
-    await Reply.findByIdAndDelete(replyId);
-
-    return res.status(200).json({ message: "Reply deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -127,22 +131,26 @@ export const editReply = async (req, res) => {
 
     const reply = await Reply.findById(replyId);
 
-    if (!reply) {
-      return res.status(404).json({ message: "Reply not found" });
+    if (req.user.id === reply.user.toString()) {
+      if (!reply) {
+        return res.status(404).json({ message: "Reply not found" });
+      }
+
+      if (reply.user.toString() !== req.user.id) {
+        return res.status(403).json({ message: "You are not authorized" });
+      }
+
+      reply.reply = req.body.reply;
+      reply.edited = true;
+
+      await reply.save();
+
+      return res
+        .status(200)
+        .json({ comment: reply.comment, reply: req.body.reply });
+    } else {
+      res.status(403).json({ message: "Forbidden!" });
     }
-
-    if (reply.user.toString() !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized" });
-    }
-
-    reply.reply = req.body.reply;
-    reply.edited = true;
-
-    await reply.save();
-
-    return res
-      .status(200)
-      .json({ comment: reply.comment, reply: req.body.reply });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

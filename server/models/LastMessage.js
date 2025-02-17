@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const messageSchema = new mongoose.Schema(
+const lastMessageSchema = new mongoose.Schema(
   {
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,14 +12,13 @@ const messageSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
-    picturePath: String,
-    text: {type: String, maxlength: 1500},
+    message: { type: String, default: "" },
   },
   {
     timestamps: true,
   }
 );
 
-const Message = mongoose.model("message", messageSchema);
+const LastMessage = mongoose.model("lastMessage", lastMessageSchema);
 
-export default Message;
+export default LastMessage;

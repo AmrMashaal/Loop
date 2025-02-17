@@ -16,15 +16,14 @@ const userSchema = new mongoose.Schema(
     online: { type: Boolean, default: false },
     chatHistory: { type: Map, of: Object, default: {} },
     passwordChangedAt: { type: String, default: "" },
-    notifications: { type: Array, default: [] },
-    occupation: String,
-    location: String,
     links: {
       facebook: String,
       x: String,
       instagram: String,
       linkedin: String,
     },
+    occupation: String,
+    location: String,
   },
   { timestamps: true }
 );

@@ -1,5 +1,4 @@
-import Notification from "../models/notification.js";
-import User from "../models/User.js";
+import Notification from "../models/Notification.js";
 
 export const getNotification = async (req, res) => {
   const { id } = req.params;
@@ -9,7 +8,8 @@ export const getNotification = async (req, res) => {
     const notifications = await Notification.find({ receiverId: id })
       .limit(limit)
       .skip((page - 1) * limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("senderId receiverId", "picturePath");
 
     if (!notifications) {
       return res.status(404).json({ message: "User is not found" });
@@ -22,19 +22,8 @@ export const getNotification = async (req, res) => {
 };
 
 export const sendNotification = async (req, res) => {
-  const { senderId } = req.params;
-
   try {
-    const senderData = await User.findById(senderId);
-
-    if (!senderData) {
-      return res.status(404).json({ message: "User is not found" });
-    }
-
     const notifications = new Notification({
-      firstName: senderData.firstName,
-      lastName: senderData.lastName,
-      picturePath: senderData.picturePath,
       type: req.body.type,
       description: req.body.description,
       linkId: req.body.linkId,
@@ -46,9 +35,14 @@ export const sendNotification = async (req, res) => {
       return res.status(404).json({ message: "User is not found" });
     }
 
-    await notifications.save();
+    const postedNot = await notifications.save();
 
-    res.status(200).json(notifications);
+    const populatedNot = await postedNot.populate(
+      "senderId receiverId",
+      "picturePath"
+    );
+
+    res.status(200).json(populatedNot);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -5,34 +5,22 @@ import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
   FavoriteOutlined,
-  ShareOutlined,
 } from "@mui/icons-material";
+import { formatLikesCount } from "../../frequentFunctions";
 
 const LikePost = ({
   ele,
   setShowLikes,
   handleLike,
-  whoLikes,
+  setPostInfo,
   setIsPostClicked,
   setPostClickData,
   loading,
 }) => {
-  function formatLikesCount(number) {
-    if (number < 1000) {
-      return number.toString();
-    } else if (number < 1000000) {
-      return (number / 1000).toFixed(1).replace(/\.0$/, "") + "k";
-    } else if (number < 1000000000) {
-      return (number / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
-    } else {
-      return (number / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
-    }
-  }
-
   return (
     <FlexBetween>
       <FlexBetween gap="8px">
-        <FlexBetween>
+        <FlexBetween position="relative">
           <IconButton
             onClick={() => handleLike(ele || [])}
             disabled={loading.postId === ele._id}
@@ -48,7 +36,7 @@ const LikePost = ({
             sx={{ cursor: "pointer" }}
             onClick={() => {
               setShowLikes(true);
-              whoLikes(ele?._id);
+              setPostInfo({ postId: ele._id, userId: null });
             }}
           >
             {formatLikesCount(ele?.likesCount)}
@@ -78,10 +66,6 @@ const LikePost = ({
           {formatLikesCount(ele?.commentCount)}
         </FlexBetween>
       </FlexBetween>
-
-      <IconButton>
-        <ShareOutlined />
-      </IconButton>
     </FlexBetween>
   );
 };

@@ -30,9 +30,11 @@ const SearchThings = ({
     verified: false,
   });
   const [isPostClicked, setIsPostClicked] = useState(false);
+
   const theme = useTheme();
   const medium = theme.palette.neutral.medium;
   const alt = theme.palette.background.alt;
+
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   return (
@@ -73,12 +75,17 @@ const SearchThings = ({
 
           <Box>
             <Typography
-              m="14px 0 10px"
+              m="3px 0 20px"
               fontSize="16px"
               color={medium}
+              textTransform="capitalize"
               sx={{ userSelect: "none" }}
             >
-              Filter Search
+              {loading
+                ? "Loading..."
+                : `${data?.count !== undefined ? data?.count : ""} ${`${type}${
+                    data?.count > 1 ? "s" : ""
+                  }`}`}
             </Typography>
 
             <Box display="flex" gap="10px">
@@ -102,10 +109,10 @@ const SearchThings = ({
                       backgroundColor: "#8080802e",
                     },
                   }}
-                  onClick={() => setType("users")}
+                  onClick={() => setType("user")}
                 >
                   <People
-                    sx={{ color: type === "users" ? "#00D5FA" : medium }}
+                    sx={{ color: type === "user" ? "#00D5FA" : medium }}
                   />
                   Users
                 </Box>
@@ -130,10 +137,10 @@ const SearchThings = ({
                       backgroundColor: "#8080802e",
                     },
                   }}
-                  onClick={() => setType("posts")}
+                  onClick={() => setType("post")}
                 >
                   <CommentSharp
-                    sx={{ color: type === "posts" ? "#00D5FA" : medium }}
+                    sx={{ color: type === "post" ? "#00D5FA" : medium }}
                   />
                   Posts
                 </Box>
@@ -154,8 +161,8 @@ const SearchThings = ({
             justifyContent="center"
             alignContent="baseline"
           >
-            {type === "users" && data?.length > 0
-              ? data?.map((user) => {
+            {type === "user" && data?.data?.length > 0
+              ? data?.data?.map((user) => {
                   return (
                     <Link
                       key={user._id}
@@ -180,6 +187,7 @@ const SearchThings = ({
                           size="70px"
                           isSearch={true}
                         />
+
                         <Box mt="7px">
                           <Box
                             display="flex"
@@ -196,10 +204,12 @@ const SearchThings = ({
                             >
                               {user.firstName} {user.lastName}
                             </Typography>
+
                             {user.verified && (
                               <VerifiedOutlined sx={{ color: "#15a1ed" }} />
                             )}
                           </Box>
+
                           <Typography fontSize="13px" color={medium}>
                             {user.occupation}
                           </Typography>
@@ -210,35 +220,49 @@ const SearchThings = ({
                 })
               : undefined}
 
-            {type === "posts" ? (
+            {type === "post" && (
               <Box width={isNonMobileScreens ? "60%" : "90%"}>
                 <PostWidget
-                  posts={data}
+                  posts={data?.data}
                   postLoading={loading}
                   setPostClickData={setPostClickData}
                   isPostClicked={isPostClicked}
                   setIsPostClicked={setIsPostClicked}
                 />
               </Box>
-            ) : undefined}
-            {loading && type === "users" && <SearchSkeleton />}
+            )}
+
+            {loading && type === "user" && <SearchSkeleton />}
           </Box>
-          <Button
-            sx={{
-              whiteSpace: "nowrap",
-              padding: "5px 23px",
-              border: "2px solid",
-              fontWeight: "500",
-              fontSize: "14px",
-              borderRadius: "20px",
-              width: "200px",
-              display: "block",
-              margin: "auto",
-            }}
-            onClick={() => setPage((prev) => prev + 1)}
-          >
-            More
-          </Button>
+
+          {data?.data?.length < data?.count && (
+            <Button
+              sx={{
+                whiteSpace: "nowrap",
+                padding: "5px 23px",
+                border: "2px solid",
+                fontWeight: "500",
+                fontSize: "14px",
+                borderRadius: "20px",
+                width: "200px",
+                display: "block",
+                margin: "auto",
+              }}
+              onClick={() => setPage((prev) => prev + 1)}
+            >
+              More
+            </Button>
+          )}
+
+          {!loading && data?.data?.length === 0 && (
+            <Typography
+              textAlign="center"
+              fontSize="26px"
+              color={theme.palette.neutral.medium}
+            >
+              There is no result.
+            </Typography>
+          )}
         </Box>
       </Box>
 

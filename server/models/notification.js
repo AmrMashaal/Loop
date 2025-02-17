@@ -2,11 +2,16 @@ import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
   {
-    senderId: { type: String, required: true },
-    receiverId: { type: String, required: true },
-    picturePath: { type: String, required: true },
-    firstName: { type: String, required: true },
-    lastName: String,
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+    receiverId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
     type: {
       type: String,
       enum: ["like", "comment", "message", "newPost", "reply"],
@@ -19,6 +24,8 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Notification = mongoose.model("notification", notificationSchema);
+const Notification =
+  mongoose.models.notification ||
+  mongoose.model("notification", notificationSchema);
 
 export default Notification;

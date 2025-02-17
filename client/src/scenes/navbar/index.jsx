@@ -29,6 +29,7 @@ import { Link, useNavigate } from "react-router-dom";
 import FriendsRequest from "../widgets/FriendsRequest";
 import NotificationData from "../widgets/NotificationData";
 import socket from "../../components/socket";
+import { setIsOverFlow } from "../../App";
 
 // eslint-disable-next-line react/prop-types
 const Navbar = ({ isProfile }) => {
@@ -36,11 +37,12 @@ const Navbar = ({ isProfile }) => {
   const [openRequests, setOpenRequests] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
+  const [isDeleteNotifications, setIsDeleteNotifications] = useState(false);
   const [returnNavColor, setReturnNavColor] = useState(true);
+  const [requestLoading, setRequestLoading] = useState(true);
   const [friendsRequestData, setFriendRequestData] = useState([]);
   const [notificationsState, setNotificationsState] = useState(null);
   const [watchedNotifications, setWatchedNotifications] = useState(null);
-  const [isDeleteNotifications, setIsDeleteNotifications] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchValue, setSearchValue] = useState("");
 
@@ -61,6 +63,8 @@ const Navbar = ({ isProfile }) => {
   const fullName = `${user?.firstName} ${user?.lastName}`;
 
   const friendsRequest = async () => {
+    setRequestLoading(true);
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/friends/friendRequest/${user._id}`,
@@ -76,6 +80,8 @@ const Navbar = ({ isProfile }) => {
       dispatch(setFriendsRequest({ friendsRequestState: data }));
     } catch (error) {
       console.log(error);
+    } finally {
+      setRequestLoading(false);
     }
   };
 
@@ -153,8 +159,6 @@ const Navbar = ({ isProfile }) => {
   };
 
   useEffect(() => {
-    friendsRequest();
-
     const navScroll = () => {
       if (window.scrollY > 77) {
         setReturnNavColor(false);
@@ -173,6 +177,12 @@ const Navbar = ({ isProfile }) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (openRequests) {
+      friendsRequest();
+    }
+  }, [openRequests]);
 
   useEffect(() => {
     socket.on("getNotifications", (data) => {
@@ -206,7 +216,13 @@ const Navbar = ({ isProfile }) => {
   }, [notificationsState]);
 
   useEffect(() => {
-    document.body.style.overflow = isMobileMenuToggled ? "hidden" : "unset";
+    if (!isNonMobileScreens) {
+      if (isMobileMenuToggled) {
+        setIsOverFlow(true);
+      } else {
+        setIsOverFlow(false);
+      }
+    }
   }, [isMobileMenuToggled, mode]);
 
   useEffect(() => {
@@ -939,6 +955,7 @@ const Navbar = ({ isProfile }) => {
           setIsMobileMenuToggled={setIsMobileMenuToggled}
           friendsRequestData={friendsRequestData}
           setFriendRequestData={setFriendRequestData}
+          requestLoading={requestLoading}
         />
       )}
 

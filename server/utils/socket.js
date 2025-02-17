@@ -1,3 +1,6 @@
+import User from "../models/User.js";
+import Notification from "../models/notification.js";
+
 const onlineUsers = {};
 
 export const initSocket = (io) => {
@@ -5,25 +8,23 @@ export const initSocket = (io) => {
     socket.on("userOnline", async (data) => {
       onlineUsers[data.userId] = socket.id;
 
-      await fetch(
-        `${process.env.FRONTEND_FETCHING_LINK}/users/${data.userId}/onlineState`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            makeOnline: true,
-          }),
-        }
-      );
+      try {
+        const user = await User.findById(data.userId);
+
+        user.online = true;
+
+        await user.save();
+      } catch (error) {
+        console.log(error.message);
+      }
     });
 
     // --------------------------------------------------------
 
     socket.on("sendMessage", (data) => {
+      console.log()
       socket
-        .to(onlineUsers[data.receivedId])
+        .to(onlineUsers[data.receiverId])
         .emit("receiveMessage", data.message);
     });
 
@@ -44,38 +45,28 @@ export const initSocket = (io) => {
       // ------------------------------------------------------
       else if (data.notification.type === "newPost") {
         for (const friend in data.friends) {
-          const response = await fetch(
-            `${process.env.FRONTEND_FETCHING_LINK}/notifications/${data._id}/${data.friends[friend]._id}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${data.token}`,
-              },
+          try {
+            const newNotification = new Notification({
+              type: "newPost",
+              description: `${data.firstName} shared a new post`,
+              linkId: data.postId,
+              receiverId: data.friends[friend],
+              senderId: data._id,
+            });
 
-              body: JSON.stringify({
-                type: "newPost",
-                description: `${data.firstName} shared a new post`,
-                linkId: data.postId,
-                receiverId: data.friends[friend]._id,
-                senderId: data._id,
-              }),
-            }
-          );
+            await newNotification.save();
 
-          const notification = await response.json();
+            await newNotification.populate(
+              "senderId receiverId",
+              "picturePath"
+            );
 
-          console.log(
-            onlineUsers[
-              data?.friends[friend]?.sender?._id === data?._id
-                ? data?.friends[friend]?.receiver?._id.toString()
-                : data?.friends[friend]?.sender?._id.toString()
-            ]
-          );
-
-          socket
-            .to(onlineUsers[data.friends[friend]._id])
-            .emit("friendNewPost", notification);
+            socket
+              .to(onlineUsers[data.friends[friend]])
+              .emit("friendNewPost", newNotification);
+          } catch (error) {
+            console.log(error.message);
+          }
         }
       }
     });
@@ -91,18 +82,15 @@ export const initSocket = (io) => {
         delete onlineUsers[userId];
       }
 
-      await fetch(
-        `${process.env.FRONTEND_FETCHING_LINK}/users/${userId}/onlineState`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            makeOnline: false,
-          }),
-        }
-      );
+      try {
+        const user = await User.findById(userId);
+
+        user.online = false;
+
+        await user.save();
+      } catch (error) {
+        console.log(error.message);
+      }
     });
   });
 };

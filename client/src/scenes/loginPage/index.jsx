@@ -1,6 +1,8 @@
 import { Box, useTheme, useMediaQuery, Typography } from "@mui/material";
 import Form from "./Form";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { setIsOverFlow } from "../../App";
 
 const LoginPage = () => {
   const theme = useTheme();
@@ -9,8 +11,10 @@ const LoginPage = () => {
 
   const mode = useSelector((state) => state.mode);
 
-  document.body.style.overflow = "auto";
-  document.title = "Loop";
+  useEffect(() => {
+    document.title = "Loop";
+    setIsOverFlow(false);
+  }, []);
 
   const defaultColor = theme.palette.background.default;
 

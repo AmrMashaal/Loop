@@ -23,7 +23,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../../../state";
 import FlexBetween from "../../components/FlexBetween";
 import { Link } from "react-router-dom";
-// import { badWords } from "../../../infoArrays";
 
 const MyPostWidget = ({ picturePath, socket }) => {
   const dispatch = useDispatch();

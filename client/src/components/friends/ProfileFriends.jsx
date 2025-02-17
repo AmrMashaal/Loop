@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import WidgetWrapper from "../WidgetWrapper";
 import { useSelector } from "react-redux";
 import { VerifiedOutlined } from "@mui/icons-material";
-import { Box, useMediaQuery } from "@mui/system";
+import { Box, useMediaQuery, useTheme } from "@mui/system";
 import { Button, Typography } from "@mui/material";
 import UserImage from "../UserImage";
 import { Link } from "react-router-dom";
@@ -18,6 +18,8 @@ const ProfileFriends = ({ userParam }) => {
   const token = useSelector((state) => state.token);
 
   const isNonMobileScreens = useMediaQuery("(min-width: 555px)");
+
+  const { palette } = useTheme();
 
   const handleGetFriends = async (initial = false) => {
     setLoading(true);
@@ -143,6 +145,18 @@ const ProfileFriends = ({ userParam }) => {
           <Box sx={{ gridColumn: "span 4" }}>
             <ProfileFriendsSkeleton />
           </Box>
+        )}
+
+        {!loading && friends.friends.length === 0 && (
+          <Typography
+            my="10px"
+            fontSize="17px"
+            color={palette.neutral.medium}
+            textAlign="center"
+            sx={{ gridColumn: "span 4" }}
+          >
+            Doesn&apos;t Have Friends Yet
+          </Typography>
         )}
 
         {friends?.friends?.length !== friends?.count && (

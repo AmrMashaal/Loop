@@ -178,21 +178,25 @@ export const editComment = async (req, res) => {
   try {
     const comment = await Comment.findById(commentId);
 
-    if (!comment) {
-      return res.status(404).json({ message: "comment is not found" });
+    if (req.user.id === comment.user.toString()) {
+      if (!comment) {
+        return res.status(404).json({ message: "comment is not found" });
+      }
+
+      comment.text = req.body.text;
+      comment.edited = true;
+
+      await comment.save();
+
+      await comment.populate(
+        "user",
+        "_id verified firstName lastName picturePath"
+      );
+
+      res.status(200).json(comment);
+    } else {
+      res.status(403).json({ message: "Forbidden!" });
     }
-
-    comment.text = req.body.text;
-    comment.edited = true;
-
-    await comment.save();
-
-    await comment.populate(
-      "user",
-      "_id verified firstName lastName picturePath"
-    );
-
-    res.status(200).json(comment);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -204,15 +208,26 @@ export const pinComment = async (req, res) => {
   try {
     const comment = await Comment.findById(commentId);
 
-    if (!comment) {
-      return res.status(404).json({ message: "comment is not found" });
+    const postOfComment = await Post.findById(comment.postId);
+
+    if (req.user.id === postOfComment.userId.toString()) {
+      if (!comment) {
+        return res.status(404).json({ message: "comment is not found" });
+      }
+
+      comment.pinned = !comment.pinned;
+
+      await comment.save();
+
+      await comment.populate(
+        "user",
+        "_id verified firstName lastName picturePath"
+      );
+
+      res.status(200).json(comment);
+    } else {
+      res.status(403).json({ message: "Forbidden!" });
     }
-
-    comment.pinned = !comment.pinned;
-
-    await comment.save();
-
-    res.status(200).json(comment);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }

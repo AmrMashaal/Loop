@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import TasksComponent from "../../components/TasksComponent";
 import FlexBetween from "../../components/FlexBetween";
@@ -16,8 +15,8 @@ const FriendsRequest = ({
   friendsRequestData,
   setIsMobileMenuToggled,
   setFriendRequestData,
+  requestLoading,
 }) => {
-  const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
 
   // -------------------------------------------------------
@@ -72,7 +71,8 @@ const FriendsRequest = ({
       setOpen={setOpenRequests}
       description="Friend Request"
     >
-      {friendsRequestData.length !== 0 &&
+      {!requestLoading &&
+        friendsRequestData.length !== 0 &&
         friendsRequestData?.map((request) => {
           console.log(request);
           if (request?._id === undefined) {
@@ -152,7 +152,8 @@ const FriendsRequest = ({
             </Box>
           );
         })}
-      {friendsRequestData.length === 0 && (
+
+      {!requestLoading && friendsRequestData.length === 0 && (
         <Box
           display="flex"
           justifyContent="center"
@@ -168,6 +169,10 @@ const FriendsRequest = ({
         >
           <Typography fontSize="25px">There is no friend request</Typography>
         </Box>
+      )}
+
+      {requestLoading && (
+        <Box className="loadingAnimation" width="30px" height="30px"></Box>
       )}
     </TasksComponent>
   );

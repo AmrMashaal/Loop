@@ -16,6 +16,7 @@ import { useState } from "react";
 import DeleteComponent from "./DeleteComponent";
 import EditThing from "./EditThing";
 import socket from "../socket";
+import { formatLikesCount } from "../../frequentFunctions";
 
 const Replies = ({
   data,
@@ -23,12 +24,10 @@ const Replies = ({
   timeAgo,
   user,
   testArabic,
-  escapeHtml,
   convertTextLink,
   setOpenPhotoImage,
   setIsOpenPhoto,
   setShowLikes,
-  whoLikes,
   setCommentsState,
   setInputType,
   token,
@@ -36,6 +35,8 @@ const Replies = ({
   palette,
   isNonMobileScreens,
   postId,
+  setShowLikesType,
+  setShowLikesId,
 }) => {
   const [replyText, setReplyText] = useState("");
   const [replyId, setReplyId] = useState(null);
@@ -47,18 +48,6 @@ const Replies = ({
     loading: false,
     replyId: null,
   });
-
-  function formatLikesCount(number) {
-    if (number < 1000) {
-      return number.toString();
-    } else if (number < 1000000) {
-      return (number / 1000).toFixed(1).replace(/\.0$/, "") + "k";
-    } else if (number < 1000000000) {
-      return (number / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
-    } else {
-      return (number / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
-    }
-  }
 
   const handleDeleteReply = async () => {
     try {
@@ -267,7 +256,7 @@ const Replies = ({
                       }}
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(
-                          escapeHtml(convertTextLink(reply.reply)),
+                          convertTextLink(reply.reply),
                           {
                             ADD_ATTR: ["target", "rel"],
                           }
@@ -330,7 +319,9 @@ const Replies = ({
                           userSelect: "none",
                         }}
                         onClick={() => {
-                          setShowLikes(true), whoLikes(reply?._id, "reply");
+                          setShowLikes(true);
+                          setShowLikesType("reply");
+                          setShowLikesId(reply._id);
                         }}
                       >
                         {formatLikesCount(reply?.likesCount)}

@@ -3,8 +3,6 @@ import { Typography } from "@mui/material";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { setFriends } from "../../../state";
 import OnlineFriends from "../../components/friends/OnlineFriends";
 import UserFriends from "../../components/friends/UserFriends";
 import FlexBetween from "../../components/FlexBetween";
@@ -25,7 +23,6 @@ const FriendsWidget = ({
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
 
-  const dispatch = useDispatch();
 
   const handleUserFriend = async () => {
     if (type === "friends") {
@@ -42,10 +39,6 @@ const FriendsWidget = ({
         );
 
         const friends = await response.json();
-
-        if (user._id === userId) {
-          dispatch(setFriends({ friends: friends }));
-        }
 
         setUserFriends(friends);
       } catch (error) {

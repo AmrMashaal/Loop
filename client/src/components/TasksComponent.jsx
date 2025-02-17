@@ -3,20 +3,28 @@ import { Close } from "@mui/icons-material";
 import { Divider, IconButton, Typography } from "@mui/material";
 import { Box, useMediaQuery, useTheme } from "@mui/system";
 import { useEffect } from "react";
+import { setIsOverFlow } from "../App";
 
-const TasksComponent = ({ children, open, setOpen, description, id = "" }) => {
+const TasksComponent = ({
+  children,
+  open,
+  setOpen,
+  description,
+  id = "",
+  setPage,
+}) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const theme = useTheme();
 
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = "hidden";
+      setIsOverFlow(true);
     } else {
-      document.body.style.overflow = "hidden";
+      setIsOverFlow(false);
     }
 
     return () => {
-      document.body.style.overflow = "unset";
+      setIsOverFlow(false);
     };
   }, [open]);
 
@@ -29,7 +37,7 @@ const TasksComponent = ({ children, open, setOpen, description, id = "" }) => {
       left="0"
       display="flex"
       alignItems="center"
-      zIndex="11111"
+      zIndex="1111"
       justifyContent="center"
     >
       <Box
@@ -38,6 +46,7 @@ const TasksComponent = ({ children, open, setOpen, description, id = "" }) => {
         height="100%"
         onClick={() => {
           setOpen(false);
+          setPage && setPage(1);
         }}
         bgcolor="#00000066"
       ></Box>
@@ -74,7 +83,12 @@ const TasksComponent = ({ children, open, setOpen, description, id = "" }) => {
           <Typography fontSize="15px" textTransform="capitalize">
             {description}
           </Typography>
-          <IconButton onClick={() => setOpen(false)}>
+          <IconButton
+            onClick={() => {
+              setOpen(false);
+              setPage && setPage(1);
+            }}
+          >
             <Close />
           </IconButton>
         </Box>

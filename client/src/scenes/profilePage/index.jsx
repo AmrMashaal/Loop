@@ -16,12 +16,13 @@ import WrongPassword from "../../components/WrongPassword";
 import socket from "../../components/socket";
 import ProfileFriends from "../../components/friends/ProfileFriends";
 import ProfileAbout from "../../components/profile/ProfileAbout";
+import { setIsOverFlow } from "../../App";
 
 const ProfilePage = () => {
   const [page, setPage] = useState(1);
   const [postsCount, setPostsCount] = useState(0);
   const [userInfo, setUserInfo] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
   const [isPostClicked, setIsPostClicked] = useState(false);
   const [wrongPassword, setWrongPassword] = useState(false);
@@ -52,7 +53,13 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  document.body.style.overflow = isPostClicked ? "hidden" : "unset";
+  useEffect(() => {
+    if (isPostClicked) {
+      setIsOverFlow(true);
+    } else {
+      setIsOverFlow(false);
+    }
+  }, [isPostClicked]);
 
   async function getPosts(reset = false) {
     page === 1 && setIsLoading(true);
@@ -388,6 +395,7 @@ const ProfilePage = () => {
                             setPostClickData={setPostClickData}
                             isPostClicked={isPostClicked}
                             setIsPostClicked={setIsPostClicked}
+                            postLoading={isLoading}
                           />
                           {isPostClicked && (
                             <PostClick

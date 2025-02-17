@@ -60,7 +60,7 @@ const ProfileAbout = ({ userInfo }) => {
                 name :
               </Typography>
 
-              <Typography fontSize="17px" fontWeight="500">
+              <Typography fontSize="17px">
                 {userInfo?.firstName} {userInfo?.lastName}
               </Typography>
             </Box>
@@ -80,9 +80,7 @@ const ProfileAbout = ({ userInfo }) => {
                 username :
               </Typography>
 
-              <Typography fontSize="17px" fontWeight="500">
-                {userInfo?.username}
-              </Typography>
+              <Typography fontSize="17px">{userInfo?.username}</Typography>
             </Box>
 
             <Box
@@ -100,7 +98,7 @@ const ProfileAbout = ({ userInfo }) => {
                 birthdate :
               </Typography>
 
-              <Typography fontSize="17px" fontWeight="500">
+              <Typography fontSize="17px">
                 {userInfo?.birthdate?.split("-").join("/")}
               </Typography>
             </Box>
@@ -120,7 +118,7 @@ const ProfileAbout = ({ userInfo }) => {
                 age :
               </Typography>
 
-              <Typography fontSize="17px" fontWeight="500">
+              <Typography fontSize="17px">
                 {calculateAge(userInfo?.birthdate)}
               </Typography>
             </Box>
@@ -140,11 +138,7 @@ const ProfileAbout = ({ userInfo }) => {
                 gender :
               </Typography>
 
-              <Typography
-                fontSize="17px"
-                fontWeight="500"
-                textTransform="capitalize"
-              >
+              <Typography fontSize="17px" textTransform="capitalize">
                 {userInfo?.gender}
               </Typography>
             </Box>
@@ -164,9 +158,7 @@ const ProfileAbout = ({ userInfo }) => {
                 location :
               </Typography>
 
-              <Typography fontSize="17px" fontWeight="500">
-                {userInfo?.location}
-              </Typography>
+              <Typography fontSize="17px">{userInfo?.location}</Typography>
             </Box>
 
             <Box
@@ -184,9 +176,7 @@ const ProfileAbout = ({ userInfo }) => {
                 occupation :
               </Typography>
 
-              <Typography fontSize="17px" fontWeight="500">
-                {userInfo?.occupation}
-              </Typography>
+              <Typography fontSize="17px">{userInfo?.occupation}</Typography>
             </Box>
           </Box>
 
@@ -225,7 +215,6 @@ const ProfileAbout = ({ userInfo }) => {
 
                   <Link
                     fontSize="17px"
-                    fontWeight="500"
                     to={userInfo?.links?.facebook}
                     target="_blank"
                     style={{
@@ -261,7 +250,6 @@ const ProfileAbout = ({ userInfo }) => {
 
                   <Link
                     fontSize="17px"
-                    fontWeight="500"
                     to={userInfo?.links?.instagram}
                     target="_blank"
                     style={{
@@ -297,7 +285,6 @@ const ProfileAbout = ({ userInfo }) => {
 
                   <Link
                     fontSize="17px"
-                    fontWeight="500"
                     to={`${userInfo?.links?.linkedin}`}
                     target="_blank"
                     style={{
@@ -329,7 +316,6 @@ const ProfileAbout = ({ userInfo }) => {
 
                   <Link
                     fontSize="17px"
-                    fontWeight="500"
                     to={userInfo?.links?.x}
                     target="_blank"
                     style={{
@@ -361,7 +347,6 @@ const ProfileAbout = ({ userInfo }) => {
 
                   <Link
                     fontSize="17px"
-                    fontWeight="500"
                     to={userInfo?.links?.youtube}
                     target="_blank"
                     style={{
