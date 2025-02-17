@@ -32,13 +32,7 @@ app.use(morgan("common"));
 app.use(express.json({ limit: "30mb", extended: true }));
 app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
-app.use(
-  cors({
-    origin: ["https://loop-frontend-five.vercel.app/"],
-    methods: ["POST", "GET"],
-    credentials: true,
-  })
-);
+app.use(cors());
 
 // Routes
 app.use("/auth", authRoutes);
