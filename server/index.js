@@ -23,6 +23,10 @@ const serverConnection = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
   } catch (err) {
     console.log(err);
   }
