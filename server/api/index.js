@@ -5,17 +5,17 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
-import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/users.js";
-import postRoutes from "./routes/posts.js";
-import messageRoutes from "./routes/messages.js";
-import commentRoutes from "./routes/comments.js";
+import authRoutes from "../routes/auth.js";
+import userRoutes from "../routes/users.js";
+import postRoutes from "../routes/posts.js";
+import messageRoutes from "../routes/messages.js";
+import commentRoutes from "../routes/comments.js";
 import searchRoutes from "./routes/search.js";
-import notificationRoutes from "./routes/notifications.js";
-import likeRoutes from "./routes/likes.js";
-import friendRoutes from "./routes/friends.js";
-import replyRoutes from "./routes/reply.js";
-import lastMessageRoutes from "./routes/lastMessage.js";
+import notificationRoutes from "../routes/notifications.js";
+import likeRoutes from "../routes/likes.js";
+import friendRoutes from "../routes/friends.js";
+import replyRoutes from "../routes/reply.js";
+import lastMessageRoutes from "../routes/lastMessage.js";
 
 dotenv.config();
 
