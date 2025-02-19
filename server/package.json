@@ -5,9 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "install": "pnpm install",
-    "build": "npm install"
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
