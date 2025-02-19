@@ -25,7 +25,7 @@ const serverConnection = async () => {
     });
 
     server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Server listening on port ${PORT}...`);
     });
   } catch (err) {
     console.log(err);
@@ -34,4 +34,6 @@ const serverConnection = async () => {
 
 serverConnection();
 
-export default server;
+// ?.updateMany({}, { $set: { ?: 0 } })
+// .then((result) => console.log("Users updated:", result))
+// .catch((err) => console.error(err));
