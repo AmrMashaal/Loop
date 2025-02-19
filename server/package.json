@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "install": "npm install",
+    "vercel-build": "npm run install"
   },
   "keywords": [],
   "author": "",

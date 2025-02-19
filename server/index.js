@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import http from "http";
 import { Server } from "socket.io";
-import app from "./api/index.js";
+import app from "./app.js";
 import { initSocket } from "./utils/socket.js";
 
 const server = http.createServer(app);
