@@ -68,7 +68,7 @@ const LoginPage = () => {
           }}
         >
           <img
-            src="\public\assets\Untitled_Project-removebg-preview.png"
+            src="/public/assets/Untitled_Project-removebg-preview.png"
             alt=""
             width="100%"
           />

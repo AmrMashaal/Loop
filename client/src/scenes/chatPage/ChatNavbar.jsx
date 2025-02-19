@@ -65,13 +65,13 @@ const ChatNavbar = ({ setOpenChats, lastMessageData, userParam,fromNav }) => {
             onClick={() => navigate("/")}
           >
             <img
-              src="\public\assets\logoSInArrow.png"
+              src="/public/assets/logoSInArrow.png"
               alt="loop-icon"
               width="40"
               style={{ pointerEvents: "none" }}
             />
             <img
-              src="\public\assets\arrow.png"
+              src="/public/assets/arrow.png"
               alt="loop-icon"
               width="40"
               className="imageArrow"
