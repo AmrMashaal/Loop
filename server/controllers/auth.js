@@ -84,7 +84,7 @@ export const login = async (req, res) => {
   
   try {
     const user = await User.findOne({ username });
-
+    console.log(req.body.username);
     const realPassword = await bcrypt.compare(password, user.password);
 
     if (!user) {
