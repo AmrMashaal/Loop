@@ -12,7 +12,7 @@ export const getUser = async (req, res) => {
   const id = req.params.id;
 
   try {
-    let user = await user.findOne({ _id: id });
+    let user = await User.findOne({ _id: id });
 
     const { password, ...dataWithoutPassword } = user.toObject();
 
@@ -93,7 +93,7 @@ export const editUser = async (req, res) => {
       } = req.body;
 
       const user = await User.findById(id);
-      const isUserName = await user.findOne({ username });
+      const isUserName = await User.findOne({ username });
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });

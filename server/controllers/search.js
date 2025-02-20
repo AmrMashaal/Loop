@@ -9,16 +9,15 @@ export const searchInfo = async (req, res) => {
 
   try {
     if (type === "users") {
-      let users = await user
-        ?.find({
-          $or: [
-            { firstName: { $regex: firstWord, $options: "i" } },
-            ...(secondWord
-              ? [{ lastName: { $regex: secondWord, $options: "i" } }]
-              : []),
-            { username: { $regex: firstWord, $options: "i" } },
-          ],
-        })
+      let users = await User.find({
+        $or: [
+          { firstName: { $regex: firstWord, $options: "i" } },
+          ...(secondWord
+            ? [{ lastName: { $regex: secondWord, $options: "i" } }]
+            : []),
+          { username: { $regex: firstWord, $options: "i" } },
+        ],
+      })
         .limit(10)
         .skip((page - 1) * 10)
         .sort({ verified: -1, firstName: 1 });
@@ -28,7 +27,7 @@ export const searchInfo = async (req, res) => {
         return dataWithoutPassword;
       });
 
-      const count = await user.countDocuments({
+      const count = await User.countDocuments({
         $or: [
           { firstName: { $regex: firstWord, $options: "i" } },
           ...(secondWord

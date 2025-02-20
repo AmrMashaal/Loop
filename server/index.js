@@ -19,10 +19,7 @@ initSocket(io);
 
 const serverConnection = async () => {
   try {
-    mongoose.connect(process.env.MONGODB_KEY, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    mongoose.connect(process.env.MONGODB_KEY);
 
     server.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}...`);
