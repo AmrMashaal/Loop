@@ -10,7 +10,7 @@ import userRoutes from "../routes/users.js";
 import postRoutes from "../routes/posts.js";
 import messageRoutes from "../routes/messages.js";
 import commentRoutes from "../routes/comments.js";
-import searchRoutes from "./routes/search.js";
+import searchRoutes from "../routes/search.js";
 import notificationRoutes from "../routes/notifications.js";
 import likeRoutes from "../routes/likes.js";
 import friendRoutes from "../routes/friends.js";
