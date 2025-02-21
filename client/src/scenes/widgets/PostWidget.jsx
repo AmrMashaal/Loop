@@ -596,7 +596,7 @@ const PostWidget = ({
             mb="10px"
           >
             <img
-              src="/public/assets/5784488_2968170-removebg-preview.png"
+              src="/assets/5784488_2968170-removebg-preview.png"
               alt=""
               width="280"
               style={{ userSelect: "none", maxWidth: "100%" }}

@@ -4,7 +4,7 @@ import { IconButton, Typography } from "@mui/material";
 import { Box, useMediaQuery } from "@mui/system";
 import { Link, useNavigate } from "react-router-dom";
 
-const ChatNavbar = ({ setOpenChats, lastMessageData, userParam,fromNav }) => {
+const ChatNavbar = ({ setOpenChats, lastMessageData, userParam, fromNav }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const navigate = useNavigate();
@@ -65,13 +65,13 @@ const ChatNavbar = ({ setOpenChats, lastMessageData, userParam,fromNav }) => {
             onClick={() => navigate("/")}
           >
             <img
-              src="/public/assets/logoSInArrow.png"
+              src="/assets/logoSInArrow.png"
               alt="loop-icon"
               width="40"
               style={{ pointerEvents: "none" }}
             />
             <img
-              src="/public/assets/arrow.png"
+              src="/assets/arrow.png"
               alt="loop-icon"
               width="40"
               className="imageArrow"

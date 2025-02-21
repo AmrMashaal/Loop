@@ -290,13 +290,13 @@ const Navbar = ({ isProfile }) => {
           onClick={() => navigate("/")}
         >
           <img
-            src="/public/assets/logoSInArrow.png"
+            src="/assets/logoSInArrow.png"
             alt="loop-icon"
             width={isNonMobileScreens ? "50" : "40"}
             style={{ pointerEvents: "none" }}
           />
           <img
-            src="/public/assets/arrow.png"
+            src="/assets/arrow.png"
             alt="loop-icon"
             width={isNonMobileScreens ? "50" : "40"}
             className="imageArrow"

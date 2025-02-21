@@ -68,7 +68,7 @@ const LoginPage = () => {
           }}
         >
           <img
-            src="/public/assets/Untitled_Project-removebg-preview.png"
+            src="/assets/Untitled_Project-removebg-preview.png"
             alt=""
             width="100%"
           />
@@ -91,7 +91,7 @@ const LoginPage = () => {
           flexDirection={isNonMobileScreen ? "row" : "column"}
         >
           <img
-            src="/public/assets/Screenshot_13-10-2024_0245_picsart.com-removebg-preview.png"
+            src="/assets/Screenshot_13-10-2024_0245_picsart.com-removebg-preview.png"
             alt="loop-icon"
             width="100"
             style={{
