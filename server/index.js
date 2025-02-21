@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 6001;
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_LINK,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
   },
 });
 
