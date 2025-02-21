@@ -39,19 +39,6 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        fontSrc: ["'self'", "https:"],
-      },
-    },
-  })
-);
 
 // Routes
 app.use("/auth", authRoutes);
