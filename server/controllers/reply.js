@@ -31,8 +31,6 @@ export const getReplies = async (req, res) => {
           replyId: reply._id.toString(),
         });
 
-        console.log(req.user.id, reply._id.toString());
-
         return {
           ...reply._doc,
           isLiked: Boolean(isLiked),

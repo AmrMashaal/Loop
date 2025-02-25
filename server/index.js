@@ -22,15 +22,15 @@ const serverConnection = async () => {
     mongoose.connect(process.env.MONGODB_KEY);
 
     server.listen(PORT, () => {
-      console.log(`Server listening on port ${PORT}...`);
+      if (process.env.NODE_ENV === "development") {
+        console.log(`Server listening on port ${PORT}...`);
+      }
     });
   } catch (err) {
-    console.log(err);
+    if (process.env.NODE_ENV === "development") {
+      console.log(err.message);
+    }
   }
 };
 
 serverConnection();
-
-// ?.updateMany({}, { $set: { ?: 0 } })
-// .then((result) => console.log("Users updated:", result))
-// .catch((err) => console.error(err));

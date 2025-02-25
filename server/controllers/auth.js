@@ -17,11 +17,15 @@ export const register = async (req, res) => {
 
   if (req.file) {
     try {
- const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
+      const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
       const compressedBuffer = await compressImage(req.file.buffer);
       const result = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
-          { resource_type: "image", public_id: uniqueImageName, folder: "posts" },
+          {
+            resource_type: "image",
+            public_id: uniqueImageName,
+            folder: "posts",
+          },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
@@ -82,10 +86,10 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
     const user = await User.findOne({ username });
-    console.log(req.body.username);
+
     const realPassword = await bcrypt.compare(password, user.password);
 
     if (!user) {

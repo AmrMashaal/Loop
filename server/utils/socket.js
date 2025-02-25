@@ -15,14 +15,15 @@ export const initSocket = (io) => {
 
         await user.save();
       } catch (error) {
-        console.log(error.message);
+        if (process.env.NODE_ENV === "development") {
+          console.log(error.message);
+        }
       }
     });
 
     // --------------------------------------------------------
 
     socket.on("sendMessage", (data) => {
-      console.log()
       socket
         .to(onlineUsers[data.receiverId])
         .emit("receiveMessage", data.message);
@@ -65,7 +66,9 @@ export const initSocket = (io) => {
               .to(onlineUsers[data.friends[friend]])
               .emit("friendNewPost", newNotification);
           } catch (error) {
-            console.log(error.message);
+            if (process.env.NODE_ENV === "development") {
+              console.log(error.message);
+            }
           }
         }
       }
@@ -89,7 +92,9 @@ export const initSocket = (io) => {
 
         await user.save();
       } catch (error) {
-        console.log(error.message);
+        if (process.env.NODE_ENV === "development") {
+          console.log(error.message);
+        }
       }
     });
   });
