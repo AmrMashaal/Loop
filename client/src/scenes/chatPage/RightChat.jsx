@@ -11,7 +11,6 @@ import Dropzone from "react-dropzone";
 const RightChat = ({
   messages,
   user,
-  decryptMessage,
   realTime,
   handleFormSubmit,
   setImage,
@@ -88,11 +87,9 @@ const RightChat = ({
                 <Typography p="10px 10px 3px">{msg?.text}</Typography>
               )}
 
-              {msg?.picturePath && decryptMessage(msg?.picturePath) && (
+              {msg?.picturePath && msg?.picturePath && (
                 <img
-                  src={`${import.meta.env.VITE_API_URL}/assets/${decryptMessage(
-                    msg?.picturePath
-                  )}`}
+                  src={msg?.picturePath}
                   style={{
                     maxWidth: "100%",
                     width: "350px",
@@ -104,8 +101,7 @@ const RightChat = ({
                   }}
                   alt=""
                   onClick={() => {
-                    setShowImage(true),
-                      setImageName(decryptMessage(msg?.picturePath));
+                    setShowImage(true), setImageName(msg?.picturePath);
                   }}
                 />
               )}
@@ -217,9 +213,9 @@ const RightChat = ({
           placeholder="write a message..."
           onChange={(e) => {
             if (e.target.value.length > 1500) {
-              setMessage(e.target.value.slice(0, 1480))
+              setMessage(e.target.value.slice(0, 1480));
             } else {
-              setMessage(e.target.value)
+              setMessage(e.target.value);
             }
           }}
           value={message}

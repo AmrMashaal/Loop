@@ -37,11 +37,7 @@ const UserImage = ({
         }}
         width={size}
         height={size}
-        src={
-          image
-            ? `${import.meta.env.VITE_API_URL}/assets/${image}`
-            : "/assets/loading-user.png"
-        }
+        src={image ? image : "/assets/loading-user.png"}
         alt="user img"
       />
 

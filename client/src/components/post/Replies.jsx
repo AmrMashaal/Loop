@@ -267,9 +267,7 @@ const Replies = ({
 
                   {reply.picturePath && (
                     <img
-                      src={`${import.meta.env.VITE_API_URL}/assets/${
-                        reply.picturePath
-                      }`}
+                      src={reply.picturePath}
                       alt={reply.picturePath}
                       style={{
                         width: "300px",

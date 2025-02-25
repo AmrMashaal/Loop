@@ -2,7 +2,7 @@
 const PostImg = ({ setIsPostClicked, setPostClickData, ele }) => {
   return (
     <img
-      src={`${import.meta.env.VITE_API_URL}/assets/${ele.picturePath}`}
+      src={ele.picturePath}
       alt="Post Picture"
       style={{
         maxHeight: "560px",

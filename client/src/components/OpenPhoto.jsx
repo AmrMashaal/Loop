@@ -53,8 +53,7 @@ const OpenPhoto = ({ photo, setIsImagOpen }) => {
         justifyContent="center"
       >
         <img
-          src={`${import.meta.env.VITE_API_URL}/assets/${photo}`}
-          alt=""
+          src={photo}
           style={{
             zIndex: "1",
             position: "relative",

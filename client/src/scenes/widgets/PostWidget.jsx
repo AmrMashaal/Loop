@@ -544,10 +544,8 @@ const PostWidget = ({
               image={
                 posts.filter((post) => post._id === postInfo.postId)[0]
                   ?.picturePath
-                  ? `${import.meta.env.VITE_API_URL}/assets/${
-                      posts.filter((post) => post._id === postInfo.postId)[0]
-                        ?.picturePath
-                    }`
+                  ? posts.filter((post) => post._id === postInfo.postId)[0]
+                      ?.picturePath
                   : null
               }
               description={

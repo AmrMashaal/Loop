@@ -1,9 +1,9 @@
-import { v4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import Comment from "../models/Comment.js";
 import Notification from "../models/notification.js";
 import Like from "../models/Like.js";
 import sharp from "sharp";
-import path from "path";
+import cloudinary from "../utils/cloudinary.js";
 import mongoose from "mongoose";
 import Post from "../models/Post.js";
 import Reply from "../models/Reply.js";
@@ -100,18 +100,23 @@ export const postCommentOriginal = async (req, res) => {
 
   if (req.file) {
     try {
-      const uniqueImageName = `${v4()}-${req.file.originalname}`;
+      const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
       const compressedBuffer = await compressImage(req.file.buffer);
-      const filePath = path.join(
-        process.cwd(),
-        "public/assets",
-        uniqueImageName
-      );
-
-      // Save the compressed image to the file system
-      await sharp(compressedBuffer).toFile(filePath);
-      req.file.path = filePath; // Update file path for potential future use
-      picturePath = uniqueImageName;
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: "image",
+            public_id: uniqueImageName,
+            folder: "posts",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(compressedBuffer);
+      });
+      picturePath = result.secure_url;
     } catch (error) {
       res.status(500).json({ message: error });
     }

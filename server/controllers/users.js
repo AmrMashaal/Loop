@@ -1,10 +1,10 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
 import sharp from "sharp";
-import { v4 } from "uuid";
-import path from "path";
+import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import Friend from "../models/Friend.js";
+import cloudinary from "../utils/cloudinary.js";
 
 // ---------------------------------------------------------------
 
@@ -40,35 +40,51 @@ export const editUser = async (req, res) => {
     if (req.file) {
       if (req.body.picturePath && !req.body.background) {
         try {
-          const uniqueImageName = `${v4()}-${req.file.originalname}`;
-          const compressedBuffer = await compressImage(req.file.buffer);
-          const filePath = path.join(
-            process.cwd(),
-            "public/assets",
-            uniqueImageName
-          );
+          const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
 
-          // Save the compressed image to the file system
-          await sharp(compressedBuffer).toFile(filePath);
-          req.file.path = filePath; // Update file path for potential future use
-          picturePath = uniqueImageName;
+          const compressedBuffer = await compressImage(req.file.buffer);
+
+          const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                resource_type: "image",
+                public_id: uniqueImageName,
+                folder: "posts",
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+            uploadStream.end(compressedBuffer);
+          });
+
+          picturePath = result.secure_url;
         } catch (err) {
           res.status(500).json({ message: err.message });
         }
       } else if (req.body.background && !req.body.picturePath) {
         try {
-          const uniqueImageName = `${v4()}-${req.file.originalname}`;
-          const compressedBuffer = await compressImage(req.file.buffer);
-          const filePath = path.join(
-            process.cwd(),
-            "public/assets",
-            uniqueImageName
-          );
+          const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
 
-          // Save the compressed image to the file system
-          await sharp(compressedBuffer).toFile(filePath);
-          req.file.path = filePath; // Update file path for potential future use
-          background = uniqueImageName;
+          const compressedBuffer = await compressImage(req.file.buffer);
+
+          const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                resource_type: "image",
+                public_id: uniqueImageName,
+                folder: "posts",
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              }
+            );
+            uploadStream.end(compressedBuffer);
+          });
+
+          background = result.secure_url;
         } catch (err) {
           res.status(500).json({ message: err.message });
         }

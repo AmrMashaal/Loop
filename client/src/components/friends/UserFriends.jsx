@@ -63,11 +63,10 @@ const UserFriends = ({
                   >
                     <img
                       src={
-                        `${import.meta.env.VITE_API_URL}/assets/${
-                          friend?.sender?._id === userId
-                            ? friend?.receiver?.picturePath
-                            : friend?.sender?.picturePath
-                        }` || "/assets/loading-user.png"
+                        friend?.sender?._id === userId
+                          ? friend?.receiver?.picturePath
+                          : friend?.sender?.picturePath ||
+                            "/assets/loading-user.png"
                       }
                       alt={
                         friend?.sender?._id === userId

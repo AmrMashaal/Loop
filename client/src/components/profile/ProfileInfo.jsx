@@ -201,9 +201,9 @@ const ProfileInfo = ({ userInfo, userId }) => {
               );
           }}
           width="100%"
-          src={`${import.meta.env.VITE_API_URL}/assets/${
+          src={
             userInfo?._id === user._id ? user.background : userInfo?.background
-          }`}
+          }
           style={{
             height: "300px",
             maxWidth: "100%",

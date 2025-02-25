@@ -1,8 +1,7 @@
 import sharp from "sharp";
 import Message from "../models/Message.js";
-import CryptoJS from "crypto-js";
-import { v4 } from "uuid";
-import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import cloudinary from "../utils/cloudinary.js";
 
 export const getMessages = async (req, res) => {
   const { page, limit = 15 } = req.query;
@@ -40,26 +39,27 @@ const compressImage = async (buffer) => {
 export const sendMessage = async (req, res) => {
   const { senderId, receiverId } = req.params;
 
-  function encryptMessage(message) {
-    return CryptoJS.AES.encrypt(message, process.env.MESSAGE_SECRET);
-  }
-
   let picturePath = null;
 
   if (req.file) {
     try {
-      const uniqueImageName = `${v4()}-${req.file.originalname}`;
+      const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
       const compressedBuffer = await compressImage(req.file.buffer);
-      const filePath = path.join(
-        process.cwd(),
-        "public/assets",
-        uniqueImageName
-      );
-
-      // Save the compressed image to the file system
-      await sharp(compressedBuffer).toFile(filePath);
-      req.file.path = filePath; // Update file path for potential future use
-      picturePath = encryptMessage(uniqueImageName).toString();
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            resource_type: "image",
+            public_id: uniqueImageName,
+            folder: "posts",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(compressedBuffer);
+      });
+      picturePath = result.secure_url;
     } catch (error) {
       res.status(500).json({ message: error });
     }

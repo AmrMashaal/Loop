@@ -779,9 +779,7 @@ const Comments = ({
 
                     {com?.picturePath && (
                       <img
-                        src={`${import.meta.env.VITE_API_URL}/assets/${
-                          com?.picturePath
-                        }`}
+                        src={com?.picturePath}
                         alt={com?.picturePath}
                         style={{
                           width: "300px",

@@ -230,9 +230,7 @@ const PostClick = ({
             }}
           >
             <img
-              src={`${import.meta.env.VITE_API_URL}/assets/${
-                postDetails.picturePath
-              }`}
+              src={postDetails.picturePath}
               title={postDetails.picturePath}
               style={{
                 objectFit: "contain",

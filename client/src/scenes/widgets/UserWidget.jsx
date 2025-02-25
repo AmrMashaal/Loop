@@ -39,7 +39,6 @@ const UserWidget = ({ userId, picturePath }) => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-
         const data = await response.json();
         setTheUser(data);
       } catch (error) {
@@ -62,9 +61,7 @@ const UserWidget = ({ userId, picturePath }) => {
             <Link to={`/profile/${userId}`}>
               {user.background ? (
                 <img
-                  src={`${import.meta.env.VITE_API_URL}/assets/${
-                    user.background
-                  }`}
+                  src={user.background}
                   alt=""
                   style={{
                     position: "absolute",
