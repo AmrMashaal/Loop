@@ -102,7 +102,9 @@ const PostClick = ({
           setIsDeletedPost(true);
         }
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -125,7 +127,9 @@ const PostClick = ({
       setCountCheck(data);
       return data;
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setCountCheckLoading(false);
     }
@@ -155,7 +159,9 @@ const PostClick = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setLikesLoading(false);
     }

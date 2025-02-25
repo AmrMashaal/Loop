@@ -23,7 +23,6 @@ const FriendsWidget = ({
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
 
-
   const handleUserFriend = async () => {
     if (type === "friends") {
       setLoading(true);
@@ -42,7 +41,9 @@ const FriendsWidget = ({
 
         setUserFriends(friends);
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -64,7 +65,9 @@ const FriendsWidget = ({
         const onlineFriends = await response.json();
         setOnlineFriends(onlineFriends);
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setLoading(false);
       }

@@ -42,7 +42,9 @@ const UserWidget = ({ userId, picturePath }) => {
         const data = await response.json();
         setTheUser(data);
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setUserLoading(false);
       }

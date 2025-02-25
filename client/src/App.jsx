@@ -57,7 +57,9 @@ const App = () => {
 
       dispatch(setFriends({ friends: friendsIds }));
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 

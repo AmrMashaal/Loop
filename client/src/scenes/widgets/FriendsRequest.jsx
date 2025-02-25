@@ -38,7 +38,9 @@ const FriendsRequest = ({
         );
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
   // -------------------------------------------------------
@@ -61,7 +63,9 @@ const FriendsRequest = ({
         );
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -74,7 +78,6 @@ const FriendsRequest = ({
       {!requestLoading &&
         friendsRequestData.length !== 0 &&
         friendsRequestData?.map((request) => {
-          console.log(request);
           if (request?._id === undefined) {
             return;
           }

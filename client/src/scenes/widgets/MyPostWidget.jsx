@@ -104,7 +104,9 @@ const MyPostWidget = ({ picturePath, socket }) => {
           });
         }
       } catch (err) {
-        console.log(`Error: ${err}`);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", err);
+        }
       } finally {
         setLoading(false);
       }

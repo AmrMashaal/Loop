@@ -146,7 +146,9 @@ const Form = () => {
         navigate("/login");
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -190,7 +192,9 @@ const Form = () => {
         setLoginError({ username: true, password: false });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 

@@ -86,7 +86,9 @@ const ProfilePage = () => {
 
       setPostsCount(newPosts.count);
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -143,7 +145,9 @@ const ProfilePage = () => {
         dispatch(setLogin({ token, user: data }));
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -194,7 +198,9 @@ const ProfilePage = () => {
         setWrongPassword(true);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 

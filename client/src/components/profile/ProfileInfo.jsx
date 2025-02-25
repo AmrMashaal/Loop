@@ -69,7 +69,9 @@ const ProfileInfo = ({ userInfo, userId }) => {
         setFriendship(data);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -90,7 +92,9 @@ const ProfileInfo = ({ userInfo, userId }) => {
         setFriendSettings("friends");
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -115,7 +119,9 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
       setFriendSettings("pending");
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setAddLoading(false);
     }
@@ -138,7 +144,9 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
       setFriendship(data);
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 

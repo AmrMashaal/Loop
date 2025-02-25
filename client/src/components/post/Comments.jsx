@@ -144,7 +144,9 @@ const Comments = ({
           });
         }
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setLoading(false);
       }
@@ -176,7 +178,9 @@ const Comments = ({
         }
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -206,7 +210,9 @@ const Comments = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setLikesLoading(false);
     }
@@ -258,7 +264,9 @@ const Comments = ({
         commentsState.filter((newCom) => newCom._id !== comment._id)
       );
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -326,7 +334,9 @@ const Comments = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setCommentLikeLoading({ loading: false, commentId });
     }
@@ -383,7 +393,9 @@ const Comments = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setPostLikeLoading(false);
     }
@@ -468,7 +480,9 @@ const Comments = ({
         ]);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -551,7 +565,9 @@ const Comments = ({
           });
         }
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setLoading(false);
         setIsImage(false);
@@ -597,7 +613,9 @@ const Comments = ({
         )
       );
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setCommentsState((prev) =>
         prev.map((com) =>

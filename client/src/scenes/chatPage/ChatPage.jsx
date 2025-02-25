@@ -63,7 +63,9 @@ const ChatPage = ({ socket, fromNav }) => {
         setMessages((prevMessages) => [...reversedMessages, ...prevMessages]);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setChatLoad(false);
     }
@@ -115,7 +117,9 @@ const ChatPage = ({ socket, fromNav }) => {
 
         setMessages((prevMessages) => [...prevMessages, messagesResponse]);
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       } finally {
         setImage("");
         setMessage("");
@@ -151,7 +155,9 @@ const ChatPage = ({ socket, fromNav }) => {
 
       setLastMessageData(lastMessages);
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setHistoryLoad(false);
     }
@@ -260,7 +266,9 @@ const ChatPage = ({ socket, fromNav }) => {
         setWrongPassword(true);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -334,16 +342,18 @@ const ChatPage = ({ socket, fromNav }) => {
           });
         }
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       }
     }
   };
 
   useEffect(() => {
-if (title.length !== 0) {
-  document.title = title;
-}
-  }, [title])
+    if (title.length !== 0) {
+      document.title = title;
+    }
+  }, [title]);
 
   return (
     <Box margin="auto" id="chatBox">

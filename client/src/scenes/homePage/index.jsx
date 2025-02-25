@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Box, useMediaQuery } from "@mui/material";
 import Navbar from "../navbar";
 import UserWidget from "../widgets/UserWidget";
@@ -9,8 +10,13 @@ import { useEffect, useState } from "react";
 import { setFriends } from "../../../state";
 import WrongPassword from "../../components/WrongPassword";
 
-// eslint-disable-next-line react/prop-types
-const HomePage = ({ socket, newPosts, setNewPosts, onlineFriends, setOnlineFriends }) => {
+const HomePage = ({
+  socket,
+  newPosts,
+  setNewPosts,
+  onlineFriends,
+  setOnlineFriends,
+}) => {
   const [loading, setLoading] = useState(true);
   const [wrongPassword, setWrongPassword] = useState(false);
 
@@ -37,7 +43,9 @@ const HomePage = ({ socket, newPosts, setNewPosts, onlineFriends, setOnlineFrien
       const friends = await response.json();
       dispatch(setFriends({ friends: friends }));
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setLoading(false);
     }
@@ -65,7 +73,9 @@ const HomePage = ({ socket, newPosts, setNewPosts, onlineFriends, setOnlineFrien
         setWrongPassword(true);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -76,10 +86,7 @@ const HomePage = ({ socket, newPosts, setNewPosts, onlineFriends, setOnlineFrien
   document.title = "Loop";
 
   return (
-    <Box
-      position="relative"
-      className="homeContainer"
-    >
+    <Box position="relative" className="homeContainer">
       <Box
         position="fixed"
         width="800px"

@@ -47,7 +47,9 @@ const EditThing = ({ setIsEdit, text, thingId, setDataState, type }) => {
 
           setIsEdit(false);
         } catch (error) {
-          console.log(error);
+          if (import.meta.env.VITE_NODE_ENV === "development") {
+            console.error("Error:", error);
+          }
         }
       } else {
         try {
@@ -82,7 +84,9 @@ const EditThing = ({ setIsEdit, text, thingId, setDataState, type }) => {
 
           setIsEdit(false);
         } catch (error) {
-          console.log(error);
+          if (import.meta.env.VITE_NODE_ENV === "development") {
+            console.error("Error:", error);
+          }
         }
       }
     }

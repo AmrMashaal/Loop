@@ -77,7 +77,9 @@ const Replies = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -152,7 +154,9 @@ const Replies = ({
         }
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setReplyLikeLoading({ loading: false, replyId: null });
     }

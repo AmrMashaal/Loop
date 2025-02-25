@@ -138,7 +138,9 @@ const PostWidget = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setLikesLoading(false);
     }
@@ -195,7 +197,9 @@ const PostWidget = ({
         });
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setClickLikeLoading({ postId: null, loading: false });
     }
@@ -216,7 +220,9 @@ const PostWidget = ({
 
       dispatch(setDeletePost({ postId: postWhoDeleted }));
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -239,7 +245,9 @@ const PostWidget = ({
         const data = await response.json();
         dispatch(setPost({ post_id: postInfo.postId, post: data }));
       } catch (error) {
-        console.log(error);
+        if (import.meta.env.VITE_NODE_ENV === "development") {
+          console.error("Error:", error);
+        }
       }
     }
   };

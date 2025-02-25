@@ -79,7 +79,9 @@ const Navbar = ({ isProfile }) => {
       setFriendRequestData(data);
       dispatch(setFriendsRequest({ friendsRequestState: data }));
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     } finally {
       setRequestLoading(false);
     }
@@ -107,7 +109,9 @@ const Navbar = ({ isProfile }) => {
         setNotificationsState((prev) => [...prev, ...data]);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -127,7 +131,9 @@ const Navbar = ({ isProfile }) => {
         setWatchedNotifications(null);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -150,7 +156,9 @@ const Navbar = ({ isProfile }) => {
         setIsNotification(false);
       }
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -250,7 +258,9 @@ const Navbar = ({ isProfile }) => {
         }
       );
     } catch (error) {
-      console.log(error);
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
