@@ -25,7 +25,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
@@ -39,6 +38,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.json());
 
 // Routes
 app.use("/auth", authRoutes);
