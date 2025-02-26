@@ -74,7 +74,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+        const response = await fetch(`/api/posts`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,

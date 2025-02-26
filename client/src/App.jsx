@@ -42,7 +42,7 @@ const App = () => {
   const handleUserFriend = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/friends/${user?._id}/friends?app=true`,
+        `/api/friends/${user?._id}/friends?app=true`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

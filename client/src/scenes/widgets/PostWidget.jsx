@@ -121,13 +121,10 @@ const PostWidget = ({
   const whoLikes = async (postId, initial = false) => {
     setLikesLoading(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${postId}/post?page=${page}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`/api/likes/${postId}/post?page=${page}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await response.json();
       if (initial) {
@@ -152,15 +149,12 @@ const PostWidget = ({
     setClickLikeLoading({ postId, loading: true });
 
     try {
-      const response1 = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${postId}/${user._id}/like`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response1 = await fetch(`/api/likes/${postId}/${user._id}/like`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const updatedPost = await response1.json();
 
@@ -170,9 +164,7 @@ const PostWidget = ({
 
       if (ele.userId !== user._id && updatedPost.isLiked) {
         const response2 = await fetch(
-          `${import.meta.env.VITE_API_URL}/notifications/${user._id}/${
-            ele.userId
-          }`,
+          `/api/notifications/${user._id}/${ele.userId}`,
           {
             method: "POST",
             headers: {
@@ -207,16 +199,13 @@ const PostWidget = ({
 
   const handleDeletePost = async () => {
     try {
-      await fetch(
-        `${import.meta.env.VITE_API_URL}/posts/${postWhoDeleted}/delete`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await fetch(`/api/posts/${postWhoDeleted}/delete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       dispatch(setDeletePost({ postId: postWhoDeleted }));
     } catch (error) {
@@ -230,17 +219,14 @@ const PostWidget = ({
     e.preventDefault();
     if (editText !== description && editText) {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/posts/${postInfo.postId}/edit`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ description: editText }),
-          }
-        );
+        const response = await fetch(`/api/posts/${postInfo.postId}/edit`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ description: editText }),
+        });
 
         const data = await response.json();
         dispatch(setPost({ post_id: postInfo.postId, post: data }));

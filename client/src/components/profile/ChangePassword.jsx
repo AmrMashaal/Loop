@@ -39,20 +39,17 @@ const ChangePassword = ({ changePassword, setChangePassword }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user._id}/password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            oldPassword: values.currentPassword,
-            newPassword: values.newPassword,
-          }),
-        }
-      );
+      const response = await fetch(`/api/users/${user._id}/password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          oldPassword: values.currentPassword,
+          newPassword: values.newPassword,
+        }),
+      });
 
       const result = await response.json();
 

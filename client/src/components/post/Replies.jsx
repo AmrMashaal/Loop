@@ -51,16 +51,13 @@ const Replies = ({
 
   const handleDeleteReply = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/replies/${replyId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/replies/${replyId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         setCommentsState((prev) => {
@@ -88,9 +85,7 @@ const Replies = ({
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${replyId}/${
-          user._id
-        }/likeReply`,
+        `/api/likes/${replyId}/${user._id}/likeReply`,
         {
           method: "PATCH",
           headers: {
@@ -126,9 +121,7 @@ const Replies = ({
 
         if (data.reply.user !== user._id && data.isLiked) {
           const response2 = await fetch(
-            `${import.meta.env.VITE_API_URL}/notifications/${user._id}/${
-              data.reply.user
-            }`,
+            `/api/notifications/${user._id}/${data.reply.user}`,
             {
               method: "POST",
               headers: {

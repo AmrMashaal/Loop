@@ -75,13 +75,10 @@ const PostClick = ({
       });
 
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/posts/${postId}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await fetch(`/api/posts/${postId}`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const data = await response.json();
 
@@ -114,13 +111,10 @@ const PostClick = ({
   const getPostClickInfo = async () => {
     setCountCheckLoading(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/posts/${postDetails._id}/clickInfo`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`/api/posts/${postDetails._id}/clickInfo`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await response.json();
 
@@ -140,9 +134,7 @@ const PostClick = ({
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${
-          postDetails._id
-        }/post?page=${page}`,
+        `/api/likes/${postDetails._id}/post?page=${page}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

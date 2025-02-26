@@ -29,7 +29,7 @@ const FriendsWidget = ({
       try {
         const response = await fetch(
           `${
-            import.meta.env.VITE_API_URL
+            /api
           }/friends/${userId}/friends?isProfile=true`,
           {
             method: "GET",
@@ -54,13 +54,10 @@ const FriendsWidget = ({
     if (type === "onlineFriends") {
       setLoading(true);
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${userId}/onlineFriends`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await fetch(`/api/users/${userId}/onlineFriends`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const onlineFriends = await response.json();
         setOnlineFriends(onlineFriends);

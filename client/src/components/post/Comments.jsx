@@ -99,14 +99,11 @@ const Comments = ({
       setLoading(true);
 
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/comments/postComment/${_id}`,
-          {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData,
-          }
-        );
+        const response = await fetch(`/api/comments/postComment/${_id}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
 
         const data = await response.json();
 
@@ -117,9 +114,7 @@ const Comments = ({
 
         if (userId && userId !== user?._id) {
           const response2 = await fetch(
-            `${import.meta.env.VITE_API_URL}/notifications/${
-              user?._id
-            }/${userId}`,
+            `/api/notifications/${user?._id}/${userId}`,
             {
               method: "POST",
               headers: {
@@ -156,9 +151,7 @@ const Comments = ({
   const handleComments = async (first = true) => {
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/comments/${_id}/${comIdParam}?page=${pageNumber}&limit=5`,
+        `/api/comments/${_id}/${comIdParam}?page=${pageNumber}&limit=5`,
         {
           method: "GET",
           headers: {
@@ -191,9 +184,7 @@ const Comments = ({
 
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/likes/${id}/${showLikesType}?page=${likesPage}`,
+        `/api/likes/${id}/${showLikesType}?page=${likesPage}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -247,16 +238,13 @@ const Comments = ({
 
   const handleDeleteComment = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/comments/${commentId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/comments/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const comment = await response.json();
 
@@ -275,9 +263,7 @@ const Comments = ({
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${commentId}/${
-          user?._id
-        }/likeComment`,
+        `/api/likes/${commentId}/${user?._id}/likeComment`,
         {
           method: "PATCH",
           headers: {
@@ -307,9 +293,7 @@ const Comments = ({
         comment.isLiked
       ) {
         const response2 = await fetch(
-          `${import.meta.env.VITE_API_URL}/notifications/${user?._id}/${
-            comment.comment.user
-          }`,
+          `/api/notifications/${user?._id}/${comment.comment.user}`,
           {
             method: "POST",
             headers: {
@@ -346,15 +330,12 @@ const Comments = ({
     setPostLikeLoading(true);
 
     try {
-      const response1 = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${_id}/${user?._id}/like`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response1 = await fetch(`/api/likes/${_id}/${user?._id}/like`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const updatedPost = await response1.json();
 
@@ -366,9 +347,7 @@ const Comments = ({
 
       if (userId && userId !== user?._id && updatedPost.isLiked) {
         const response2 = await fetch(
-          `${import.meta.env.VITE_API_URL}/notifications/${
-            user?._id
-          }/${userId}`,
+          `/api/notifications/${user?._id}/${userId}`,
           {
             method: "POST",
             headers: {
@@ -456,15 +435,12 @@ const Comments = ({
 
   const handlePinComment = async (commentId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/comments/${commentId}/pin`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/comments/${commentId}/pin`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const newComment = await response.json();
 
@@ -514,14 +490,11 @@ const Comments = ({
       }
 
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/replies/${replyData.id}`,
-          {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData,
-          }
-        );
+        const response = await fetch(`/api/replies/${replyData.id}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
 
         const data = await response.json();
 
@@ -538,9 +511,7 @@ const Comments = ({
 
         if (replyData.userId && replyData.userId !== user?._id) {
           const response2 = await fetch(
-            `${import.meta.env.VITE_API_URL}/notifications/${user?._id}/${
-              replyData.userId
-            }`,
+            `/api/notifications/${user?._id}/${replyData.userId}`,
             {
               method: "POST",
               headers: {
@@ -591,13 +562,10 @@ const Comments = ({
     );
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/replies/${commentId}?page=${page}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`/api/replies/${commentId}?page=${page}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const replies = await response.json();
 
