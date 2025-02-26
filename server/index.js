@@ -3,6 +3,8 @@ import http from "http";
 import { Server } from "socket.io";
 import app from "./api/index.js";
 import { initSocket } from "./utils/socket.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const server = http.createServer(app);
 
@@ -12,8 +14,10 @@ const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_LINK,
     methods: ["GET", "POST", "PATCH", "DELETE"],
+    credentials: true,
   },
 });
+
 
 initSocket(io);
 
