@@ -28,9 +28,9 @@ const FriendsWidget = ({
       setLoading(true);
       try {
         const response = await fetch(
-          `${
+          `
             /api
-          }/friends/${userId}/friends?isProfile=true`,
+          /friends/${userId}/friends?isProfile=true`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
