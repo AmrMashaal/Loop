@@ -49,7 +49,8 @@ const LeftChat = ({
     if (userId) {
       if (userId !== user._id && lastMessageData.length !== 0) {
         const userLastMsg = lastMessageData.find(
-          (ele) => ele.senderId._id === userId || ele.receiverId._id === userId
+          (ele) =>
+            ele?.senderId?._id === userId || ele?.receiverId?._id === userId
         );
 
         setTitle(
@@ -63,7 +64,7 @@ const LeftChat = ({
         setTitle(`Chat - ${user.firstName} ${user?.lastName}`);
       }
     } else {
-      setTitle("Chat")
+      setTitle("Chat");
     }
   }, [lastMessageData, userId]);
 
@@ -128,9 +129,9 @@ const LeftChat = ({
                 <Link
                   key={index}
                   to={`/chat/${
-                    user._id === ele?.senderId?._id
+                    user?._id === ele?.senderId?._id
                       ? ele?.receiverId?._id
-                      : ele.senderId._id
+                      : ele?.senderId?._id
                   }`}
                   style={{ margin: "20px 0", display: "block" }}
                 >
@@ -171,8 +172,8 @@ const LeftChat = ({
                               : ele?.senderId?.lastName}
                           </Typography>
 
-                          {ele.senderId._id === user._id ? (
-                            ele?.receiverId.verified ? (
+                          {ele?.senderId?._id === user._id ? (
+                            ele?.receiverId?.verified ? (
                               <VerifiedOutlined
                                 sx={{
                                   fontSize: "20px",
@@ -180,7 +181,7 @@ const LeftChat = ({
                                 }}
                               />
                             ) : undefined
-                          ) : ele?.senderId.verified ? (
+                          ) : ele?.senderId?.verified ? (
                             <VerifiedOutlined
                               sx={{
                                 fontSize: "20px",
@@ -202,7 +203,7 @@ const LeftChat = ({
                           gap="2px"
                           alignItems="center"
                         >
-                          {ele?.senderId._id === user._id ? (
+                          {ele?.senderId?._id === user._id ? (
                             <Typography>You:</Typography>
                           ) : undefined}{" "}
                           {ele?.message ? (
