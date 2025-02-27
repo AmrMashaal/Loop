@@ -159,7 +159,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
   const handleTriangle = () => {
     (friendSettings === "remove" ||
       (friendship?.status === "pending" &&
-        friendship??.sender?._id === user._id)) &&
+        friendship?.sender?._id === user._id)) &&
       setIsDelete(true),
       // -----------------------------------
       friendSettings === "accept" &&
