@@ -28,7 +28,12 @@ const FriendsWidget = ({
       setLoading(true);
       try {
         const response = await fetch(
+<<<<<<< HEAD
           ` ${import.meta.env.VITE_API_URL}
+=======
+          `
+            /api
+>>>>>>> 092f172fba4c140d73c474c742c621b9b23c026c
           /friends/${userId}/friends?isProfile=true`,
           {
             method: "GET",
