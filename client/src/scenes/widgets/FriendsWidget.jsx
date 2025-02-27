@@ -28,8 +28,7 @@ const FriendsWidget = ({
       setLoading(true);
       try {
         const response = await fetch(
-          ` ${import.meta.env.VITE_API_URL}
-          /friends/${userId}/friends?isProfile=true`,
+          ` ${import.meta.env.VITE_API_URL}/friends/${userId}/friends?isProfile=true`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },

@@ -130,7 +130,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
   const friendshipStatus = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/friends/${userInfo?._id}`,
+        `${import.meta.env.VITE_API_URL}/friends/${userId}`,
         {
           method: "GET",
           headers: {
