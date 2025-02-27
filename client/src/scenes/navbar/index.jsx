@@ -283,7 +283,7 @@ const Navbar = ({ isProfile }) => {
       }}
     >
       <img
-        src="\public\assets\ramadan.png"
+        src="\assets\ramadan.png"
         alt=""
         style={{
           position: "absolute",
