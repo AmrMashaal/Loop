@@ -86,20 +86,20 @@ const ProfileFriends = ({ userParam }) => {
             }}
             className="opacityBox"
             key={
-              friend.sender._id === userParam
+              friend?.sender?._id === userParam
                 ? friend.receiver._id
-                : friend.sender._id
+                : friend?.sender?._id
             }
             to={`/profile/${
-              friend.sender._id === userParam
+              friend?.sender?._id === userParam
                 ? friend.receiver._id
-                : friend.sender._id
+                : friend?.sender?._id
             }`}
           >
             <Box display="flex" alignItems="center" gap="10px">
               <UserImage
                 image={
-                  friend.sender._id === userParam
+                  friend?.sender?._id === userParam
                     ? friend.receiver.picturePath
                     : friend.sender.picturePath
                 }
@@ -113,15 +113,15 @@ const ProfileFriends = ({ userParam }) => {
                   textOverflow="ellipsis"
                   whiteSpace="nowrap"
                 >
-                  {friend.sender._id === userParam
+                  {friend?.sender?._id === userParam
                     ? friend.receiver.firstName
                     : friend.sender.firstName}{" "}
-                  {friend.sender._id === userParam
+                  {friend?.sender?._id === userParam
                     ? friend.receiver.lastName
                     : friend.sender.lastName}
                 </Typography>
 
-                {friend.sender._id === userParam
+                {friend?.sender?._id === userParam
                   ? friend.receiver.verified && (
                       <VerifiedOutlined
                         sx={{
