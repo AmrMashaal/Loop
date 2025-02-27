@@ -36,7 +36,9 @@ const SearchPage = () => {
 
     try {
       const response = await fetch(
-        `/api/search/${type}s/${encodedSearch}?page=${page}`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/search/${type}s/${encodedSearch}?page=${page}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -102,7 +104,9 @@ const SearchPage = () => {
   const checkCorrectPassword = async () => {
     try {
       const response = await fetch(
-        `/api/users/${user._id}/checkCorrectPassword`,
+        `${import.meta.env.VITE_API_URL}/users/${
+          user._id
+        }/checkCorrectPassword`,
         {
           method: "POST",
           headers: {

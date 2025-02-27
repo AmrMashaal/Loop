@@ -51,10 +51,13 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   const handleRemoveFriend = async () => {
     try {
-      const response = await fetch(`/api/friends/${userId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${userId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       const data = await response.json();
 
@@ -74,10 +77,13 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   const acceptRequest = async () => {
     try {
-      const response = await fetch(`/api/friends/${userId}/accept`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${userId}/accept`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.ok) {
         const friends = await response.json();
@@ -96,13 +102,16 @@ const ProfileInfo = ({ userInfo, userId }) => {
     setAddLoading(true);
 
     try {
-      const response = await fetch(`/api/friends/${userInfo?._id}/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${userInfo?._id}/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await response.json();
 
@@ -120,13 +129,16 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   const friendshipStatus = async () => {
     try {
-      const response = await fetch(`/api/friends/${userInfo?._id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${userInfo?._id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await response.json();
 

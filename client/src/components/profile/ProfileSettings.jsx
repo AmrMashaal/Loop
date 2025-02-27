@@ -148,7 +148,9 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
 
     try {
       const response = await fetch(
-        `/api/users/${user._id}/${user.username}/edit`,
+        `${import.meta.env.VITE_API_URL}/users/${user._id}/${
+          user.username
+        }/edit`,
         {
           method: "PATCH",
           headers: {

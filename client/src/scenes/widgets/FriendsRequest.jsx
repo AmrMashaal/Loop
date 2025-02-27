@@ -22,10 +22,13 @@ const FriendsRequest = ({
   // -------------------------------------------------------
   const acceptFriend = async (friendId) => {
     try {
-      const response = await fetch(`/api/friends/${friendId}/accept`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${friendId}/accept`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.ok) {
         setFriendRequestData((prev) =>
@@ -44,10 +47,13 @@ const FriendsRequest = ({
 
   const refuseFriend = async (friendId) => {
     try {
-      const response = await fetch(`/api/friends/${friendId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/${friendId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (response.ok) {
         setFriendRequestData((prev) =>

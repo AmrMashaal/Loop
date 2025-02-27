@@ -25,14 +25,17 @@ const EditThing = ({ setIsEdit, text, thingId, setDataState, type }) => {
     if (editText.length > 0) {
       if (type !== "reply") {
         try {
-          const response = await fetch(`/api/comments/${thingId}/edit`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ text: editText }),
-          });
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/comments/${thingId}/edit`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ text: editText }),
+            }
+          );
 
           const editedComment = await response.json();
 
@@ -50,14 +53,17 @@ const EditThing = ({ setIsEdit, text, thingId, setDataState, type }) => {
         }
       } else {
         try {
-          const response = await fetch(`/api/replies/${thingId}/edit`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ reply: editText }),
-          });
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/replies/${thingId}/edit`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ reply: editText }),
+            }
+          );
 
           const editedReply = await response.json();
 

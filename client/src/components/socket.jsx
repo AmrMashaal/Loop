@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
 
-const socket = io.connect("/api");
+const socket = io.connect(import.meta.env.VITE_API_URL);
 
-export default socket
+export default socket;

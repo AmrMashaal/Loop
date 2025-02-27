@@ -40,7 +40,6 @@ app.use(
 );
 app.use(express.json());
 
-
 // Routes
 app.use("/auth", authRoutes);
 app.use("/search", searchRoutes);

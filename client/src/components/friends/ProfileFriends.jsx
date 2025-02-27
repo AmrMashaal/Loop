@@ -25,7 +25,9 @@ const ProfileFriends = ({ userParam }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `/api/friends/${userParam}/friends?page=${page}&isProfile=true`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/friends/${userParam}/friends?page=${page}&isProfile=true`,
         {
           method: "GET",
           headers: {

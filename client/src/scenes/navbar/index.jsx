@@ -66,10 +66,13 @@ const Navbar = ({ isProfile }) => {
     setRequestLoading(true);
 
     try {
-      const response = await fetch(`/api/friends/friendRequest/${user._id}`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/friends/friendRequest/${user._id}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       const data = await response.json();
 
@@ -87,7 +90,9 @@ const Navbar = ({ isProfile }) => {
   const getNotifications = async (initial = false) => {
     try {
       const response = await fetch(
-        `/api/notifications/${user._id}?page=${pageNumber}&limit=10`,
+        `${import.meta.env.VITE_API_URL}/notifications/${
+          user._id
+        }?page=${pageNumber}&limit=10`,
         {
           method: "GET",
           headers: {
@@ -112,12 +117,15 @@ const Navbar = ({ isProfile }) => {
 
   const handleWatchNotification = async () => {
     try {
-      const response = await fetch(`/api/notifications/${user._id}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/notifications/${user._id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         setWatchedNotifications(null);
@@ -131,12 +139,15 @@ const Navbar = ({ isProfile }) => {
 
   const handleDeleteNotifications = async () => {
     try {
-      const response = await fetch(`/api/notifications/${user._id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/notifications/${user._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         setNotificationsState(null);
@@ -234,15 +245,18 @@ const Navbar = ({ isProfile }) => {
     socket.disconnect();
 
     try {
-      await fetch(`/api/users/${user._id}/onlineState`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          makeOnline: false,
-        }),
-      });
+      await fetch(
+        `${import.meta.env.VITE_API_URL}/users/${user._id}/onlineState`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            makeOnline: false,
+          }),
+        }
+      );
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);

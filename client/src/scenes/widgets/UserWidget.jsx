@@ -32,10 +32,13 @@ const UserWidget = ({ userId, picturePath }) => {
   const getUser = async () => {
     if (userId) {
       try {
-        const response = await fetch(`/api/users/${userId}`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/users/${userId}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await response.json();
         setTheUser(data);
       } catch (error) {

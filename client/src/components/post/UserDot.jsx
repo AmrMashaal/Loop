@@ -16,12 +16,15 @@ const UserDot = (props) => {
 
   const handlePin = async () => {
     try {
-      const response = await fetch(`/api/posts/${props.postInfo.postId}/pin`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/posts/${props.postInfo.postId}/pin`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await response.json();
 

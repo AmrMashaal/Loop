@@ -47,7 +47,9 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
   async function getPosts(reset = false) {
     try {
       const response = await fetch(
-        `/api/posts/feed?page=${pageNumber}&limit=${10 + newPostsData.length}`,
+        `${import.meta.env.VITE_API_URL}/posts/feed?page=${pageNumber}&limit=${
+          10 + newPostsData.length
+        }`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
