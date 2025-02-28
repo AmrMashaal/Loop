@@ -421,6 +421,7 @@ const ChatPage = ({ socket, fromNav }) => {
             isNonMobileScreens={isNonMobileScreens}
             historyLoad={historyLoad}
             lastMessageData={lastMessageData}
+            setLastMessageData={setLastMessageData}
             user={user}
             setTitle={setTitle}
             userId={userId}

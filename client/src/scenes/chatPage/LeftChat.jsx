@@ -6,15 +6,19 @@ import { Link } from "react-router-dom";
 import { Image, Search, VerifiedOutlined } from "@mui/icons-material";
 import ChatHistorySkeleton from "../skeleton/ChatHistorySkeleton";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const LeftChat = ({
   isNonMobileScreens,
   historyLoad,
   lastMessageData,
+  setLastMessageData,
   user,
   setTitle,
   userId,
 }) => {
+  const token = useSelector((state) => state.token);
+
   const formatMessageTime = (createdAt) => {
     const date = new Date(createdAt);
     const now = new Date();
@@ -68,18 +72,32 @@ const LeftChat = ({
     }
   }, [lastMessageData, userId]);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     const searchValue = e.target[1].value;
 
-    try {
-      
-    } catch (error) {
-      if (import.meta.env.NODE_ENV === "development") {
-        console.error(error);
+    if (searchValue.length !== 0) {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/search/users/${searchValue}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        setLastMessageData(data.data);
+      } catch (error) {
+        if (import.meta.env.NODE_ENV === "development") {
+          console.error(error);
+        }
       }
     }
-  }
+  };
 
   return (
     <Box flex={!isNonMobileScreens && 1}>
@@ -116,7 +134,6 @@ const LeftChat = ({
               position: "relative",
               margin: "13px 0 40px",
             }}
-
             onSubmit={handleSearch}
           >
             <IconButton
@@ -141,13 +158,17 @@ const LeftChat = ({
 
           <Box>
             {lastMessageData?.map((ele, index) => {
+              if (!ele?.senderId?.firstName && !ele?.firstName) return;
+
               return (
                 <Link
                   key={index}
                   to={`/chat/${
-                    user?._id === ele?.senderId?._id
-                      ? ele?.receiverId?._id
-                      : ele?.senderId?._id
+                    ele?.senderId
+                      ? user?._id === ele?.senderId?._id
+                        ? ele?.receiverId?._id
+                        : ele?.senderId?._id
+                      : ele?._id
                   }`}
                   style={{ margin: "20px 0", display: "block" }}
                 >
@@ -159,9 +180,11 @@ const LeftChat = ({
                     <Box display="flex" gap="10px">
                       <UserImage
                         image={
-                          user._id === ele?.senderId?._id
-                            ? ele?.receiverId?.picturePath
-                            : ele?.senderId?.picturePath
+                          ele?.senderId
+                            ? user?._id === ele?.senderId?._id
+                              ? ele?.receiverId?.picturePath
+                              : ele?.senderId?.picturePath
+                            : ele?.picturePath
                         }
                         size="60"
                       />
@@ -180,16 +203,29 @@ const LeftChat = ({
                             overflow="hidden"
                             whiteSpace="nowrap"
                           >
-                            {user._id === ele?.senderId?._id
-                              ? ele?.receiverId?.firstName
-                              : ele?.senderId?.firstName}{" "}
-                            {user._id === ele?.senderId?._id
-                              ? ele?.receiverId?.lastName
-                              : ele?.senderId?.lastName}
+                            {ele?.senderId
+                              ? user?._id === ele?.senderId?._id
+                                ? ele?.receiverId?.firstName
+                                : ele?.senderId?.firstName
+                              : ele?.firstName}{" "}
+                            {ele?.senderId
+                              ? user?._id === ele?.senderId?._id
+                                ? ele?.receiverId?.lastName
+                                : ele?.senderId?.lastName
+                              : ele?.lastName}
                           </Typography>
 
-                          {ele?.senderId?._id === user._id ? (
-                            ele?.receiverId?.verified ? (
+                          {ele?.senderId ? (
+                            ele?.senderId?._id === user._id ? (
+                              ele?.receiverId?.verified ? (
+                                <VerifiedOutlined
+                                  sx={{
+                                    fontSize: "20px",
+                                    color: "#00D5FA",
+                                  }}
+                                />
+                              ) : undefined
+                            ) : ele?.senderId?.verified ? (
                               <VerifiedOutlined
                                 sx={{
                                   fontSize: "20px",
@@ -197,7 +233,7 @@ const LeftChat = ({
                                 }}
                               />
                             ) : undefined
-                          ) : ele?.senderId?.verified ? (
+                          ) : ele?.verified ? (
                             <VerifiedOutlined
                               sx={{
                                 fontSize: "20px",
@@ -222,20 +258,22 @@ const LeftChat = ({
                           {ele?.senderId?._id === user._id ? (
                             <Typography>You:</Typography>
                           ) : undefined}{" "}
-                          {ele?.message ? (
-                            ele?.message
-                          ) : (
-                            <Box display="flex" gap="4px">
-                              <Typography fontWeight="300">Image</Typography>
-                              <Image />
-                            </Box>
-                          )}
+                          {ele?.senderId ? (
+                            ele?.message ? (
+                              ele?.message
+                            ) : (
+                              <Box display="flex" gap="4px">
+                                <Typography fontWeight="300">Image</Typography>
+                                <Image />
+                              </Box>
+                            )
+                          ) : undefined}
                         </Typography>
                       </Box>
                     </Box>
 
                     <Typography color="#d7d7d7" fontSize="12px">
-                      {formatMessageTime(ele?.updatedAt)}
+                      {ele?.senderId && formatMessageTime(ele?.updatedAt)}
                     </Typography>
                   </Box>
                   {lastMessageData?.indexOf(ele) !==
