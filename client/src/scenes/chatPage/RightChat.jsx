@@ -41,6 +41,7 @@ const RightChat = ({
       mt="50px"
       p={isNonMobileScreens ? "0 75px" : "0 15px"}
       width="100%"
+      mb="75px"
     >
       {messages?.map((msg) => {
         return (
@@ -126,17 +127,18 @@ const RightChat = ({
 
       <form
         style={{
-          width: "100%",
-          position: "sticky",
+          width: isNonMobileScreens ? "80%" : "100%",
+          position: "fixed",
           bottom: "-1px",
           height: "75px",
-          left: "0",
+          left: isNonMobileScreens ? "287px" : "50%",
           textAlign: "center",
           backgroundColor: "#20232d",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           padding: "0 8px 0",
+          transform: !isNonMobileScreens && "translateX(-50%)",
         }}
         onSubmit={handleFormSubmit}
       >

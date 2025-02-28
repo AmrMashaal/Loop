@@ -18,7 +18,7 @@ const ChatPage = ({ socket, fromNav }) => {
   const [image, setImage] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [imageError, setImageError] = useState(false);
-  const [chatLoad, setChatLoad] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
   const [historyLoad, setHistoryLoad] = useState(true);
   const [wrongPassword, setWrongPassword] = useState(false);
   const [showSroll, setShowSroll] = useState(false);
@@ -40,8 +40,6 @@ const ChatPage = ({ socket, fromNav }) => {
   };
 
   const getMessages = async (reset = false) => {
-    if (reset) setChatLoad(true);
-
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/messages/${
@@ -67,7 +65,7 @@ const ChatPage = ({ socket, fromNav }) => {
         console.error("Error:", error);
       }
     } finally {
-      setChatLoad(false);
+      setInitialLoad(false);
     }
   };
 
@@ -231,10 +229,10 @@ const ChatPage = ({ socket, fromNav }) => {
   useEffect(() => {
     setPageNumber(1);
 
-    if (!chatLoad && messages.length !== 0) {
+    if (!initialLoad) {
       window.scrollTo(0, document.body.scrollHeight);
     }
-  }, [userId, chatLoad, messages]);
+  }, [userId, initialLoad]);
 
   useEffect(() => {
     if (pageNumber === 1) {
@@ -326,14 +324,14 @@ const ChatPage = ({ socket, fromNav }) => {
         if (userId !== user._id) {
           setLastMessageData((prevHistory) => {
             return prevHistory.map((ele) => {
-              return data.receiverId._id === ele.senderId._id ||
-                data.receiverId._id === ele.receiverId._id
+              return data?.receiverId?._id === ele?.senderId?._id ||
+                data?.receiverId?._id === ele?.receiverId?._id
                 ? {
                     ...ele,
                     message: message,
-                    updatedAt: data.updatedAt,
+                    updatedAt: data?.updatedAt,
                     senderId: {
-                      ...ele.receiverId,
+                      ...ele?.receiverId,
                       _id: user._id,
                     },
                   }
@@ -354,6 +352,10 @@ const ChatPage = ({ socket, fromNav }) => {
       document.title = title;
     }
   }, [title]);
+
+  useEffect(() => {
+    setInitialLoad(true);
+  }, [userId]);
 
   return (
     <Box margin="auto" id="chatBox">
@@ -425,7 +427,7 @@ const ChatPage = ({ socket, fromNav }) => {
           />
         )}
 
-        {userId && !chatLoad && (
+        {userId && !initialLoad && (
           <RightChat
             messages={messages}
             user={user}
@@ -445,7 +447,7 @@ const ChatPage = ({ socket, fromNav }) => {
           />
         )}
 
-        {chatLoad && userId && pageNumber === 1 && (
+        {initialLoad && userId && pageNumber === 1 && (
           <ChatSkeleton isNonMobileScreens={isNonMobileScreens} />
         )}
 

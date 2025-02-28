@@ -1,6 +1,6 @@
-import cloudinary from "../utils/cloudinary.js";
-import { v4 as uuidv4 } from "uuid";
 import sharp from "sharp";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import Comment from "../models/Comment.js";
@@ -22,27 +22,23 @@ export const createPost = async (req, res) => {
     try {
       const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
       const compressedBuffer = await compressImage(req.file.buffer);
-      const result = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            resource_type: "image",
-            public_id: uniqueImageName,
-            folder: "posts",
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        uploadStream.end(compressedBuffer);
-      });
-      picturePath = result.secure_url;
+      const filePath = path.join(
+        process.cwd(),
+        "public/assets",
+        uniqueImageName
+      );
+
+      // Save the compressed image to the file system
+      await sharp(compressedBuffer).toFile(filePath);
+      req.file.path = filePath; // Update file path for potential future use
+      picturePath = uniqueImageName;
     } catch (error) {
-      return res.status(500).json({ message: "Image upload error", error });
+      res.status(500).json({ message: error });
     }
   }
 
   try {
+    // Destructure and set post details
     const { userId, description, textAddition } = req.body;
     const user = await User.findById(userId);
 
@@ -64,7 +60,7 @@ export const createPost = async (req, res) => {
 
     res.status(201).json(newPost);
   } catch (err) {
-    console.error("Post creation error:", err);
+    console.error("Image compression or post creation error:", err);
     res.status(500).json({ message: "Failed to create post" });
   }
 };

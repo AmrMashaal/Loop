@@ -68,6 +68,19 @@ const LeftChat = ({
     }
   }, [lastMessageData, userId]);
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const searchValue = e.target[1].value;
+
+    try {
+      
+    } catch (error) {
+      if (import.meta.env.NODE_ENV === "development") {
+        console.error(error);
+      }
+    }
+  }
+
   return (
     <Box flex={!isNonMobileScreens && 1}>
       <Box
@@ -103,6 +116,8 @@ const LeftChat = ({
               position: "relative",
               margin: "13px 0 40px",
             }}
+
+            onSubmit={handleSearch}
           >
             <IconButton
               sx={{
@@ -111,6 +126,7 @@ const LeftChat = ({
                 left: "0",
                 transform: "translateY(-50%)",
               }}
+              type="submit"
             >
               <Search sx={{ color: "#65666c" }} />
             </IconButton>
