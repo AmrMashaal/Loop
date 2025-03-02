@@ -392,7 +392,8 @@ const PostClick = ({
             <Navbar />
           )}
 
-          {isDeletedPost && <Typography>This post has been deleted</Typography>}
+          {isDeletedPost && <Typography>This post has been deleted or has become private.
+            </Typography>}
 
           {showLikes && (
             <WhoLiked

@@ -39,7 +39,7 @@ export const createPost = async (req, res) => {
 
   try {
     // Destructure and set post details
-    const { userId, description, textAddition } = req.body;
+    const { userId, description, textAddition, privacy } = req.body;
     const user = await User.findById(userId);
 
     const newPost = new Post({
@@ -52,6 +52,7 @@ export const createPost = async (req, res) => {
       location: user.location,
       verified: user.verified,
       textAddition: textAddition,
+      privacy,
       comments: [],
       likes: [],
     });
@@ -83,17 +84,15 @@ export const getFeedPosts = async (req, res) => {
         : fr.sender.toString();
     });
 
-    let posts = await Post.find({ userId: { $in: friendsIds } })
+    let posts = await Post.find({
+      $or: [
+        { privacy: "friends", userId: { $in: friendsIds } },
+        { privacy: "public" },
+      ],
+    })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-
-    if (posts.length === 0) {
-      posts = await Post.find({ userId: { $ne: id } })
-        .sort({ verified: -1, createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit);
-    }
 
     const postsWithIsLiked = await Promise.all(
       posts.map(async (post) => {
@@ -117,10 +116,40 @@ export const getUserPosts = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const userPosts = await Post.find({ userId })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .sort({ pinned: -1, createdAt: -1 });
+    const userFriends = await Friend.find({
+      $or: [
+        { sender: userId, status: "accepted" },
+        { receiver: userId, status: "accepted" },
+      ],
+    });
+
+    const isFriend = userFriends.some((friend) => {
+      return (
+        friend.sender.toString() === req.user.id ||
+        friend.receiver.toString() === req.user.id
+      );
+    });
+
+    let userPosts;
+    if (userId === req.user.id) {
+      userPosts = await Post.find({ userId })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort({ pinned: -1, createdAt: -1 });
+    } else if (isFriend) {
+      userPosts = await Post.find({
+        userId,
+        $or: [{ privacy: "public" }, { privacy: "friends" }],
+      })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort({ pinned: -1, createdAt: -1 });
+    } else if (!isFriend) {
+      userPosts = await Post.find({ userId, privacy: "public" })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort({ pinned: -1, createdAt: -1 });
+    }
 
     const postsWithIsLiked = await Promise.all(
       userPosts.map(async (post) => {
@@ -142,22 +171,27 @@ export const getUserPosts = async (req, res) => {
 };
 
 export const getPost = async (req, res) => {
+  const { postId } = req.params;
+
   try {
-    const { postId } = req.params;
     const post = await Post.findById(postId);
 
-    if (!post) {
-      return res.status(404).json({ message: "Post is not found" });
+    if (post.userId.toString() !== req.user.id && post.privacy === "private") {
+      res.status(403).json({ message: "Forbidden!" });
+    } else {
+      if (!post) {
+        return res.status(404).json({ message: "Post is not found" });
+      }
+
+      const isLiked = await Like.findOne({
+        userId: req.user.id,
+        postId: post._id,
+      });
+
+      const postWithIsLiked = { ...post._doc, isLiked: Boolean(isLiked) };
+
+      res.status(200).json(postWithIsLiked);
     }
-
-    const isLiked = await Like.findOne({
-      userId: req.user.id,
-      postId: post._id,
-    });
-
-    const postWithIsLiked = { ...post._doc, isLiked: Boolean(isLiked) };
-
-    res.status(200).json(postWithIsLiked);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -270,6 +304,37 @@ export const getPostClickInfo = async (req, res) => {
     }
 
     res.status(200).json({ likesCount, commentsCount: commentCount, isLiked });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const changePrivacy = async (req, res) => {
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+
+    if (req.user.id === post.userId.toString()) {
+      if (!post) {
+        return res.status(404).json({ message: "Post is not found" });
+      }
+
+      post.privacy = req.body.privacy;
+
+      await post.save();
+
+      const isLiked = await Like.findOne({
+        userId: req.user.id,
+        postId: post._id,
+      });
+
+      const postWithIsLiked = { ...post._doc, isLiked: Boolean(isLiked) };
+
+      res.status(200).json(postWithIsLiked);
+    } else {
+      res.status(403).json({ message: "Forbidden!" });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

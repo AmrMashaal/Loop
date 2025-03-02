@@ -1,5 +1,10 @@
 /* eslint-disable react/prop-types */
-import { DeleteOutlined, EditOutlined, PushPin } from "@mui/icons-material";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PrivacyTip,
+  PushPin,
+} from "@mui/icons-material";
 import { IconButton, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useLocation } from "react-router-dom";
@@ -63,6 +68,22 @@ const UserDot = (props) => {
       >
         <EditOutlined sx={{ fontSize: "25px" }} />
         <Typography fontSize="16px">Edit The Post</Typography>
+      </IconButton>
+
+      <IconButton
+        sx={{
+          borderRadius: "8px",
+          display: "flex",
+          gap: "10px",
+          alignItems: "center",
+          width: "100%",
+        }}
+        onClick={() => {
+          props.setIsDots(false), props.setIsChangePrivacy(true);
+        }}
+      >
+        <PrivacyTip sx={{ fontSize: "25px" }} />
+        <Typography fontSize="16px">Change The Privacy</Typography>
       </IconButton>
 
       {location.pathname.split("/")[1] === "profile" && (

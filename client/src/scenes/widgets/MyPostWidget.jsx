@@ -4,6 +4,9 @@ import {
   DeleteOutlined,
   ImageOutlined,
   FormatQuote,
+  Public,
+  People,
+  Lock,
 } from "@mui/icons-material";
 import {
   Box,
@@ -32,6 +35,8 @@ const MyPostWidget = ({ picturePath, socket }) => {
   const [showColors, setShowColors] = useState(false);
   const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState(null);
+  const [postPrivacy, setPostPrivacy] = useState("public");
+  const [showPostPrivacy, setShowPostPrivacy] = useState(false);
   const [post, setPost] = useState("");
   const [textAddition, setTextAddition] = useState({ type: "", value: "" });
 
@@ -56,14 +61,11 @@ const MyPostWidget = ({ picturePath, socket }) => {
 
   const handlePost = async (e) => {
     e.preventDefault();
-    if (
-      (post && !loading) ||
-      (image && !loading)
-      /* !post.split(" ").some((word) => badWords.includes(word)) */
-    ) {
+    if ((post && !loading) || (image && !loading)) {
       const formData = new FormData();
       formData.append("userId", _id);
       formData.append("description", post);
+      formData.append("privacy", postPrivacy);
       formData.append("textAddition", JSON.stringify(textAddition));
       setIsError(false);
       setLoading(true);
@@ -90,18 +92,20 @@ const MyPostWidget = ({ picturePath, socket }) => {
 
           dispatch(setPosts({ posts: [post, ...posts] }));
 
-          socket.emit("newPost", post);
+          if (post.privacy !== "private") {
+            socket.emit("newPost", { post, friends: user.friends });
 
-          socket.emit("notifications", {
-            notification: {
-              type: "newPost",
-            },
-            friends: user.friends,
-            _id: user._id,
-            token: token,
-            firstName: user.firstName,
-            postId: post._id,
-          });
+            socket.emit("notifications", {
+              notification: {
+                type: "newPost",
+              },
+              friends: user.friends,
+              _id: user._id,
+              token: token,
+              firstName: user.firstName,
+              postId: post._id,
+            });
+          }
         }
       } catch (err) {
         if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -130,8 +134,14 @@ const MyPostWidget = ({ picturePath, socket }) => {
       "backgroundColorsParent"
     );
 
+    const privacyParent = document.getElementById("privacyParent");
+
     if (event.target !== backgroundColorsParent) {
       setShowColors(false);
+    }
+
+    if (event.target !== privacyParent) {
+      setShowPostPrivacy(false);
     }
   });
 
@@ -318,9 +328,86 @@ const MyPostWidget = ({ picturePath, socket }) => {
               </Box>
             </Box>
 
-            <Box position="relative">
+            <Box
+              position="relative"
+              display="flex"
+              gap="5px"
+              alignItems="center"
+            >
               <Box
-                p="2px 6px"
+                p="2px 20px"
+                borderRadius="10px"
+                textAlign="center"
+                sx={{
+                  ":hover": {
+                    outline: "1px solid gray",
+                  },
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+                id="privacyParent"
+                onClick={() => {
+                  setShowPostPrivacy(true);
+                }}
+              >
+                {postPrivacy}
+              </Box>
+
+              {showPostPrivacy && (
+                <Box
+                  position="absolute"
+                  top="35px"
+                  left={!isMobileScreens && "9%"}
+                  display="flex"
+                  gap="15px"
+                  bgcolor={palette.neutral.light}
+                  zIndex="1"
+                  flexWrap="wrap"
+                  justifyContent="center"
+                  padding="10px 4px"
+                  borderRadius="9px"
+                  sx={{ transform: !isMobileScreens && "translateX(-50%)" }}
+                >
+                  {["public", "friends", "private"].map((privacy, index) => {
+                    return (
+                      <Box
+                        key={index}
+                        display="flex"
+                        gap="4px"
+                        alignItems="center"
+                        sx={{
+                          cursor: "pointer",
+                          outline:
+                            postPrivacy === privacy &&
+                            `3px solid ${palette.primary.main}`,
+                          ":hover": {
+                            outline: `2px dashed ${palette.primary.main}`,
+                          },
+                        }}
+                        p="5px 10px"
+                        borderRadius="5px"
+                        onClick={() => {
+                          setPostPrivacy(privacy);
+                          setShowPostPrivacy(false);
+                        }}
+                      >
+                        {privacy}
+
+                        {privacy === "public" ? (
+                          <Public />
+                        ) : privacy === "friends" ? (
+                          <People />
+                        ) : (
+                          <Lock />
+                        )}
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
+
+              <Box
+                p="2px 8px"
                 display="flex"
                 justifyContent="center"
                 alignItems="center"

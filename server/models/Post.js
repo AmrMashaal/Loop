@@ -10,6 +10,7 @@ const postSchema = new mongoose.Schema(
     likesCount: { type: Number, default: 0 },
     commentCount: { type: Number, default: 0 },
     description: { type: String, maxlength: 2000 },
+    privacy: { type: String, default: "public" },
     lastName: String,
     location: String,
     userPicturePath: String,

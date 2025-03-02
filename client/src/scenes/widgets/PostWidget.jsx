@@ -4,6 +4,9 @@ import {
   VerifiedOutlined,
   MoreHoriz,
   PushPinOutlined,
+  Public,
+  Lock,
+  People,
 } from "@mui/icons-material";
 import { Box, useMediaQuery, useTheme } from "@mui/system";
 import { useLocation, useParams } from "react-router-dom";
@@ -13,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import FlexBetween from "../../components/FlexBetween";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import UserImage from "../../components/UserImage";
-import { setPost, setDeletePost } from "../../../state";
+import { setPost, setDeletePost, setPosts } from "../../../state";
 import DeleteComponent from "../../components/post/DeleteComponent";
 import UserDot from "../../components/post/UserDot";
 import LikePost from "../../components/post/LikePost";
@@ -24,6 +27,7 @@ import PostSkeleton from "../skeleton/PostSkeleton";
 import socket from "../../components/socket";
 import DOMPurify from "dompurify";
 import { setIsOverFlow } from "../../App";
+import ChangePrivacy from "../../components/post/ChangePrivacy";
 
 const PostWidget = ({
   posts,
@@ -34,6 +38,8 @@ const PostWidget = ({
 }) => {
   const [showLikes, setShowLikes] = useState(false);
   const [likesLoading, setLikesLoading] = useState(false);
+  const [changePrivacyLoading, setChangePrivacyLoading] = useState(false);
+  const [isChangePrivacy, setIsChangePrivacy] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [isDots, setIsDots] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -288,6 +294,40 @@ const PostWidget = ({
     }
   }, [showLikes]);
 
+  const handleChangePrivacy = async (postPrivacy) => {
+    setChangePrivacyLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/posts/${
+          postInfo.postId
+        }/changePrivacy`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ privacy: postPrivacy }),
+        }
+      );
+
+      const data = await response.json();
+
+      dispatch(
+        setPosts({
+          posts: [data, ...posts.filter((ele) => ele._id !== data._id)],
+        })
+      );
+    } catch (error) {
+      if (import.meta.env.MODE === "development") {
+        console.error(error);
+      }
+    } finally {
+      setIsChangePrivacy(false);
+      setChangePrivacyLoading(false);
+    }
+  };
+
   // eslint-disable-next-line react/prop-types
   return (
     <>
@@ -324,10 +364,18 @@ const PostWidget = ({
                           fontSize="11px"
                           color={medium}
                           display="flex"
+                          alignItems="center"
                           gap="3px"
                           sx={{ userSelect: "none" }}
                         >
                           {timeAgo(ele?.createdAt)}{" "}
+                          {ele?.privacy === "public" ? (
+                            <Public sx={{ fontSize: "15px" }} />
+                          ) : ele?.privacy === "friends" ? (
+                            <People sx={{ fontSize: "15px" }} />
+                          ) : (
+                            <Lock sx={{ fontSize: "15px" }} />
+                          )}
                           {ele?.edited && (
                             <Typography fontWeight="500" fontSize="11px">
                               | Edited
@@ -497,6 +545,7 @@ const PostWidget = ({
               </WidgetWrapper>
             );
           })}
+
           {isDots && (
             <Box
               position="fixed"
@@ -542,6 +591,7 @@ const PostWidget = ({
                   setIsDelete={setIsDelete}
                   setIsDots={setIsDots}
                   setIsEdit={setIsEdit}
+                  setIsChangePrivacy={setIsChangePrivacy}
                 />
               </Box>
             </Box>
@@ -586,6 +636,16 @@ const PostWidget = ({
             />
           )}
         </>
+      )}
+
+      {isChangePrivacy && (
+        <ChangePrivacy
+          palette={palette}
+          setIsChangePrivacy={setIsChangePrivacy}
+          isChangePrivacy={isChangePrivacy}
+          handleChangePrivacy={handleChangePrivacy}
+          changePrivacyLoading={changePrivacyLoading}
+        />
       )}
 
       {postLoading && <PostSkeleton />}

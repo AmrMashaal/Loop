@@ -38,3 +38,14 @@ const serverConnection = async () => {
 };
 
 serverConnection();
+
+// async function updateAll() {
+//   try {
+//     const result = await ?.updateMany({}, { $set: { newField: "defaultValue" } });
+//     console.log(`Updated ${result.modifiedCount} ?s.`);
+//   } catch (error) {
+//     console.error("Error updating ?s:", error);
+//   }
+// }
+
+// updateAll();
