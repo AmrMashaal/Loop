@@ -1,6 +1,6 @@
-// console.log = () => {};
-// console.warn = () => {};
-// console.error = () => {};
+console.log = () => {};
+console.warn = () => {};
+console.error = () => {};
 
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import HomePage from "./scenes/homePage";
