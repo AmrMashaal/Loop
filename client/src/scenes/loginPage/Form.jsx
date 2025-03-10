@@ -513,7 +513,7 @@ const Form = () => {
 
               {loginError.username && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  username is wrong
+                  the username does not exist
                 </Typography>
               )}
 
@@ -532,7 +532,7 @@ const Form = () => {
               />
               {loginError.password && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  the password is wrong
+                  wrong password
                 </Typography>
               )}
             </Box>
