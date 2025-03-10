@@ -29,6 +29,7 @@ const SearchThings = ({
     userId: "",
     verified: false,
   });
+  const [postClicType, setPostClickType] = useState("");
   const [isPostClicked, setIsPostClicked] = useState(false);
 
   const theme = useTheme();
@@ -227,6 +228,7 @@ const SearchThings = ({
                   setPostClickData={setPostClickData}
                   isPostClicked={isPostClicked}
                   setIsPostClicked={setIsPostClicked}
+                  setPostClickType={setPostClickType}
                 />
               </Box>
             )}
@@ -278,6 +280,7 @@ const SearchThings = ({
           _id={postClickData._id}
           userId={postClickData.userId}
           verified={postClickData.verified}
+          postClickType={postClicType}
         />
       )}
     </Box>

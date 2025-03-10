@@ -912,39 +912,41 @@ const PostWidget = ({
 
       {postLoading && <PostSkeleton />}
 
+      {!postLoading && posts?.length === 0 && location.pathname === "/" && (
+        <Box
+          display="flex"
+          alignItems="center"
+          flexDirection="column"
+          mb="40px"
+          sx={{ userSelect: "none" }}
+        >
+          <img
+            src="\assets\repair.svg"
+            alt=""
+            width={isNonMobileScreens? "400" :"250"}
+            style={{ pointerEvents: "none" }}
+          />
+
+          <Typography fontSize="24px">Come back later</Typography>
+
+          <Typography color={palette.text.secondary} fontSize="15px">
+            Sorry there is a problem with the server
+          </Typography>
+        </Box>
+      )}
+
       {!postLoading &&
         posts?.length === 0 &&
         location.pathname.split("/")[1] === "profile" && (
-          <Box
-            display="flex"
-            gap="15px"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="column"
-            mb="10px"
-          >
-            <img
-              src="/assets/5784488_2968170-removebg-preview.png"
-              alt=""
-              width="280"
-              style={{ userSelect: "none", maxWidth: "100%" }}
-            />
-
-            <Typography
-              fontSize={isNonMobileScreens ? "18px" : "14px"}
-              textTransform="uppercase"
-            >
-              {user._id === userId ? (
-                <>You haven&apos;t</>
-              ) : (
-                <>
-                  <span>This user </span>
-                  hasn&apos;t
-                </>
-              )}{" "}
-              shared anything yet
-            </Typography>
-          </Box>
+          <Typography
+          textAlign="center"
+          fontSize="26px"
+          color={palette.neutral.medium}
+          mt={isNonMobileScreens ? "25px" : "110px"}
+          mb="20px"
+        >
+          No posts available
+        </Typography>
         )}
     </>
   );
