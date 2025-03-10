@@ -35,18 +35,13 @@ const registerSchema = yup.object().shape({
     .max(20)
     .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters"),
   username: yup.string().max(20).required("required"),
-  password: yup.string().required("required"),
+  password: yup.string().min(6, "Password must be at least 6 characters").required("required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Password must match")
+    .required("Confirm password is required"),
   location: yup.string().required("required"),
   occupation: yup.string().required("required"),
-  picture: yup
-    .mixed()
-    .required("A file is required")
-    .test(
-      "fileType",
-      "Unsupported file format",
-      (value) =>
-        value && ["image/jpeg", "image/png", "image/webp"].includes(value.type)
-    ),
   gender: yup.string().required("required"),
   birthdate: yup
     .string()
@@ -81,6 +76,7 @@ const initialValuesRegister = {
   lastName: "",
   username: "",
   password: "",
+  confirmPassword: "",
   location: "",
   occupation: "",
   picture: "",
@@ -323,16 +319,19 @@ const Form = () => {
                   )}
                 </Dropzone>
               </Box>
+
               {touched.picture && errors.picture && (
                 <Typography color="error" variant="body2">
                   {errors.picture}
                 </Typography>
               )}
+
               <TextField
                 label="Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
+                type="password"
                 name="password" // name is related to initialValuesRegister
                 error={Boolean(touched.password) && Boolean(errors.password)}
                 helperText={touched.password && errors.password}
@@ -340,8 +339,26 @@ const Form = () => {
                   gridColumn: "span 4",
                 }}
               />
+
+              <TextField
+                label="Confirm Password"
+                name="confirmPassword"
+                value={values.confirmPassword}
+                error={Boolean(
+                  touched.confirmPassword && errors.confirmPassword
+                )}
+                helperText={touched.confirmPassword && errors.confirmPassword}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                type="password"
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+
               <Box sx={{ gridColumn: "span 4" }}>
                 <InputLabel>Gender</InputLabel>
+
                 <Box display="flex" alignItems="center" gap="10px" my="10px">
                   <Box
                     display="flex"
@@ -361,6 +378,7 @@ const Form = () => {
                       checked={values.gender === "male" ? true : false}
                     />
                   </Box>
+
                   <Box
                     display="flex"
                     alignItems="center"
@@ -380,6 +398,7 @@ const Form = () => {
                     />
                   </Box>
                 </Box>
+
                 {touched.gender && errors.gender && (
                   <Typography color="error" fontSize="12px" whiteSpace="nowrap">
                     {errors.gender}
@@ -401,6 +420,7 @@ const Form = () => {
               />
 
               <InputLabel id="location-lable">Location</InputLabel>
+
               <Select
                 name="location"
                 displayEmpty
@@ -422,6 +442,7 @@ const Form = () => {
                   );
                 })}
               </Select>
+
               {Boolean(touched.location) && Boolean(errors.location) && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
                   {errors.location}
@@ -436,6 +457,7 @@ const Form = () => {
                 <InputLabel id="occupation-lable" sx={{ mb: "10px" }}>
                   Occupation
                 </InputLabel>
+
                 <Select
                   name="occupation"
                   displayEmpty
@@ -457,6 +479,7 @@ const Form = () => {
                     );
                   })}
                 </Select>
+
                 {Boolean(touched.occupation) && Boolean(errors.occupation) && (
                   <Typography
                     color="error"
@@ -487,11 +510,13 @@ const Form = () => {
                   gridColumn: "span 4",
                 }}
               />
+
               {loginError.username && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
                   the username does not exist
                 </Typography>
               )}
+
               <TextField
                 label="Password"
                 type="password"
@@ -544,7 +569,10 @@ const Form = () => {
               {location.pathname === "/signup" ? "REGISTER" : "Login"}
             </Button>
 
-            <Link to={location.pathname === "/signup" ? "/login" : "/signup"}>
+            <Link
+              to={location.pathname === "/signup" ? "/login" : "/signup"}
+              reloadDocument
+            >
               <Typography
                 color={palette.primary.main}
                 sx={{

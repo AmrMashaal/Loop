@@ -22,13 +22,12 @@ import Dropzone from "react-dropzone";
 import UserImage from "../../components/UserImage";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "../../../state";
+import { useSelector } from "react-redux";
 import FlexBetween from "../../components/FlexBetween";
 import { Link } from "react-router-dom";
+import { posts, setPosts } from "../../App";
 
 const MyPostWidget = ({ picturePath, socket }) => {
-  const dispatch = useDispatch();
   const [isImage, setIsImage] = useState(false);
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,7 +41,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
 
   const { _id } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const posts = useSelector((state) => state.posts);
   const user = useSelector((state) => state.user);
 
   const isMobileScreens = useMediaQuery("(max-width: 389px)");
@@ -90,7 +88,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
           setImage(null);
           setIsImage(false);
 
-          dispatch(setPosts({ posts: [post, ...posts] }));
+          setPosts([post, ...posts]);
 
           if (post.privacy !== "private") {
             socket.emit("newPost", { post, friends: user.friends });
@@ -361,11 +359,11 @@ const MyPostWidget = ({ picturePath, socket }) => {
                   display="flex"
                   gap="15px"
                   bgcolor={palette.neutral.light}
-                  zIndex="1"
                   flexWrap="wrap"
                   justifyContent="center"
                   padding="10px 4px"
                   borderRadius="9px"
+                  zIndex="111"
                   sx={{ transform: !isMobileScreens && "translateX(-50%)" }}
                 >
                   {["public", "friends", "private"].map((privacy, index) => {

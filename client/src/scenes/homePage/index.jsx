@@ -86,7 +86,11 @@ const HomePage = ({
   document.title = "Loop";
 
   return (
-    <Box position="relative" className="homeContainer">
+    <Box
+      position="relative"
+      className="homeContainer"
+      mb={!isNonMobileScreens ? "71px" : ""}
+    >
       <Box
         position="fixed"
         width="800px"

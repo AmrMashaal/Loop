@@ -16,7 +16,7 @@ import { useState } from "react";
 import DeleteComponent from "./DeleteComponent";
 import EditThing from "./EditThing";
 import socket from "../socket";
-import { formatLikesCount } from "../../frequentFunctions";
+import { convertTextLink, formatLikesCount } from "../../frequentFunctions";
 
 const Replies = ({
   data,
@@ -24,7 +24,6 @@ const Replies = ({
   timeAgo,
   user,
   testArabic,
-  convertTextLink,
   setOpenPhotoImage,
   setIsOpenPhoto,
   setShowLikes,

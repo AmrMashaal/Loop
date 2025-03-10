@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import PostClick from "../../components/post/PostClick";
 import PostWidget from "./PostWidget";
-import { setPosts } from "../../../state/index";
 import { debounce } from "lodash";
 import _ from "lodash";
-import { setIsOverFlow } from "../../App";
+import { posts, setIsOverFlow, setPosts } from "../../App";
 
 // eslint-disable-next-line react/prop-types
 const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
-  const [pageNumber, setPageNumber] = useState(1);
   const [isPostClicked, setIsPostClicked] = useState(false);
   const [postLoading, setPostLoading] = useState(true);
+  const [postClickType, setPostClickType] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
   const [postClickData, setPostClickData] = useState({
     picturePath: "",
     firstName: "",
@@ -24,9 +24,7 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
     userId: "",
     verified: false,
   });
-  const posts = useSelector((state) => state.posts);
   const token = useSelector((state) => state.token);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isPostClicked) {
@@ -37,7 +35,7 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
   }, [isPostClicked]);
 
   useEffect(() => {
-    dispatch(setPosts({ posts: [] }));
+    setPosts([]);
   }, []);
 
   function uiqueIt(data) {
@@ -59,13 +57,11 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
       const newPosts = await response.json();
 
       if (reset) {
-        dispatch(setPosts({ posts: uiqueIt(newPosts) }));
+        setPosts(uiqueIt(newPosts));
       } else if (newPostsData.length === 0) {
-        dispatch(setPosts({ posts: uiqueIt([...posts, ...newPosts]) }));
+        setPosts(uiqueIt([...posts, ...newPosts]));
       } else {
-        dispatch(
-          setPosts({ posts: uiqueIt([...posts, ...newPosts, ...newPostsData]) })
-        );
+        setPosts(uiqueIt([...posts, ...newPosts, ...newPostsData]));
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -103,7 +99,6 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
   return (
     <Box>
       {isPostClicked && (
@@ -117,17 +112,18 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
           _id={postClickData._id}
           userId={postClickData.userId}
           verified={postClickData.verified}
+          postClickType={postClickType}
         />
       )}
 
       <PostWidget
-        posts={posts}
         postClickData={postClickData}
         setPostClickData={setPostClickData}
         isPostClicked={isPostClicked}
         setIsPostClicked={setIsPostClicked}
         postLoading={postLoading}
         socket={socket}
+        setPostClickType={setPostClickType}
       />
     </Box>
   );

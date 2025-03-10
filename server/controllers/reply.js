@@ -4,6 +4,7 @@ import Like from "../models/Like.js";
 import { v4 as uuidv4 } from "uuid";
 import sharp from "sharp";
 import cloudinary from "../utils/cloudinary.js";
+import Repost from "../models/Repost.js";
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
@@ -21,8 +22,7 @@ export const getReplies = async (req, res) => {
     const replies = await Reply.find({ comment: commentId })
       .populate("user", "firstName lastName verified picturePath _id")
       .limit(6)
-      .skip(6 * (page - 1))
-      .sort({ createdAt: -1 });
+      .skip(6 * (page - 1));
 
     const repliesWithIsLiked = await Promise.all(
       replies.map(async (reply) => {
@@ -89,11 +89,21 @@ export const postReply = async (req, res) => {
       "firstName lastName verified picturePath _id"
     );
 
-    await Post.findByIdAndUpdate(req.body.postId, {
-      $inc: {
-        commentCount: 1,
-      },
-    });
+    const post = await Post.findById(req.body.postId);
+
+    if (post) {
+      await Post.findByIdAndUpdate(req.body.postId, {
+        $inc: {
+          commentCount: 1,
+        },
+      });
+    } else {
+      await Repost.findByIdAndUpdate(req.body.postId, {
+        $inc: {
+          commentCount: 1,
+        },
+      });
+    }
 
     return res.status(200).json(replyWithUserInfo);
   } catch (err) {
@@ -105,20 +115,29 @@ export const deleteReply = async (req, res) => {
   try {
     const { replyId } = req.params;
 
-    const reply = await Reply.findById(replyId).populate("comment", "postId");
+    const reply = await Reply.findByIdAndDelete(replyId).populate(
+      "comment",
+      "postId repostId"
+    );
 
     if (req.user.id === reply.user.toString()) {
       if (!reply) {
         return res.status(404).json({ message: "Reply not found" });
       }
-
-      await Post.findByIdAndUpdate(reply.comment.postId, {
-        $inc: {
-          commentCount: -1,
-        },
-      });
-
-      await Reply.findByIdAndDelete(replyId);
+      const post = await Post.findById(reply.comment.postId);
+      if (post) {
+        await Post.findByIdAndUpdate(reply.comment.postId, {
+          $inc: {
+            commentCount: -1,
+          },
+        });
+      } else {
+        await Repost.findByIdAndUpdate(reply.comment.repostId, {
+          $inc: {
+            commentCount: -1,
+          },
+        });
+      }
 
       return res.status(200).json({ message: "Reply deleted" });
     } else {

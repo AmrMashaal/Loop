@@ -129,6 +129,7 @@ const ChangePassword = ({ changePassword, setChangePassword }) => {
                 sx={{ width: "100%", mb: "1rem" }}
               />
             </Box>
+
             <TextField
               label="Confirm Password"
               name="confirmPassword"

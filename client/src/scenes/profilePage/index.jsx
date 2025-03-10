@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PostClick from "../../components/post/PostClick";
 import { debounce } from "lodash";
-import { setLogin, setPosts } from "../../../state";
+import { setLogin } from "../../../state";
 import ProfileInfo from "../../components/profile/ProfileInfo";
 import { Divider, Typography } from "@mui/material";
 import FriendsWidget from "../widgets/FriendsWidget";
@@ -16,11 +16,12 @@ import WrongPassword from "../../components/WrongPassword";
 import socket from "../../components/socket";
 import ProfileFriends from "../../components/friends/ProfileFriends";
 import ProfileAbout from "../../components/profile/ProfileAbout";
-import { setIsOverFlow } from "../../App";
+import { posts, setIsOverFlow, setPosts } from "../../App";
 
 const ProfilePage = () => {
   const [page, setPage] = useState(1);
   const [postsCount, setPostsCount] = useState(0);
+  const [postClickType, setPostClickType] = useState("");
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
@@ -39,7 +40,6 @@ const ProfilePage = () => {
 
   const { userId } = useParams();
 
-  const posts = useSelector((state) => state.posts);
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const mode = useSelector((state) => state.mode);
@@ -63,7 +63,7 @@ const ProfilePage = () => {
 
   async function getPosts(reset = false) {
     page === 1 && setIsLoading(true);
-    page === 1 && dispatch(setPosts({ posts: [] }));
+    page === 1 && setPosts([]);
 
     try {
       const response = await fetch(
@@ -79,9 +79,9 @@ const ProfilePage = () => {
       const newPosts = await response.json();
 
       if (reset) {
-        dispatch(setPosts({ posts: newPosts.posts }));
+        setPosts(newPosts.posts);
       } else {
-        dispatch(setPosts({ posts: [...posts, ...newPosts.posts] }));
+        setPosts([...posts, ...newPosts.posts]);
       }
 
       setPostsCount(newPosts.count);
@@ -109,9 +109,16 @@ const ProfilePage = () => {
   useEffect(() => {
     const handleScroll = debounce(() => {
       if (
-        window.scrollY + window.innerHeight >= document.body.offsetHeight - 3 &&
+        window.scrollY + window.innerHeight >=
+          document.body.offsetHeight - 10 &&
         !isLoading &&
-        posts.length < postsCount
+        posts?.length < postsCount &&
+        location.pathname.split("/")[
+          location.pathname.split("/")?.length - 1
+        ] !== "friends" &&
+        location.pathname.split("/")[
+          location.pathname.split("/")?.length - 1
+        ] !== "about"
       ) {
         getMorePosts();
       }
@@ -121,7 +128,7 @@ const ProfilePage = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [postsCount, posts.length]);
+  }, [postsCount, posts?.length]);
 
   const userData = async () => {
     setUserInfo(null);
@@ -209,7 +216,7 @@ const ProfilePage = () => {
   }, []);
 
   return (
-    <div>
+    <div style={{ marginBottom: !isNonMobileScreens ? "71px" : "" }}>
       <Box
         position="fixed"
         width="800px"
@@ -219,6 +226,7 @@ const ProfilePage = () => {
         top="-200px"
         left="-172px"
         zIndex="10"
+        mb="71px"
         sx={{
           opacity: mode === "light" ? "0.1" : "0.07",
           background:
@@ -402,7 +410,9 @@ const ProfilePage = () => {
                             isPostClicked={isPostClicked}
                             setIsPostClicked={setIsPostClicked}
                             postLoading={isLoading}
+                            setPostClickType={setPostClickType}
                           />
+
                           {isPostClicked && (
                             <PostClick
                               picturePath={postClickData.picturePath}
@@ -414,6 +424,7 @@ const ProfilePage = () => {
                               _id={postClickData._id}
                               userId={postClickData.userId}
                               verified={postClickData.verified}
+                              postClickType={postClickType}
                             />
                           )}
                         </>

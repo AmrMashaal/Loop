@@ -14,10 +14,12 @@ import Comments from "./Comments";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../../scenes/navbar";
-import { formatLikesCount } from "../../frequentFunctions";
+import { convertTextLink, formatLikesCount } from "../../frequentFunctions";
 import WhoLiked from "../WhoLiked";
+import DOMPurify from "dompurify";
 
 const PostClick = ({
+  postClickType,
   setIsPostClicked,
   picturePath: initialPicturePath,
   firstName: initialFirstName,
@@ -44,11 +46,11 @@ const PostClick = ({
   const [countCheckLoading, setCountCheckLoading] = useState(true);
   const [likesLoading, setLikesLoading] = useState(false);
   const [showLikes, setShowLikes] = useState(false);
+  const [isReposted, setIsReposted] = useState(false);
   const [postId, setPostId] = useState(null);
   const [countCheck, setCountCheck] = useState(null);
   const [likeList, setLikeList] = useState([]);
   const [page, setPage] = useState(1);
-
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   const { palette } = useTheme();
@@ -86,16 +88,33 @@ const PostClick = ({
         const data = await response.json();
 
         if (response.ok) {
-          setPostDetails({
-            picturePath: data.picturePath,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            userPicturePath: data.userPicturePath,
-            description: data.description,
-            _id: data._id,
-            userId: data.userId,
-            verified: data.verified,
-          });
+          if (data.reposted) {
+            setPostDetails({
+              picturePath: data.postId.picturePath,
+              firstName: data.userId.firstName,
+              lastName: data.userId.lastName,
+              userPicturePath: data.userId.picturePath,
+              description: data.description,
+              _id: data._id,
+              userId: data.userId._id,
+              verified: data.userId.verified,
+            });
+
+            setIsReposted(true);
+          } else {
+            setPostDetails({
+              picturePath: data.picturePath,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              userPicturePath: data.userPicturePath,
+              description: data.description,
+              _id: data._id,
+              userId: data.userId,
+              verified: data.verified,
+            });
+
+            setIsReposted(false);
+          }
 
           setIsDeletedPost(false);
         } else {
@@ -115,7 +134,9 @@ const PostClick = ({
     setCountCheckLoading(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/posts/${postDetails._id}/clickInfo`,
+        `${import.meta.env.VITE_API_URL}/${
+          postClickType === "repost" || isReposted ? "reposts" : "posts"
+        }/${postDetails._id}/clickInfo`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -123,6 +144,12 @@ const PostClick = ({
       );
 
       const data = await response.json();
+
+      if (data.reposted === undefined) {
+        setIsReposted(true);
+      } else {
+        setIsReposted(false);
+      }
 
       setCountCheck(data);
       return data;
@@ -137,12 +164,13 @@ const PostClick = ({
 
   const whoLikes = async (_, initial) => {
     setLikesLoading(true);
-
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${
-          postDetails._id
-        }/post?page=${page}`,
+        `${import.meta.env.VITE_API_URL}/likes/${postDetails._id}/${
+          (postClickType && postClickType === "post") || !isReposted
+            ? "post"
+            : "repost"
+        }?page=${page}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -334,9 +362,15 @@ const PostClick = ({
               overflowX: "auto",
               direction: testArabic ? "rtl" : "ltr",
             }}
-          >
-            {postDetails?.description}
-          </Typography>
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(
+                convertTextLink(postDetails?.description),
+                {
+                  ADD_ATTR: ["target", "rel"],
+                }
+              ),
+            }}
+          />
 
           <Box
             display="flex"
@@ -385,6 +419,8 @@ const PostClick = ({
               countCheckLoading={countCheckLoading}
               countCheck={countCheck}
               setCountCheck={setCountCheck}
+              postClickType={postClickType}
+              isReposted={isReposted}
             />
           )}
 
@@ -392,8 +428,11 @@ const PostClick = ({
             <Navbar />
           )}
 
-          {isDeletedPost && <Typography>This post has been deleted or has become private.
-            </Typography>}
+          {isDeletedPost && (
+            <Typography>
+              This post has been deleted or has become private.
+            </Typography>
+          )}
 
           {showLikes && (
             <WhoLiked

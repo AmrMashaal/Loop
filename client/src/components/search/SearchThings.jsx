@@ -223,7 +223,6 @@ const SearchThings = ({
             {type === "post" && (
               <Box width={isNonMobileScreens ? "60%" : "90%"}>
                 <PostWidget
-                  posts={data?.data}
                   postLoading={loading}
                   setPostClickData={setPostClickData}
                   isPostClicked={isPostClicked}

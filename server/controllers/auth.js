@@ -68,7 +68,9 @@ export const register = async (req, res) => {
       lastName,
       username,
       password: passwordHash,
-      picturePath,
+      picturePath:
+        picturePath ||
+        "https://res.cloudinary.com/dc3ta1xrf/image/upload/v1741039254/posts/feb4142e-fff3-4a0f-a2bd-d89bd563543c-loading-user.png.jpg",
       friends,
       occupation,
       location,

@@ -262,3 +262,7 @@ li {
   -ms-transform: scale(1.3);
   -o-transform: scale(1.3);
 }
+
+.mobileNav {
+  backdrop-filter: blur(10px);
+}

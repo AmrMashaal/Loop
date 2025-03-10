@@ -12,6 +12,7 @@ const TasksComponent = ({
   description,
   id = "",
   setPage,
+  minHeight = "660px",
 }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const theme = useTheme();
@@ -58,7 +59,7 @@ const TasksComponent = ({
         display="flex"
         flexDirection="column"
         gap="14px"
-        minHeight="660px"
+        minHeight={minHeight}
         position="relative"
         borderRadius={isNonMobileScreens ? "0.75rem" : "0"}
         sx={{

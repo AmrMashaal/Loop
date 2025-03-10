@@ -16,12 +16,15 @@ import {
   Search,
   DarkMode,
   LightMode,
-  Menu,
   Close,
   People,
-  Person2,
   Message,
   Notifications,
+  HomeOutlined,
+  MessageOutlined,
+  PeopleOutline,
+  NotificationsOutlined,
+  Home,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout, setFriendsRequest } from "../../../state/index";
@@ -29,17 +32,17 @@ import { Link, useNavigate } from "react-router-dom";
 import FriendsRequest from "../widgets/FriendsRequest";
 import NotificationData from "../widgets/NotificationData";
 import socket from "../../components/socket";
-import { setIsOverFlow } from "../../App";
+import UserImage from "../../components/UserImage";
 
 // eslint-disable-next-line react/prop-types
 const Navbar = ({ isProfile }) => {
-  const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [openRequests, setOpenRequests] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
   const [isDeleteNotifications, setIsDeleteNotifications] = useState(false);
   const [returnNavColor, setReturnNavColor] = useState(true);
   const [requestLoading, setRequestLoading] = useState(true);
+  const [isClickProfile, setIsClickProfile] = useState(false);
   const [friendsRequestData, setFriendRequestData] = useState([]);
   const [notificationsState, setNotificationsState] = useState(null);
   const [watchedNotifications, setWatchedNotifications] = useState(null);
@@ -58,7 +61,6 @@ const Navbar = ({ isProfile }) => {
 
   const theme = useTheme();
   const neutrallLight = theme.palette.neutral.light;
-  const background = theme.palette.background.default;
   const alt = theme.palette.background.alt;
   const fullName = `${user?.firstName} ${user?.lastName}`;
 
@@ -167,6 +169,16 @@ const Navbar = ({ isProfile }) => {
   };
 
   useEffect(() => {
+    const removeIsClickProfile = (event) => {
+      const elementId = document.getElementById("profileNav");
+
+      if (!elementId?.contains(event.target)) {
+        setIsClickProfile(false);
+      }
+    };
+
+    document.addEventListener("click", removeIsClickProfile);
+
     const navScroll = () => {
       if (window.scrollY > 77) {
         setReturnNavColor(false);
@@ -183,6 +195,8 @@ const Navbar = ({ isProfile }) => {
       if (isProfile) {
         document.removeEventListener("scroll", navScroll);
       }
+
+      document.removeEventListener("click", removeIsClickProfile);
     };
   }, []);
 
@@ -222,16 +236,6 @@ const Navbar = ({ isProfile }) => {
       setWatchedNotifications(null);
     };
   }, [notificationsState]);
-
-  useEffect(() => {
-    if (!isNonMobileScreens) {
-      if (isMobileMenuToggled) {
-        setIsOverFlow(true);
-      } else {
-        setIsOverFlow(false);
-      }
-    }
-  }, [isMobileMenuToggled, mode]);
 
   useEffect(() => {
     if (pageNumber === 1) {
@@ -615,33 +619,52 @@ const Navbar = ({ isProfile }) => {
           </FormControl>
         </FlexBetween>
       ) : (
-        <Box display="flex" gap="10px">
-          <IconButton
+        <Box display="flex" gap="7px">
+          <Box
             onClick={() => setIsSearch(true)}
             sx={{
+              width: "41px",
+              height: "41px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               bgcolor:
                 isProfile && returnNavColor && mode === "light"
                   ? "#F0F0F0"
                   : isProfile && returnNavColor && mode === "dark"
                   ? "#33333391"
                   : undefined,
+              borderRadius: "50%",
             }}
           >
             <Search />
-          </IconButton>
-          <IconButton
-            onClick={() => setIsMobileMenuToggled(true)}
+          </Box>
+
+          <Box
             sx={{
+              width: "41px",
+              height: "41px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               bgcolor:
                 isProfile && returnNavColor && mode === "light"
                   ? "#F0F0F0"
                   : isProfile && returnNavColor && mode === "dark"
                   ? "#33333391"
                   : undefined,
+              borderRadius: "50%",
             }}
+            onClick={() => dispatch(setMode())}
           >
-            <Menu />
-          </IconButton>
+            {theme.palette.mode === "light" ? (
+              <LightMode sx={{ fontSize: "25px" }} />
+            ) : (
+              <DarkMode sx={{ fontSize: "25px" }} />
+            )}
+          </Box>
         </Box>
       )}
 
@@ -710,86 +733,100 @@ const Navbar = ({ isProfile }) => {
             </Box>
           )}
 
-          {isMobileMenuToggled && (
-            <Box
-              width="100%"
-              height="100%"
-              position="fixed"
-              left="0"
-              top="0"
-              zIndex="9"
-              sx={{
-                backgroundColor: "#00000059",
-              }}
-              onClick={() => setIsMobileMenuToggled(false)}
-            ></Box>
-          )}
-
           <Box
             position="fixed"
-            maxWidth="500px"
-            minWidth="200px"
-            padding="10px"
-            height="100%"
+            width="100%"
+            padding="5px 10px 10px"
             zIndex="10"
-            backgroundColor={background}
-            right={isMobileMenuToggled ? "0" : "-400px"}
-            top="0"
+            backgroundColor={mode === "light" ? "#ebebebb8" : "#1a1a1ade"}
+            bottom="-3px"
+            left="0"
             boxShadow="6px 2px 20px 0 #0000002d"
-            sx={{
-              transition: ".3s right",
-            }}
+            borderTop="1px solid #0000001f"
+            className="mobileNav"
           >
-            <IconButton onClick={() => setIsMobileMenuToggled(false)}>
-              <Close />
-            </IconButton>
-
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              gap="20px"
-              marginTop="14px"
-            >
-              <Link
-                to={`/profile/${user._id}`}
-                onClick={() => setIsMobileMenuToggled(false)}
-              >
+            <Box display="flex" justifyContent="space-around">
+              <Link to={`/`}>
                 <Box
-                  display="flex"
-                  alignItems="center"
                   sx={{ cursor: "pointer", userSelect: "none" }}
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
                 >
                   <IconButton sx={{ position: "relative" }}>
-                    <Person2 sx={{ fontSize: "25px" }} />
+                    {location.pathname === "/" ? (
+                      <Home
+                        sx={{
+                          fontSize: "25px",
+                          color: "#0dc6f2",
+                        }}
+                      />
+                    ) : (
+                      <HomeOutlined
+                        sx={{
+                          fontSize: "25px",
+                          color:
+                            location.pathname === "/"
+                              ? "#0dc6f2"
+                              : mode === "dark"
+                              ? "#c4c4c4"
+                              : "",
+                        }}
+                      />
+                    )}
                   </IconButton>
 
-                  <Typography>Profile Page</Typography>
+                  <Typography
+                    mt="-4px"
+                    color={mode === "light" ? "#0000008a" : "#c4c4c4"}
+                    fontSize="11px"
+                    fontWeight={location.pathname === "/" ? "500" : ""}
+                  >
+                    Home
+                  </Typography>
                 </Box>
               </Link>
 
               <Link to="/chat">
                 <Box
-                  display="flex"
-                  alignItems="center"
                   sx={{ cursor: "pointer", userSelect: "none" }}
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
                 >
-                  <IconButton sx={{ position: "relative" }}>
-                    <Message sx={{ fontSize: "25px" }} />
+                  <IconButton
+                    sx={{
+                      position: "relative",
+                      color: mode === "dark" ? "#c4c4c4" : "",
+                    }}
+                  >
+                    <MessageOutlined sx={{ fontSize: "25px" }} />
                   </IconButton>
 
-                  <Typography>Messages</Typography>
+                  <Typography
+                    mt="-4px"
+                    color={mode === "light" ? "#0000008a" : "#c4c4c4"}
+                    fontSize="11px"
+                  >
+                    Messages
+                  </Typography>
                 </Box>
               </Link>
 
               <Box
-                display="flex"
-                alignItems="center"
                 sx={{ cursor: "pointer", userSelect: "none" }}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
                 onClick={() => setOpenRequests(true)}
               >
-                <IconButton sx={{ position: "relative" }}>
-                  <People sx={{ fontSize: "25px" }} />
+                <IconButton
+                  sx={{
+                    position: "relative",
+                    color: mode === "dark" ? "#c4c4c4" : "",
+                  }}
+                >
+                  <PeopleOutline sx={{ fontSize: "25px" }} />
 
                   {user?.friendsRequest?.length > 0 && (
                     <Typography
@@ -808,11 +845,19 @@ const Navbar = ({ isProfile }) => {
                     </Typography>
                   )}
                 </IconButton>
-                <Typography>Friends Request</Typography>
+
+                <Typography
+                  mt="-4px"
+                  color={mode === "light" ? "#0000008a" : "#c4c4c4"}
+                  fontSize="11px"
+                >
+                  Requests
+                </Typography>
               </Box>
 
               <Box
                 display="flex"
+                flexDirection="column"
                 alignItems="center"
                 sx={{ cursor: "pointer", userSelect: "none" }}
                 onClick={() => {
@@ -834,9 +879,10 @@ const Navbar = ({ isProfile }) => {
                 <IconButton
                   sx={{
                     position: "relative",
+                    color: mode === "dark" ? "#c4c4c4" : "",
                   }}
                 >
-                  <Notifications sx={{ fontSize: "25px" }} />
+                  <NotificationsOutlined sx={{ fontSize: "25px" }} />
                   <Typography
                     position="absolute"
                     top="-2px"
@@ -854,7 +900,7 @@ const Navbar = ({ isProfile }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: "12px",
+                      fontSize: "11px",
                       padding: "10px",
                       color: "white",
                     }}
@@ -867,106 +913,95 @@ const Navbar = ({ isProfile }) => {
                   </Typography>
                 </IconButton>
 
-                <Typography>Notifications</Typography>
+                <Typography
+                  mt="-4px"
+                  color={mode === "light" ? "#0000008a" : "#c4c4c4"}
+                  fontSize="11px"
+                >
+                  Notifications
+                </Typography>
               </Box>
 
-              <FormControl variant="standard" value={fullName}>
-                <Select
-                  value={fullName}
-                  sx={{
-                    background: neutrallLight,
-                    padding: "2px 8px",
-                    width: "150px",
-                    "& .MuiSvgIcon-root": {
-                      width: "20px",
-                    },
-                    "& .MuiSelect-select": {
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "block",
-                    },
-                    "& .MuiSelect-select:focus": {
-                      backgroundColor: neutrallLight,
-                    },
-                  }}
-                  input={<InputBase />}
-                >
-                  <MenuItem
-                    value={fullName}
-                    sx={{ display: "flex", alignItems: "center", gap: "6px" }}
-                  >
-                    {fullName}
-                  </MenuItem>
-                  <MenuItem
-                    value="Log out"
-                    onClick={() => {
-                      dispatch(setLogout()), disconnectSocket();
-                    }}
-                  >
-                    Log out
-                  </MenuItem>
-                </Select>
-              </FormControl>
-
               <Box
-                p="3px"
-                width="130px"
-                height="36px"
-                mr="10px"
-                bgcolor={neutrallLight}
-                borderRadius="50px"
+                sx={{ cursor: "pointer", userSelect: "none" }}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
                 position="relative"
-                boxShadow="inset -1px 2px 3px 2px #00000045"
-                outline={`${neutrallLight} solid 5px`}
-                alignSelf="center"
-                sx={{ cursor: "pointer" }}
-                onClick={() => dispatch(setMode())}
+                onClick={() => setIsClickProfile(true)}
+                id="profileNav"
               >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    backgroundColor:
-                      mode === "dark" ? "#3e3e3e" : neutrallLight,
-                    transition: ".3s",
-                    left: mode === "dark" ? "0" : "89px",
-                    boxShadow: "0px 0px 10px 0px #00000054",
-                    width: "41px",
-                    height: "41px",
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: "11",
-                    ":hover": {
-                      background: mode === "dark" ? neutrallLight : "#dedede",
-                    },
-                  }}
-                >
-                  {theme.palette.mode === "light" ? (
-                    <LightMode sx={{ fontSize: "25px" }} />
-                  ) : (
-                    <DarkMode sx={{ fontSize: "25px" }} />
-                  )}
-                </Box>
+                <UserImage
+                  image={user.picturePath}
+                  size="36"
+                  isNav={true}
+                  isActive={
+                    location.pathname === `/profile/${user._id}` ? true : false
+                  }
+                />
 
                 <Typography
-                  position="absolute"
-                  top="50%"
-                  left={mode === "dark" ? "57px" : "10px"}
-                  textTransform="uppercase"
+                  mt="-4px"
+                  color={mode === "light" ? "#0000008a" : "#c4c4c4"}
                   fontSize="11px"
-                  sx={{
-                    transform: "translateY(-50%)",
-                    transition: ".3s",
-                    userSelect: "none",
-                  }}
+                  fontWeight={
+                    location.pathname === `/profile/${user._id}` ? "500" : ""
+                  }
                 >
-                  {mode === "dark" ? "dark mode" : "light mode"}
+                  Profile
                 </Typography>
+
+                {isClickProfile && (
+                  <Box
+                    position="absolute"
+                    width="150px"
+                    bottom="40px"
+                    right="20px"
+                    zIndex="111"
+                    bgcolor={alt}
+                    border="1px solid #0000001f"
+                    sx={{ cursor: "auto" }}
+                  >
+                    <Link to={`/profile/${user._id}`}>
+                      <Typography
+                        sx={{
+                          cursor:
+                            location.pathname !== `/profile/${user._id}`
+                              ? "pointer"
+                              : "context-menu",
+                          ":hover": {
+                            bgcolor:
+                              location.pathname !== `/profile/${user._id}` &&
+                              (mode === "light" ? "#f0f0f0" : "#333333"),
+                          },
+                          opacity:
+                            location.pathname === `/profile/${user._id}`
+                              ? 0.5
+                              : 1,
+                        }}
+                        p="8px"
+                      >
+                        Profile Page
+                      </Typography>
+                    </Link>
+
+                    <Typography
+                      mt="5px"
+                      sx={{
+                        cursor: "pointer",
+                        ":hover": {
+                          bgcolor: mode === "light" ? "#f0f0f0" : "#333333",
+                        },
+                      }}
+                      p="8px"
+                      onClick={() => {
+                        dispatch(setLogout()), disconnectSocket();
+                      }}
+                    >
+                      Log Out
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
           </Box>
@@ -977,7 +1012,6 @@ const Navbar = ({ isProfile }) => {
         <FriendsRequest
           openRequests={openRequests}
           setOpenRequests={setOpenRequests}
-          setIsMobileMenuToggled={setIsMobileMenuToggled}
           friendsRequestData={friendsRequestData}
           setFriendRequestData={setFriendRequestData}
           requestLoading={requestLoading}
@@ -987,7 +1021,6 @@ const Navbar = ({ isProfile }) => {
       {isNotification && !isDeleteNotifications && (
         <NotificationData
           openNotification={isNotification}
-          setIsMobileMenuToggled={setIsMobileMenuToggled}
           setIsNotification={setIsNotification}
           notificationsState={notificationsState}
           isDeleteNotifications={isDeleteNotifications}

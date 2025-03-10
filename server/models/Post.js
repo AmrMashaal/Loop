@@ -9,6 +9,7 @@ const postSchema = new mongoose.Schema(
     pinned: { type: Boolean, default: false },
     likesCount: { type: Number, default: 0 },
     commentCount: { type: Number, default: 0 },
+    shareCount: { type: Number, default: 0 },
     description: { type: String, maxlength: 2000 },
     privacy: { type: String, default: "public" },
     lastName: String,

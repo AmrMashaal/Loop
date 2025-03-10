@@ -8,14 +8,12 @@ import {
 import { IconButton, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useLocation } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { setPosts } from "../../../state";
+import { useSelector } from "react-redux";
+import { posts, setPosts } from "../../App";
 
 const UserDot = (props) => {
   const token = useSelector((state) => state.token);
-  const posts = useSelector((state) => state.posts);
 
-  const dispatch = useDispatch();
 
   const location = useLocation();
 
@@ -33,11 +31,7 @@ const UserDot = (props) => {
 
       const data = await response.json();
 
-      dispatch(
-        setPosts({
-          posts: [data, ...posts.filter((ele) => ele._id !== data._id)],
-        })
-      );
+      setPosts([data, ...posts.filter((ele) => ele._id !== data._id)]);
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);

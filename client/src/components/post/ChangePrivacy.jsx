@@ -135,7 +135,6 @@ const ChangePrivacy = ({
 
         <Button
           disabled={!postPrivacy || changePrivacyLoading}
-          sx={{ color: "white", background: "#0866ff", width: "117px" }}
           onClick={() => handleChangePrivacy(postPrivacy)}
         >
           {changePrivacyLoading ? "Loading..." : "save"}

@@ -10,6 +10,8 @@ const UserImage = ({
   isProfile,
   isSearch,
   isOnline = false,
+  isNav,
+  isActive,
 }) => {
   const theme = useTheme();
   const alt = theme.palette.background.alt;
@@ -30,7 +32,13 @@ const UserImage = ({
           borderRadius: "50%",
           objectFit: "cover",
           userSelect: "none",
-          border: isProfile ? `6px solid ${alt}` : undefined,
+          border: isProfile
+            ? `6px solid ${alt}`
+            : isNav && !isActive
+            ? `2px solid white`
+            : isActive
+            ? `2px solid #00D5FA`
+            : undefined,
           boxShadow: isProfile
             ? "rgba(0, 0, 0, 0.13) 3px 6px 7px 0px"
             : undefined,

@@ -30,7 +30,7 @@ import { debounce } from "lodash";
 import socket from "../../components/socket";
 import Replies from "./Replies";
 import WhoLiked from "./../WhoLiked";
-import { formatLikesCount } from "../../frequentFunctions";
+import { convertTextLink, formatLikesCount } from "../../frequentFunctions";
 
 const Comments = ({
   _id,
@@ -39,6 +39,8 @@ const Comments = ({
   countCheckLoading,
   countCheck,
   setCountCheck,
+  postClickType,
+  isReposted,
 }) => {
   const token = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
@@ -100,7 +102,11 @@ const Comments = ({
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/comments/postComment/${_id}`,
+          `${import.meta.env.VITE_API_URL}/comments/${
+            postClickType === "post" || !isReposted
+              ? "postComment"
+              : "repostComment"
+          }/${_id}`,
           {
             method: "POST",
             headers: { Authorization: `Bearer ${token}` },
@@ -156,9 +162,9 @@ const Comments = ({
   const handleComments = async (first = true) => {
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/comments/${_id}/${comIdParam}?page=${pageNumber}&limit=5`,
+        `${import.meta.env.VITE_API_URL}/comments/${_id}/${comIdParam}${
+          postClickType === "repost" || isReposted ? "/getRepostComments" : ""
+        }?page=${pageNumber}&limit=5`,
         {
           method: "GET",
           headers: {
@@ -225,25 +231,6 @@ const Comments = ({
       handleComments(false);
     }
   }, [pageNumber]);
-
-  const escapeHtml = (str) => {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  };
-
-  const convertTextLink = (text) => {
-    const urlPattern = /(https?:\/\/[^\s]+)/g;
-
-    text = escapeHtml(text).replace(urlPattern, (url) => {
-      return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
-    });
-
-    return text;
-  };
 
   const handleDeleteComment = async () => {
     try {
@@ -344,10 +331,11 @@ const Comments = ({
 
   const handleLikePost = async () => {
     setPostLikeLoading(true);
-
     try {
       const response1 = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${_id}/${user?._id}/like`,
+        `${import.meta.env.VITE_API_URL}/likes/${_id}/${user?._id}/${
+          postClickType === "repost" || isReposted ? "likeRepost" : "like"
+        }`,
         {
           method: "PATCH",
           headers: {
@@ -886,7 +874,6 @@ const Comments = ({
                         timeAgo={timeAgo}
                         user={user}
                         testArabic={testArabic}
-                        convertTextLink={convertTextLink}
                         setOpenPhotoImage={setOpenPhotoImage}
                         setIsOpenPhoto={setIsOpenPhoto}
                         commentLikeLoading={commentLikeLoading}

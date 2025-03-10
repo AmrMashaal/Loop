@@ -1,6 +1,6 @@
-console.log = function () {};
-console.warn = function () {};
-console.error = function () {};
+console.log = () => {};
+console.warn = () => {};
+console.error = () => {};
 
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import HomePage from "./scenes/homePage";
@@ -20,9 +20,13 @@ import { setFriends } from "../state";
 export let isOverflow;
 export let setIsOverFlow;
 
+export let posts;
+export let setPosts;
+
 const App = () => {
   const [newPosts, setNewPosts] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
+  [posts, setPosts] = useState([]);
   [isOverflow, setIsOverFlow] = useState(false);
 
   useEffect(() => {
@@ -116,6 +120,8 @@ const App = () => {
                     setNewPosts={setNewPosts}
                     onlineFriends={onlineFriends}
                     setOnlineFriends={setOnlineFriends}
+                    posts={posts}
+                    setPosts={setPosts}
                   />
                 ) : (
                   <Navigate to="/login" />

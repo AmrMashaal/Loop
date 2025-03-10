@@ -1,15 +1,16 @@
-import { Box } from "@mui/system";
+import { Box, useMediaQuery } from "@mui/system";
 import Navbar from "../navbar";
 import SearchThings from "../../components/search/SearchThings";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import WrongPassword from "../../components/WrongPassword";
+import { setPosts } from "../../App";
 
 const SearchPage = () => {
   const [type, setType] = useState("user");
   const [users, setUsers] = useState({});
-  const [posts, setPosts] = useState({});
+  const [postsFetch, setPostsFetch] = useState({});
   const [loading, setLoading] = useState(true);
   const [wrongPassword, setWrongPassword] = useState(false);
   const [page, setPage] = useState(1);
@@ -50,14 +51,17 @@ const SearchPage = () => {
 
       if (type === "post") {
         if (reset) {
-          setPosts(dataResponsed);
+          setPostsFetch(dataResponsed);
+          setPosts(dataResponsed.data);
         } else {
-          setPosts((prevPosts) => {
+          setPostsFetch((prevPosts) => {
             return {
               data: [...prevPosts.data, ...dataResponsed.data],
               count: dataResponsed.count,
             };
           });
+
+          setPosts((prevPosts) => [...prevPosts, ...dataResponsed.data]);
         }
       } else if (type === "user") {
         if (reset) {
@@ -96,7 +100,8 @@ const SearchPage = () => {
   }, [searchValue, type, page]);
 
   useEffect(() => {
-    setPosts({});
+    setPostsFetch({});
+    setPosts([]);
     setUsers({});
     setPage(1);
   }, [searchValue, type]);
@@ -129,12 +134,14 @@ const SearchPage = () => {
     }
   };
 
+  const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+
   useEffect(() => {
     checkCorrectPassword();
   }, []);
 
   return (
-    <Box>
+    <Box mb={!isNonMobileScreens ? "71px" : ""}>
       <Box
         position="fixed"
         width="800px"
@@ -175,7 +182,7 @@ const SearchPage = () => {
         searchValue={searchValue}
         type={type}
         setType={setType}
-        data={type === "user" ? users : posts}
+        data={type === "user" ? users : postsFetch}
         loading={loading}
         setPage={setPage}
       />

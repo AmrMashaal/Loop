@@ -12,11 +12,10 @@ import { Box, useMediaQuery, useTheme } from "@mui/system";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import FlexBetween from "../../components/FlexBetween";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import UserImage from "../../components/UserImage";
-import { setPost, setDeletePost, setPosts } from "../../../state";
 import DeleteComponent from "../../components/post/DeleteComponent";
 import UserDot from "../../components/post/UserDot";
 import LikePost from "../../components/post/LikePost";
@@ -26,21 +25,25 @@ import PostEdited from "../../components/post/PostEdited";
 import PostSkeleton from "../skeleton/PostSkeleton";
 import socket from "../../components/socket";
 import DOMPurify from "dompurify";
-import { setIsOverFlow } from "../../App";
+import { posts, setIsOverFlow, setPosts } from "../../App";
 import ChangePrivacy from "../../components/post/ChangePrivacy";
+import ShareComponent from "../../components/post/ShareComponent";
+import { convertTextLink } from "../../frequentFunctions";
 
 const PostWidget = ({
-  posts,
   setPostClickData,
   isPostClicked,
   setIsPostClicked,
   postLoading,
+  setPostClickType,
 }) => {
   const [showLikes, setShowLikes] = useState(false);
   const [likesLoading, setLikesLoading] = useState(false);
+  const [repostLoading, setRepostLoading] = useState(false);
   const [changePrivacyLoading, setChangePrivacyLoading] = useState(false);
   const [isChangePrivacy, setIsChangePrivacy] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const [isShare, setIsShare] = useState(false);
   const [isDots, setIsDots] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [postWhoDeleted, setPostWhoDeleted] = useState(null);
@@ -54,8 +57,6 @@ const PostWidget = ({
 
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
-
-  const dispatch = useDispatch();
 
   const token = useSelector((state) => state.token);
   const user = useSelector((state) => state.user);
@@ -74,25 +75,6 @@ const PostWidget = ({
       setIsOverFlow(false);
     }
   }, [showLikes, isPostClicked, isDelete, isDots, isEdit]);
-
-  const escapeHtml = (str) => {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  };
-
-  const convertTextLink = (text) => {
-    const urlPattern = /(https?:\/\/[^\s]+)/g;
-
-    text = escapeHtml(text).replace(urlPattern, (url) => {
-      return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
-    });
-
-    return text;
-  };
 
   const howIsText = (text, img, txtad) => {
     if (!img && text?.length < 50 && txtad?.type !== "color") return "24px";
@@ -124,24 +106,48 @@ const PostWidget = ({
     else return "15px";
   };
 
-  const whoLikes = async (postId, initial = false) => {
+  const whoLikesPost = async (postId, initial = false) => {
     setLikesLoading(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${postId}/post?page=${page}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
 
-      const data = await response.json();
-      if (initial) {
-        setLikeList(data);
+    try {
+      if (typeof postId === "object") {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/likes/${
+            postId._id
+          }/repost?page=${page}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const data = await response.json();
+
+        if (initial) {
+          setLikeList(data);
+        } else {
+          setLikeList((prev) => {
+            return { likes: [...prev.likes, ...data.likes], count: data.count };
+          });
+        }
       } else {
-        setLikeList((prev) => {
-          return { likes: [...prev.likes, ...data.likes], count: data.count };
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/likes/${postId}/post?page=${page}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const data = await response.json();
+
+        if (initial) {
+          setLikeList(data);
+        } else {
+          setLikeList((prev) => {
+            return { likes: [...prev.likes, ...data.likes], count: data.count };
+          });
+        }
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -159,7 +165,9 @@ const PostWidget = ({
 
     try {
       const response1 = await fetch(
-        `${import.meta.env.VITE_API_URL}/likes/${postId}/${user._id}/like`,
+        `${import.meta.env.VITE_API_URL}/likes/${postId}/${user._id}/${
+          typeof ele.userId !== "object" ? "like" : "likeRepost"
+        }`,
         {
           method: "PATCH",
           headers: {
@@ -171,7 +179,17 @@ const PostWidget = ({
       const updatedPost = await response1.json();
 
       if (response1.ok) {
-        dispatch(setPost({ post_id: postId, post: updatedPost.post }));
+        setPosts(
+          posts.map((ele) =>
+            ele._id !== postId
+              ? ele
+              : {
+                  ...ele,
+                  isLiked: updatedPost.isLiked,
+                  likesCount: updatedPost.post.likesCount,
+                }
+          )
+        );
       }
 
       if (ele.userId !== user._id && updatedPost.isLiked) {
@@ -224,7 +242,7 @@ const PostWidget = ({
         }
       );
 
-      dispatch(setDeletePost({ postId: postWhoDeleted }));
+      setPosts(posts.filter((ele) => ele._id !== postWhoDeleted));
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
@@ -234,7 +252,7 @@ const PostWidget = ({
 
   const handleEditPost = async (e, editText, description) => {
     e.preventDefault();
-    if (editText !== description && editText) {
+    if (editText !== description) {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/posts/${postInfo.postId}/edit`,
@@ -249,7 +267,8 @@ const PostWidget = ({
         );
 
         const data = await response.json();
-        dispatch(setPost({ post_id: postInfo.postId, post: data }));
+
+        setPosts([data, ...posts.filter((ele) => ele._id !== data._id)]);
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV === "development") {
           console.error("Error:", error);
@@ -313,11 +332,7 @@ const PostWidget = ({
 
       const data = await response.json();
 
-      dispatch(
-        setPosts({
-          posts: [data, ...posts.filter((ele) => ele._id !== data._id)],
-        })
-      );
+      setPosts([data, ...posts.filter((ele) => ele._id !== data._id)]);
     } catch (error) {
       if (import.meta.env.MODE === "development") {
         console.error(error);
@@ -325,6 +340,35 @@ const PostWidget = ({
     } finally {
       setIsChangePrivacy(false);
       setChangePrivacyLoading(false);
+    }
+  };
+
+  const handleRepost = async (e, privacy, description) => {
+    setRepostLoading(true);
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/reposts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ privacy, postId: postInfo.postId, description }),
+      });
+
+      const data = await response.json();
+
+      if (userId === user._id || !userId) {
+        setPosts([data, ...posts]);
+      }
+    } catch (error) {
+      if (import.meta.env.MODE === "development") {
+        console.error(error);
+      }
+    } finally {
+      setIsShare(false);
+      setRepostLoading(false);
     }
   };
 
@@ -341,11 +385,25 @@ const PostWidget = ({
             return (
               <WidgetWrapper mb="10px" key={index}>
                 <FlexBetween>
-                  <Link to={`/profile/${ele.userId}`}>
+                  <Link
+                    to={`/profile/${
+                      typeof ele.userId === "object"
+                        ? ele.userId._id
+                        : ele.userId
+                    }`}
+                  >
                     <FlexBetween gap="10px">
                       <Box sx={{ cursor: "pointer" }}>
-                        <UserImage image={ele.userPicturePath} size="40px" />
+                        <UserImage
+                          image={
+                            typeof ele.userId === "object"
+                              ? ele.userId.picturePath
+                              : ele.userPicturePath
+                          }
+                          size="40px"
+                        />
                       </Box>
+
                       <Box>
                         <Box
                           sx={{ cursor: "pointer" }}
@@ -354,12 +412,22 @@ const PostWidget = ({
                           gap="4px"
                         >
                           <Typography fontSize="14px" className="opacityBox">
-                            {ele?.firstName} {ele?.lastName}
+                            {typeof ele.userId === "object"
+                              ? ele.userId.firstName
+                              : ele.firstName}{" "}
+                            {typeof ele.userId === "object"
+                              ? ele.userId.lastName
+                              : ele.lastName}
                           </Typography>
-                          {ele?.verified && (
+
+                          {typeof ele.userId === "object" &&
+                          ele.userId.verified ? (
                             <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                          )}
+                          ) : ele.verified ? (
+                            <VerifiedOutlined sx={{ color: "#15a1ed" }} />
+                          ) : undefined}
                         </Box>
+
                         <Typography
                           fontSize="11px"
                           color={medium}
@@ -398,7 +466,9 @@ const PostWidget = ({
                       </Box>
                     </FlexBetween>
                   </Link>
-                  {ele.userId === user._id && (
+
+                  {typeof ele.userId === "object" &&
+                  ele.userId._id === user._id ? (
                     <IconButton
                       onClick={() => {
                         setIsDots(true),
@@ -407,7 +477,16 @@ const PostWidget = ({
                     >
                       <MoreHoriz />
                     </IconButton>
-                  )}
+                  ) : ele.userId === user._id ? (
+                    <IconButton
+                      onClick={() => {
+                        setIsDots(true),
+                          setPostInfo({ postId: ele._id, userId: ele.userId });
+                      }}
+                    >
+                      <MoreHoriz />
+                    </IconButton>
+                  ) : undefined}
                 </FlexBetween>
 
                 <Box
@@ -441,6 +520,7 @@ const PostWidget = ({
                   onClick={() => {
                     if (textAddition?.type === "color") {
                       setIsPostClicked(true),
+                        setPostClickType("post"),
                         setPostClickData({
                           firstName: ele?.firstName,
                           lastName: ele?.lastName,
@@ -457,11 +537,15 @@ const PostWidget = ({
                   <Typography
                     position="relative"
                     fontWeight={textAddition?.value === "bold" && "bold"}
-                    fontSize={howIsText(
-                      ele?.description,
-                      ele?.picturePath,
-                      textAddition
-                    )}
+                    fontSize={
+                      typeof ele.userId === "object"
+                        ? "14px"
+                        : howIsText(
+                            ele?.description,
+                            ele?.picturePath,
+                            textAddition
+                          )
+                    }
                     color={
                       textAddition?.value ===
                         "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
@@ -477,6 +561,7 @@ const PostWidget = ({
                     }
                     sx={{
                       wordBreak: "break-word",
+                      lineHeight: "1.7",
                       direction: testArabic(ele?.description) && "rtl",
                       textAlign: textAddition.type === "color",
                       p: textAddition?.value === "quotation" && "25px",
@@ -485,7 +570,7 @@ const PostWidget = ({
                       __html: DOMPurify.sanitize(
                         convertTextLink(
                           ele?.description?.length > 180
-                            ? ele?.description.slice(0, 179)
+                            ? ele?.description?.slice(0, 179)
                             : ele?.description
                         ),
                         {
@@ -507,6 +592,7 @@ const PostWidget = ({
                       }}
                       onClick={() => {
                         setIsPostClicked(true),
+                          setPostClickType("post"),
                           setPostClickData({
                             firstName: ele?.firstName,
                             lastName: ele?.lastName,
@@ -528,8 +614,168 @@ const PostWidget = ({
                   <PostImg
                     setIsPostClicked={setIsPostClicked}
                     setPostClickData={setPostClickData}
+                    setPostClickType={setPostClickType}
                     ele={ele}
                   />
+                )}
+
+                {typeof ele.userId === "object" && (
+                  <Box borderRadius="0.75rem">
+                    {ele?.postId?.picturePath && (
+                      <PostImg
+                        setIsPostClicked={setIsPostClicked}
+                        setPostClickType={setPostClickType}
+                        setPostClickData={setPostClickData}
+                        ele={ele.postId}
+                        isRepost={true}
+                      />
+                    )}
+
+                    <Box
+                      mt={ele?.postId?.picturePath ? "-17px" : "13px"}
+                      border="1px solid"
+                      borderColor={palette.neutral.light}
+                      p="10px"
+                    >
+                      {ele?.postId !== null ? (
+                        <Link
+                          to={`/profile/${ele?.postId?.userId}`}
+                          style={{ width: "fit-content", display: "block" }}
+                        >
+                          <Box gap="10px" display="flex" alignItems="center">
+                            <Box sx={{ cursor: "pointer" }}>
+                              <UserImage
+                                image={
+                                  typeof ele?.userId === "object"
+                                    ? ele?.postId?.userPicturePath
+                                    : ele?.userPicturePath
+                                }
+                                size="40px"
+                              />
+                            </Box>
+
+                            <Box>
+                              <Box
+                                sx={{ cursor: "pointer" }}
+                                display="flex"
+                                alignItems="center"
+                                gap="4px"
+                              >
+                                <Typography
+                                  fontSize="14px"
+                                  className="opacityBox"
+                                >
+                                  {typeof ele?.userId === "object"
+                                    ? ele?.postId?.firstName
+                                    : ele?.firstName}{" "}
+                                  {typeof ele?.userId === "object"
+                                    ? ele?.postId?.lastName
+                                    : ele?.lastName}
+                                </Typography>
+
+                                {ele.postId?.verified && (
+                                  <VerifiedOutlined sx={{ color: "#15a1ed" }} />
+                                )}
+                              </Box>
+
+                              <Typography
+                                fontSize="11px"
+                                color={medium}
+                                display="flex"
+                                alignItems="center"
+                                gap="3px"
+                                sx={{ userSelect: "none" }}
+                              >
+                                {timeAgo(ele?.postId?.createdAt)}{" "}
+                                {ele?.postId?.privacy === "public" ? (
+                                  <Public sx={{ fontSize: "15px" }} />
+                                ) : ele?.postId?.privacy === "friends" ? (
+                                  <People sx={{ fontSize: "15px" }} />
+                                ) : (
+                                  <Lock sx={{ fontSize: "15px" }} />
+                                )}
+                                {ele?.edited && (
+                                  <Typography fontWeight="500" fontSize="11px">
+                                    | Edited
+                                  </Typography>
+                                )}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Link>
+                      ) : (
+                        <Box display="flex" alignItems="center" gap="10px">
+                          <Lock sx={{ fontSize: "22px" }} />
+
+                          <Box>
+                            <Typography
+                              fontSize={isNonMobileScreens ? "15px" : "12px"}
+                              fontWeight="500"
+                            >
+                              This content isn&apos;t available right now
+                            </Typography>
+
+                            <Typography
+                              fontSize={isNonMobileScreens ? "12px" : "10px"}
+                              color={palette.text.secondary}
+                            >
+                              When this happens, it&apos;s usually because the
+                              owner only shared it with a small group of people,
+                              changed who can see it or it&apos;s been deleted.
+                            </Typography>
+                          </Box>
+                        </Box>
+                      )}
+
+                      {ele?.postId?.description && (
+                        <>
+                          <Typography
+                            mt="10px"
+                            fontSize="15px"
+                            dangerouslySetInnerHTML={{
+                              __html: DOMPurify.sanitize(
+                                convertTextLink(
+                                  ele?.postId?.description?.length > 180
+                                    ? ele?.postId?.description.slice(0, 179)
+                                    : ele?.postId?.description
+                                ),
+                                {
+                                  ADD_ATTR: ["target", "rel"],
+                                }
+                              ),
+                            }}
+                          />
+
+                          {ele?.postId?.description?.length > 180 && (
+                            <span
+                              style={{
+                                fontWeight: "600",
+                                cursor: "pointer",
+                                userSelect: "none",
+                              }}
+                              onClick={() => {
+                                setIsPostClicked(true),
+                                  setPostClickType("post"),
+                                  setPostClickData({
+                                    firstName: ele?.postId?.firstName,
+                                    lastName: ele?.postId?.lastName,
+                                    picturePath: ele?.postId?.picturePath,
+                                    userPicturePath:
+                                      ele?.postId?.userPicturePath,
+                                    description: ele?.postId?.description,
+                                    _id: ele?.postId?._id,
+                                    userId: ele?.postId?.userId,
+                                    verified: ele?.postId?.verified,
+                                  });
+                              }}
+                            >
+                              ...more
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </Box>
+                  </Box>
                 )}
 
                 <LikePost
@@ -541,6 +787,9 @@ const PostWidget = ({
                   setPostClickData={setPostClickData}
                   loading={clickLikeLoading}
                   setPostInfo={setPostInfo}
+                  palette={palette}
+                  setIsShare={setIsShare}
+                  setPostClickType={setPostClickType}
                 />
               </WidgetWrapper>
             );
@@ -621,7 +870,7 @@ const PostWidget = ({
               showLikes={showLikes}
               setShowLikes={setShowLikes}
               setLikeList={setLikeList}
-              WhoLikes={whoLikes}
+              WhoLikes={whoLikesPost}
               page={page}
               setPage={setPage}
               elementId={postInfo.postId}
@@ -633,6 +882,19 @@ const PostWidget = ({
               setIsDelete={setIsDelete}
               handleDeletePost={handleDeletePost}
               type="post"
+            />
+          )}
+
+          {isShare && (
+            <ShareComponent
+              isShare={isShare}
+              setIsShare={setIsShare}
+              postInfo={postInfo}
+              setPostInfo={setPostInfo}
+              user={user}
+              neutralColor={palette.neutral.light}
+              handleSubmit={handleRepost}
+              repostLoading={repostLoading}
             />
           )}
         </>

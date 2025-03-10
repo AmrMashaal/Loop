@@ -13,8 +13,7 @@ const FriendsRequest = ({
   openRequests,
   setOpenRequests,
   friendsRequestData,
-  setIsMobileMenuToggled,
-  setFriendRequestData,
+   setFriendRequestData,
   requestLoading,
 }) => {
   const token = useSelector((state) => state.token);
@@ -100,7 +99,6 @@ const FriendsRequest = ({
                   to={`/profile/${request?._id}`}
                   onClick={() => {
                     setOpenRequests(false);
-                    setIsMobileMenuToggled(false);
                   }}
                 >
                   <Box display="flex" alignItems="center" gap="10px">
