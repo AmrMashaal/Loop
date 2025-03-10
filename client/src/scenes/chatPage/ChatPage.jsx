@@ -279,8 +279,8 @@ const ChatPage = ({ socket, fromNav }) => {
     handleSubmit(e);
 
     if (
-      message.trim().length !== 0 ||
-      (image.length !== 0 && message.length < 1500)
+      (message.trim().length !== 0 && userId !== user._id) ||
+      (image?.length !== 0 && message?.length < 1500 && userId !== user._id)
     ) {
       try {
         const sendMessageResponse = await fetch(

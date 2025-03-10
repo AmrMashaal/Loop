@@ -23,7 +23,7 @@ export const convertTextLink = (text) => {
   const urlPattern = /(https?:\/\/[^\s]+)/g;
 
   text = escapeHtml(text)?.replace(urlPattern, (url) => {
-    return `<a href="${url}" target="_blank" style="color: #2f9cd0; font-weight: 500; text-decoration: underline;">${url}</a>`;
+    return `<a href="${url}" target="_blank" style="color: #41c2ff; font-weight: 500; text-decoration: underline;">${url}</a>`;
   });
 
   return text;

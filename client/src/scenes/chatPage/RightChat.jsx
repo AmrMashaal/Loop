@@ -7,6 +7,8 @@ import OpenPhoto from "../../components/OpenPhoto";
 import { setIsOverFlow } from "../../App";
 import { DeleteOutlined, Image, Send } from "@mui/icons-material";
 import Dropzone from "react-dropzone";
+import { convertTextLink } from "../../frequentFunctions";
+import DOMPurify from "dompurify";
 
 const RightChat = ({
   messages,
@@ -85,7 +87,21 @@ const RightChat = ({
               }}
             >
               {msg?.text && (
-                <Typography p="10px 10px 3px">{msg?.text}</Typography>
+                <Typography
+                  p="10px 10px 3px"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(
+                      convertTextLink(
+                        msg?.text.length > 180
+                          ? msg?.text.slice(0, 179)
+                          : msg.text
+                      ),
+                      {
+                        ADD_ATTR: ["target", "rel"],
+                      }
+                    ),
+                  }}
+                />
               )}
 
               {msg?.picturePath && msg?.picturePath && (
