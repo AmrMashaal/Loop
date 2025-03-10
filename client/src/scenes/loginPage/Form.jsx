@@ -184,7 +184,7 @@ const Form = () => {
         setLoginError({ username: false, password: true });
       }
 
-      if (loggedIn.message === "User is not exist.") {
+      if (loggedIn.message === "User does not exist.") {
         setLoginError({ username: true, password: false });
       }
     } catch (error) {
@@ -513,7 +513,7 @@ const Form = () => {
 
               {loginError.username && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  the username does not exist
+                  username is wrong
                 </Typography>
               )}
 

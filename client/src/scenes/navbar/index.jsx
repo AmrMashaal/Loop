@@ -5,9 +5,6 @@ import {
   IconButton,
   InputBase,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
   useTheme,
   useMediaQuery,
   Button,
@@ -62,7 +59,6 @@ const Navbar = ({ isProfile }) => {
   const theme = useTheme();
   const neutrallLight = theme.palette.neutral.light;
   const alt = theme.palette.background.alt;
-  const fullName = `${user?.firstName} ${user?.lastName}`;
 
   const friendsRequest = async () => {
     setRequestLoading(true);
@@ -574,49 +570,71 @@ const Navbar = ({ isProfile }) => {
             </Typography>
           </Box>
 
-          <FormControl variant="standard" value={fullName}>
-            <Select
-              value={fullName}
-              sx={{
-                background:
-                  isProfile && returnNavColor && mode === "light"
-                    ? "#f0f0f0b3"
-                    : isProfile && returnNavColor && mode === "dark"
-                    ? "#33333391"
-                    : neutrallLight,
-                padding: "2px 8px",
-                width: "150px",
-                borderRadius: "9px",
-                "& .MuiSvgIcon-root": {
-                  width: "20px",
-                },
-                "& .MuiSelect-select": {
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                },
-                "& .MuiSelect-select:focus": {
-                  backgroundColor: neutrallLight,
-                },
-              }}
-              input={<InputBase />}
-            >
-              <MenuItem
-                value={fullName}
-                sx={{ display: "flex", alignItems: "center", gap: "6px" }}
+          <Box
+            sx={{ cursor: "pointer", userSelect: "none" }}
+            position="relative"
+            onClick={() => setIsClickProfile(true)}
+            id="profileNav"
+          >
+            <UserImage
+              image={user.picturePath}
+              size="36"
+              isNav={true}
+              isActive={
+                location.pathname === `/profile/${user._id}` ? true : false
+              }
+            />
+
+            {isClickProfile && isNonMobileScreens && (
+              <Box
+                position="absolute"
+                width="150px"
+                bottom="-60px"
+                right="20px"
+                zIndex="111"
+                bgcolor={alt}
+                border="1px solid #0000001f"
+                sx={{ cursor: "auto" }}
               >
-                {fullName}
-              </MenuItem>
-              <MenuItem
-                value="Log out"
-                onClick={() => {
-                  dispatch(setLogout()), disconnectSocket();
-                }}
-              >
-                Log out
-              </MenuItem>
-            </Select>
-          </FormControl>
+                <Link to={`/profile/${user._id}`}>
+                  <Typography
+                    sx={{
+                      cursor:
+                        location.pathname !== `/profile/${user._id}`
+                          ? "pointer"
+                          : "context-menu",
+                      ":hover": {
+                        bgcolor:
+                          location.pathname !== `/profile/${user._id}` &&
+                          (mode === "light" ? "#f0f0f0" : "#333333"),
+                      },
+                      opacity:
+                        location.pathname === `/profile/${user._id}` ? 0.5 : 1,
+                    }}
+                    p="8px"
+                  >
+                    Profile Page
+                  </Typography>
+                </Link>
+
+                <Typography
+                  mt="5px"
+                  sx={{
+                    cursor: "pointer",
+                    ":hover": {
+                      bgcolor: mode === "light" ? "#f0f0f0" : "#333333",
+                    },
+                  }}
+                  p="8px"
+                  onClick={() => {
+                    dispatch(setLogout()), disconnectSocket();
+                  }}
+                >
+                  Log Out
+                </Typography>
+              </Box>
+            )}
+          </Box>
         </FlexBetween>
       ) : (
         <Box display="flex" gap="7px">
