@@ -12,15 +12,14 @@ import {
   MenuItem,
   Radio,
 } from "@mui/material";
-import EditOutLinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../../state";
 import Dropzone from "react-dropzone";
-import FlexBetween from "../../components/FlexBetween";
 import { countries, occupations } from "../../../infoArrays";
+import { DeleteOutlined } from "@mui/icons-material";
 
 const registerSchema = yup.object().shape({
   firstName: yup
@@ -35,7 +34,10 @@ const registerSchema = yup.object().shape({
     .max(20)
     .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters"),
   username: yup.string().max(20).required("required"),
-  password: yup.string().min(6, "Password must be at least 6 characters").required("required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("required"),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Password must match")
@@ -97,6 +99,8 @@ const Form = () => {
     username: false,
     password: false,
   });
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageError, setImageError] = useState(null);
 
   const { palette } = useTheme();
 
@@ -278,12 +282,10 @@ const Form = () => {
               )}
 
               <Box
-                border={`2px solid ${palette.neutral.medium}`}
-                padding="1rem"
+                my="10px"
                 sx={{
                   gridColumn: "span 4",
                   borderRadius: "4px",
-                  cursor: "pointer",
                   userSelect: "none",
                 }}
               >
@@ -291,33 +293,87 @@ const Form = () => {
                   accept=".jpg,.jpeg,.png,.webp"
                   multiple={false}
                   onDrop={(acceptedFiles) => {
-                    setFieldValue("picture", acceptedFiles[0]);
+                    const file = acceptedFiles[0];
+                    const fileExtension = file.name
+                      .split(".")
+                      .pop()
+                      .toLowerCase();
+
+                    if (
+                      ["jpg", "jpeg", "png", "webp"].includes(fileExtension)
+                    ) {
+                      setFieldValue("picture", file);
+                      setImagePreview(URL.createObjectURL(file));
+                      setImageError(null);
+                    } else if (
+                      !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
+                    ) {
+                      setImageError("This file is not supported");
+                    }
                   }}
                 >
                   {({ getRootProps, getInputProps }) => (
                     <Box
                       {...getRootProps()}
-                      border={`2px dashed ${palette.primary.main}`}
                       padding="1rem"
+                      border={
+                        !imagePreview
+                          ? `2px dashed ${palette.neutral.medium}`
+                          : ""
+                      }
+                      sx={{ cursor: "pointer" }}
                     >
                       <input {...getInputProps()} />
                       {!values.picture ? (
                         <p>Add Picture Here</p>
                       ) : (
-                        <FlexBetween>
-                          <Typography>
-                            {values.picture.name.length > 30
-                              ? `${values.picture.name.slice(0, 30) + "..."}`
-                              : values.picture.name}
-                          </Typography>
-                          <IconButton>
-                            <EditOutLinedIcon />
-                          </IconButton>
-                        </FlexBetween>
+                        <Box>
+                          <Box position="relative" width="fit-content">
+                            <img
+                              src={imagePreview}
+                              alt="preview"
+                              width="110"
+                              style={{
+                                height: "110px",
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                              }}
+                            />
+
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFieldValue("picture", null);
+                                setImagePreview(null);
+                              }}
+                              sx={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                bgcolor: "#00000073",
+                                color: "white",
+                              }}
+                            >
+                              <DeleteOutlined />
+                            </IconButton>
+                          </Box>
+                        </Box>
                       )}
                     </Box>
                   )}
                 </Dropzone>
+
+                {imageError && (
+                  <Typography
+                    color="error"
+                    fontSize="12px"
+                    whiteSpace="nowrap"
+                    mt="5px"
+                    mb="-5px"
+                  >
+                    {imageError}
+                  </Typography>
+                )}
               </Box>
 
               {touched.picture && errors.picture && (

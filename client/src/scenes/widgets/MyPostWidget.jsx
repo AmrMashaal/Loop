@@ -29,11 +29,11 @@ import { posts, setPosts } from "../../App";
 
 const MyPostWidget = ({ picturePath, socket }) => {
   const [isImage, setIsImage] = useState(false);
-  const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showColors, setShowColors] = useState(false);
   const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [postPrivacy, setPostPrivacy] = useState("public");
   const [showPostPrivacy, setShowPostPrivacy] = useState(false);
   const [post, setPost] = useState("");
@@ -65,7 +65,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
       formData.append("description", post);
       formData.append("privacy", postPrivacy);
       formData.append("textAddition", JSON.stringify(textAddition));
-      setIsError(false);
       setLoading(true);
 
       if (image) {
@@ -86,6 +85,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
           setPost("");
           setTextAddition({ type: "", value: "" });
           setImage(null);
+          setImagePreview(null);
           setIsImage(false);
 
           setPosts([post, ...posts]);
@@ -112,8 +112,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
       } finally {
         setLoading(false);
       }
-    } else {
-      setIsError(true);
     }
   };
 
@@ -122,10 +120,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
       setTextAddition({ type: "", value: "" });
     }
   }, [image]);
-
-  useEffect(() => {
-    isError && post.length !== 0 && setIsError(false);
-  }, [post]);
 
   document.addEventListener("click", (event) => {
     const backgroundColorsParent = document.getElementById(
@@ -147,6 +141,8 @@ const MyPostWidget = ({ picturePath, socket }) => {
     const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
     return regexArabic.test(description);
   };
+
+  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
   return (
     <WidgetWrapper mb="10px">
@@ -199,7 +195,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
               }}
               placeholder="What is on your mind?"
               value={post}
-              onClick={() => isError && setIsError(false)}
               onChange={(e) => {
                 if (e.target.value.length <= 1000) setPost(e.target.value);
                 else if (e.target.value.length > 1000)
@@ -489,15 +484,8 @@ const MyPostWidget = ({ picturePath, socket }) => {
         </Box>
       </Box>
 
-      {isError && (
-        <Typography color="error" mt="8px" ml="20px">
-          You have to write or share a photo
-        </Typography>
-      )}
       {isImage && (
         <Box
-          border={`2px solid ${palette.neutral.medium}`}
-          padding="1rem"
           mt="15px"
           sx={{
             gridColumn: "span 4",
@@ -513,6 +501,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
               const fileExtension = file.name.split(".").pop().toLowerCase();
               if (["jpg", "jpeg", "png", "webp"].includes(fileExtension)) {
                 setImage(file);
+                setImagePreview(URL.createObjectURL(file));
                 setImageError(null);
               } else if (
                 !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
@@ -524,8 +513,8 @@ const MyPostWidget = ({ picturePath, socket }) => {
             {({ getRootProps, getInputProps }) => (
               <Box
                 {...getRootProps()}
-                border={`2px dashed ${palette.primary.main}`}
                 padding="1rem"
+                border={`2px dashed ${palette.neutral.medium}`}
                 sx={{ cursor: "pointer" }}
               >
                 <input {...getInputProps()} />
@@ -537,22 +526,37 @@ const MyPostWidget = ({ picturePath, socket }) => {
                     </IconButton>
                   </FlexBetween>
                 ) : (
-                  <FlexBetween>
-                    <Typography>
-                      {image.name.length > 20
-                        ? `${image.name.slice(0, 20) + "..."}`
-                        : image.name}
-                    </Typography>
+                  <Box position="relative">
+                    <Box>
+                      <img
+                        src={imagePreview}
+                        alt="preview"
+                        width="100%"
+                        style={{
+                          maxHeight: isNonMobileScreens ? "500px" : "312px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Box>
+
                     <IconButton
                       onClick={(e) => {
                         e.stopPropagation();
                         setImageError(null);
                         setImage(null);
+                        setImagePreview(null);
+                      }}
+                      sx={{
+                        position: "absolute",
+                        top: "5px",
+                        right: "5px",
+                        bgcolor: "#00000073",
+                        color: "white",
                       }}
                     >
                       <DeleteOutlined />
                     </IconButton>
-                  </FlexBetween>
+                  </Box>
                 )}
               </Box>
             )}
@@ -582,13 +586,16 @@ const MyPostWidget = ({ picturePath, socket }) => {
           }}
           onClick={() => {
             setIsImage(!isImage);
-            isError && setIsError(false);
           }}
         >
           <ImageOutlined />
           <Typography>Image</Typography>
         </FlexBetween>
-        <Button onClick={handlePost} type="submit">
+        <Button
+          onClick={handlePost}
+          type="submit"
+          disabled={post === "" && !image}
+        >
           {loading ? (
             <Box display="flex" gap="4px">
               loading
