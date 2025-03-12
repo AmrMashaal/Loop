@@ -193,7 +193,8 @@ const PostWidget = ({
       }
 
       if (
-        (ele.userId !== user._id && ele.userId._id !== user._id) &&
+        ele.userId !== user._id &&
+        ele.userId._id !== user._id &&
         updatedPost.isLiked
       ) {
         const response2 = await fetch(
@@ -218,10 +219,12 @@ const PostWidget = ({
 
         const notification = await response2.json();
 
-        socket.emit("notifications", {
-          receiverId: ele.userId,
-          notification: notification,
-        });
+        if (import.meta.env.VITE_NODE_ENV !== "production") {
+          socket.emit("notifications", {
+            receiverId: ele.userId,
+            notification: notification,
+          });
+        }
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {

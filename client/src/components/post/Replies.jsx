@@ -146,10 +146,13 @@ const Replies = ({
 
           const notification = await response2.json();
 
-          socket.emit("notifications", {
+          if (import.meta.env.VITE_NODE_ENV !== "production") {
+           socket.emit("notifications", {
             receiverId: data.reply.user,
             notification: notification,
           });
+          }
+         
         }
       }
     } catch (error) {

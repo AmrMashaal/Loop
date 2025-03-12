@@ -80,19 +80,27 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      socket.on("notification", (data) => {
-        setNewPosts((prevPosts) => (prevPosts ? [...prevPosts, data] : data));
-      });
+    if (import.meta.env.VITE_NODE_ENV !== "production") {
+      if (user) {
+        socket.on("notification", (data) => {
+          setNewPosts((prevPosts) => (prevPosts ? [...prevPosts, data] : data));
+        });
 
-      if (user?.friends?.length !== 0) {
-        socket.emit("userOnline", { userId: user?._id, friends: user.friends });
+        if (
+          user?.friends?.length !== 0 &&
+          import.meta.env.VITE_NODE_ENV !== "production"
+        ) {
+          socket.emit("userOnline", {
+            userId: user?._id,
+            friends: user.friends,
+          });
+        }
+
+        return () => {
+          socket.off("notification");
+          socket.off("userOnline");
+        };
       }
-
-      return () => {
-        socket.off("notification");
-        socket.off("userOnline");
-      };
     }
   }, [socket]);
 

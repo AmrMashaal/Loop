@@ -90,7 +90,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
 
           setPosts([post, ...posts]);
 
-          if (post.privacy !== "private") {
+          if (post.privacy !== "private" && import.meta.env.VITE_NODE_ENV !== "production") {
             socket.emit("newPost", { post, friends: user.friends });
 
             socket.emit("notifications", {

@@ -108,10 +108,12 @@ const ChatPage = ({ socket, fromNav }) => {
 
         const messagesResponse = await response.json();
 
-        socket.emit("sendMessage", {
-          receiverId: userId,
-          message: messagesResponse,
-        });
+        if (import.meta.env.VITE_NODE_ENV !== "production") {
+          socket.emit("sendMessage", {
+            receiverId: userId,
+            message: messagesResponse,
+          });
+        }
 
         setMessages((prevMessages) => [...prevMessages, messagesResponse]);
       } catch (error) {
@@ -194,36 +196,38 @@ const ChatPage = ({ socket, fromNav }) => {
   }, []);
 
   useEffect(() => {
-    const handleReceiveMessage = (data) => {
-      if (data?.senderId?._id === userId) {
-        setMessages((prevMessages) => [...prevMessages, data]);
-      } else if (data?.senderId?._id !== userId) {
-        startNotificationSound();
-      }
+    if (import.meta.env.VITE_NODE_ENV !== "production") {
+      const handleReceiveMessage = (data) => {
+        if (data?.senderId?._id === userId) {
+          setMessages((prevMessages) => [...prevMessages, data]);
+        } else if (data?.senderId?._id !== userId) {
+          startNotificationSound();
+        }
 
-      setLastMessageData((prevHistory) => {
-        return prevHistory.map((ele) => {
-          return ele.senderId._id === data.senderId._id ||
-            ele.receiverId._id === data.senderId._id
-            ? {
-                ...ele,
-                message: data.text,
-                updatedAt: data.updatedAt,
-                senderId: {
-                  ...ele.senderId,
-                  _id: data.senderId._id,
-                },
-              }
-            : ele;
+        setLastMessageData((prevHistory) => {
+          return prevHistory.map((ele) => {
+            return ele.senderId._id === data.senderId._id ||
+              ele.receiverId._id === data.senderId._id
+              ? {
+                  ...ele,
+                  message: data.text,
+                  updatedAt: data.updatedAt,
+                  senderId: {
+                    ...ele.senderId,
+                    _id: data.senderId._id,
+                  },
+                }
+              : ele;
+          });
         });
-      });
-    };
+      };
 
-    socket.on("receiveMessage", handleReceiveMessage);
+      socket.on("receiveMessage", handleReceiveMessage);
 
-    return () => {
-      socket.off("receiveMessage", handleReceiveMessage);
-    };
+      return () => {
+        socket.off("receiveMessage", handleReceiveMessage);
+      };
+    }
   }, [socket, userId]);
 
   useEffect(() => {
@@ -303,10 +307,12 @@ const ChatPage = ({ socket, fromNav }) => {
 
         const data = await sendMessageResponse.json();
 
-        socket.emit("notifications", {
-          receiverId: userId,
-          notification: data,
-        });
+        if (import.meta.env.VITE_NODE_ENV !== "production") {
+          socket.emit("notifications", {
+            receiverId: userId,
+            notification: data,
+          });
+        }
 
         await fetch(`${import.meta.env.VITE_API_URL}/lastMessages`, {
           method: "POST",

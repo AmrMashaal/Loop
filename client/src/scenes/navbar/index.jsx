@@ -203,22 +203,24 @@ const Navbar = ({ isProfile }) => {
   }, [openRequests]);
 
   useEffect(() => {
-    socket.on("getNotifications", (data) => {
-      setNotificationsState((prev) =>
-        notificationsState?.length === 0 ? data : [data, ...(prev || [])]
-      );
-    });
+    if (import.meta.env.VITE_NODE_ENV !== "production") {
+      socket.on("getNotifications", (data) => {
+        setNotificationsState((prev) =>
+          notificationsState?.length === 0 ? data : [data, ...(prev || [])]
+        );
+      });
 
-    socket.on("friendNewPost", (data) => {
-      setNotificationsState((prev) =>
-        notificationsState?.length === 0 ? data : [data, ...(prev || [])]
-      );
-    });
+      socket.on("friendNewPost", (data) => {
+        setNotificationsState((prev) =>
+          notificationsState?.length === 0 ? data : [data, ...(prev || [])]
+        );
+      });
 
-    return () => {
-      socket.off("getNotifications");
-      socket.off("friendNewPost");
-    };
+      return () => {
+        socket.off("getNotifications");
+        socket.off("friendNewPost");
+      };
+    }
   }, [socket]);
 
   useEffect(() => {

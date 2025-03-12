@@ -144,10 +144,12 @@ const Comments = ({
 
           const notification = await response2.json();
 
-          socket.emit("notifications", {
-            receiverId: userId,
-            notification: notification,
-          });
+          if (import.meta.env.VITE_NODE_ENV !== "production") {
+            socket.emit("notifications", {
+              receiverId: userId,
+              notification: notification,
+            });
+          }
         }
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -315,10 +317,12 @@ const Comments = ({
 
         const notification = await response2.json();
 
-        socket.emit("notifications", {
-          receiverId: comment.user,
-          notification: notification,
-        });
+        if (import.meta.env.VITE_NODE_ENV !== "production") {
+          socket.emit("notifications", {
+            receiverId: comment.user,
+            notification: notification,
+          });
+        }
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -375,10 +379,12 @@ const Comments = ({
 
         const notification = await response2.json();
 
-        socket.emit("notifications", {
-          receiverId: userId,
-          notification: notification,
-        });
+        if (import.meta.env.VITE_NODE_ENV !== "production") {
+          socket.emit("notifications", {
+            receiverId: userId,
+            notification: notification,
+          });
+        }
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -547,10 +553,14 @@ const Comments = ({
 
           const notification = await response2.json();
 
+
+          if (import.meta.env.VITE_NODE_ENV !== "production") {
           socket.emit("notifications", {
             receiverId: replyData.userId,
             notification: notification,
           });
+          }
+          
         }
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV === "development") {
