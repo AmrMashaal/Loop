@@ -15,9 +15,9 @@ import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import SearchPage from "./scenes/searchPage/SearchPage";
 import ChatPage from "./scenes/chatPage/ChatPage";
-import socket from "./components/socket";
 import PostClick from "./components/post/PostClick";
 import { setFriends } from "../state";
+import socket from "./components/socket";
 
 export let isOverflow;
 export let setIsOverFlow;

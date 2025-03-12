@@ -204,22 +204,22 @@ const ChatPage = ({ socket, fromNav }) => {
           startNotificationSound();
         }
 
-        setLastMessageData((prevHistory) => {
-          return prevHistory.map((ele) => {
-            return ele.senderId._id === data.senderId._id ||
-              ele.receiverId._id === data.senderId._id
-              ? {
-                  ...ele,
-                  message: data.text,
-                  updatedAt: data.updatedAt,
-                  senderId: {
-                    ...ele.senderId,
-                    _id: data.senderId._id,
-                  },
-                }
-              : ele;
-          });
-        });
+        // setLastMessageData((prevHistory) => {
+        //   return prevHistory.map((ele) => {
+        //     return ele?.senderId?._id === data?.senderId?._id ||
+        //       ele.receiverId._id === data.senderId._id
+        //       ? {
+        //           ...ele,
+        //           message: data.text,
+        //           updatedAt: data.updatedAt,
+        //           senderId: {
+        //             ...ele.senderId,
+        //             _id: data.senderId._id,
+        //           },
+        //         }
+        //       : ele;
+        //   });
+        // });
       };
 
       socket.on("receiveMessage", handleReceiveMessage);
@@ -327,24 +327,24 @@ const ChatPage = ({ socket, fromNav }) => {
           }),
         });
 
-        if (userId !== user._id) {
-          setLastMessageData((prevHistory) => {
-            return prevHistory.map((ele) => {
-              return data?.receiverId?._id === ele?.senderId?._id ||
-                data?.receiverId?._id === ele?.receiverId?._id
-                ? {
-                    ...ele,
-                    message: message,
-                    updatedAt: data?.updatedAt,
-                    senderId: {
-                      ...ele?.receiverId,
-                      _id: user._id,
-                    },
-                  }
-                : ele;
-            });
-          });
-        }
+        // if (userId !== user._id) {
+        //   setLastMessageData((prevHistory) => {
+        //     return prevHistory.map((ele) => {
+        //       return data?.receiverId?._id === ele?.senderId?._id ||
+        //         data?.receiverId?._id === ele?.receiverId?._id
+        //         ? {
+        //             ...ele,
+        //             message: message,
+        //             updatedAt: data?.updatedAt,
+        //             senderId: {
+        //               ...ele?.receiverId,
+        //               _id: user._id,
+        //             },
+        //           }
+        //         : ele;
+        //     });
+        //   });
+        // }
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV === "development") {
           console.error("Error:", error);
