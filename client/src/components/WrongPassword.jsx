@@ -62,7 +62,6 @@ const WrongPassword = () => {
           fontSize="20px"
           textAlign="center"
           lineHeight="2rem"
-          color="white"
         >
           Your password was changed.
           <Typography color={palette.neutral.medium} fontSize="16px">

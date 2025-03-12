@@ -374,7 +374,7 @@ export const deletePost = async (req, res) => {
 
       await Notification.deleteMany({ linkId: id });
 
-      await Comment.deleteMany({ postId: id });
+      await Comment.deleteMany({ repostId: id });
     }
 
     res.status(200).json(deletedPost);

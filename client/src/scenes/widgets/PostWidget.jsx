@@ -192,7 +192,10 @@ const PostWidget = ({
         );
       }
 
-      if (ele.userId !== user._id && updatedPost.isLiked) {
+      if (
+        (ele.userId !== user._id && ele.userId._id !== user._id) &&
+        updatedPost.isLiked
+      ) {
         const response2 = await fetch(
           `${import.meta.env.VITE_API_URL}/notifications/${user._id}/${
             ele.userId
@@ -923,7 +926,7 @@ const PostWidget = ({
           <img
             src="\assets\repair.svg"
             alt=""
-            width={isNonMobileScreens? "400" :"250"}
+            width={isNonMobileScreens ? "400" : "250"}
             style={{ pointerEvents: "none" }}
           />
 
@@ -939,14 +942,14 @@ const PostWidget = ({
         posts?.length === 0 &&
         location.pathname.split("/")[1] === "profile" && (
           <Typography
-          textAlign="center"
-          fontSize="26px"
-          color={palette.neutral.medium}
-          mt={isNonMobileScreens ? "25px" : "110px"}
-          mb="20px"
-        >
-          No posts available
-        </Typography>
+            textAlign="center"
+            fontSize="26px"
+            color={palette.neutral.medium}
+            mt={isNonMobileScreens ? "25px" : "110px"}
+            mb="20px"
+          >
+            No posts available
+          </Typography>
         )}
     </>
   );
