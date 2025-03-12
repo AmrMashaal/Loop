@@ -151,10 +151,10 @@ const ProfileInfo = ({ userInfo, userId }) => {
   };
 
   useEffect(() => {
-    if (userInfo?._id !== user?._id) {
+    if (userInfo?._id !== user?._id && userId !== user?._id) {
       friendshipStatus();
     }
-  }, [userInfo]);
+  }, [userInfo, userId]);
 
   const handleTriangle = () => {
     (friendSettings === "remove" ||
