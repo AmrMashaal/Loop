@@ -1,6 +1,8 @@
-console.log = () => {};
-console.warn = () => {};
-console.error = () => {};
+if (import.meta.env.VITE_NODE_ENV === "production") {
+  console.log = () => {};
+  console.warn = () => {};
+  console.error = () => {};
+}
 
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import HomePage from "./scenes/homePage";
