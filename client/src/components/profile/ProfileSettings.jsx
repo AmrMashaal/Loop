@@ -21,10 +21,15 @@ import { setLogin } from "../../../state";
 import { useState } from "react";
 import FlexBetween from "../FlexBetween";
 import { Facebook, Instagram, LinkedIn, X, YouTube } from "@mui/icons-material";
+// import Cropper from "react-easy-crop";
 
 const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
   const [usernameError, setUsernameError] = useState(false);
   const [loading, setLoading] = useState(false);
+  // const [crop, setCrop] = useState({ x: 0, y: 0 });
+  // const [zoom, setZoom] = useState(1);
+  // const [imagePreview, setImagePreview] = useState(null);
+  // const [cropComplete, setCropComplete] = useState(null);
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -409,6 +414,7 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                   multiple={false}
                   onDrop={(acceptedFiles) => {
                     setFieldValue("picturePath", acceptedFiles[0]);
+                    // setImagePreview(URL.createObjectURL(acceptedFiles[0]));
                   }}
                 >
                   {({ getRootProps, getInputProps }) => (
@@ -635,6 +641,49 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
           );
         }}
       </Formik>
+
+      {/* {imagePreview && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          width="100vw"
+          height="100vh"
+          bgcolor="rgba(0, 0, 0, 0.5)"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          zIndex="1000"
+        >
+          <Cropper
+            image={imagePreview}
+            crop={crop}
+            zoom={zoom}
+            aspect={4 / 3}
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={(_, croppedAreaPixels) => {
+              setCropComplete(croppedAreaPixels);
+              console.log(croppedAreaPixels);
+            }}
+          />
+
+          <Button
+            onClick={() => {
+              setCropComplete(null);
+              setImagePreview(null);
+            }}
+            sx={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              color: palette.background.alt,
+            }}
+          >
+            done
+          </Button>
+        </Box>
+      )} */}
     </TasksComponent>
   );
 };
