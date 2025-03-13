@@ -4,5 +4,12 @@
       "source": "/api/:path*",
       "destination": "https://loop-backend-theta.vercel.app/:path*"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html",
+      "statusCode": 200
+    }
   ]
 }

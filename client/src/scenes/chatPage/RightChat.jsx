@@ -171,7 +171,7 @@ const RightChat = ({
               } else if (
                 !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
               ) {
-                setImageError("This file is not supported");
+                setImageError("This file is not supported");xxxxxx
               }
             }}
           >
