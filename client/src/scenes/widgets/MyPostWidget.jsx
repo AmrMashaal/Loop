@@ -73,7 +73,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/posts`, {
+        const response = await fetch(`/api/posts`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
@@ -90,7 +90,10 @@ const MyPostWidget = ({ picturePath, socket }) => {
 
           setPosts([post, ...posts]);
 
-          if (post.privacy !== "private" && import.meta.env.VITE_NODE_ENV !== "production") {
+          if (
+            post.privacy !== "private" &&
+            import.meta.env.VITE_NODE_ENV !== "production"
+          ) {
             socket.emit("newPost", { post, friends: user.friends });
 
             socket.emit("notifications", {

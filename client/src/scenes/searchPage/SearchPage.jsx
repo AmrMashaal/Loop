@@ -109,9 +109,7 @@ const SearchPage = () => {
   const checkCorrectPassword = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${
-          user._id
-        }/checkCorrectPassword`,
+        `/api/users/${user._id}/checkCorrectPassword`,
         {
           method: "POST",
           headers: {

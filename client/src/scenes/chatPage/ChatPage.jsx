@@ -42,9 +42,7 @@ const ChatPage = ({ socket, fromNav }) => {
   const getMessages = async (reset = false) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/messages/${
-          user._id
-        }/${userId}?page=${pageNumber}&limit=50`,
+        `/api/messages/${user._id}/${userId}?page=${pageNumber}&limit=50`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -96,15 +94,12 @@ const ChatPage = ({ socket, fromNav }) => {
       }
 
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/messages/${user._id}/${userId}`,
-          {
-            method: "POST",
+        const response = await fetch(`/api/messages/${user._id}/${userId}`, {
+          method: "POST",
 
-            headers: { Authorization: `Bearer ${token}` },
-            body: formData,
-          }
-        );
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
 
         const messagesResponse = await response.json();
 
@@ -143,13 +138,10 @@ const ChatPage = ({ socket, fromNav }) => {
     setHistoryLoad(true);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/lastMessages`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`/api/lastMessages`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const lastMessages = await response.json();
 
@@ -249,9 +241,7 @@ const ChatPage = ({ socket, fromNav }) => {
   const checkCorrectPassword = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${
-          user._id
-        }/checkCorrectPassword`,
+        `/api/users/${user._id}/checkCorrectPassword`,
         {
           method: "POST",
           headers: {
@@ -288,7 +278,7 @@ const ChatPage = ({ socket, fromNav }) => {
     ) {
       try {
         const sendMessageResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/notifications/${user._id}/${userId}`,
+          `/api/notifications/${user._id}/${userId}`,
           {
             method: "POST",
             headers: {
@@ -314,7 +304,7 @@ const ChatPage = ({ socket, fromNav }) => {
           });
         }
 
-        await fetch(`${import.meta.env.VITE_API_URL}/lastMessages`, {
+        await fetch(`/api/lastMessages`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

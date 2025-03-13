@@ -32,13 +32,10 @@ const HomePage = ({
   const handleUserFriend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user._id}/friends`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`/api/users/${user._id}/friends`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const friends = await response.json();
       dispatch(setFriends({ friends: friends }));
@@ -54,9 +51,7 @@ const HomePage = ({
   const checkCorrectPassword = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${
-          user._id
-        }/checkCorrectPassword`,
+        `/api/users/${user._id}/checkCorrectPassword`,
         {
           method: "POST",
           headers: {

@@ -78,15 +78,12 @@ const LeftChat = ({
 
     if (searchValue.length !== 0) {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/search/users/${searchValue}`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`/api/search/users/${searchValue}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         const data = await response.json();
 

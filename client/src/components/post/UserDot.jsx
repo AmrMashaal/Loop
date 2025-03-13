@@ -14,20 +14,16 @@ import { posts, setPosts } from "../../App";
 const UserDot = (props) => {
   const token = useSelector((state) => state.token);
 
-
   const location = useLocation();
 
   const handlePin = async () => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/posts/${props.postInfo.postId}/pin`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`/api/posts/${props.postInfo.postId}/pin`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await response.json();
 

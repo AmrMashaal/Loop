@@ -133,13 +133,10 @@ const ProfilePage = () => {
   const userData = async () => {
     setUserInfo(null);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
-        {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await response.json();
 
@@ -186,9 +183,7 @@ const ProfilePage = () => {
   const checkCorrectPassword = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${
-          user._id
-        }/checkCorrectPassword`,
+        `/api/users/${user._id}/checkCorrectPassword`,
         {
           method: "POST",
           headers: {
