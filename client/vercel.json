@@ -5,15 +5,7 @@
       "destination": "https://loop-backend-theta.vercel.app/:path*"
     }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "s-maxage=1, stale-while-revalidate"
-        }
-      ]
-    }
-  ]
+  "redirects": [],
+  "headers": [],
+  "routes": [{ "src": "/(.*)", "dest": "/" }]
 }
