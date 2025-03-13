@@ -3,10 +3,6 @@
     {
       "source": "/api/:path*",
       "destination": "${VITE_API_URL}/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
