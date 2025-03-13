@@ -37,9 +37,7 @@ const SearchPage = () => {
 
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/search/${type}s/${encodedSearch}?page=${page}`,
+        `/api/search/${type}s/${encodedSearch}?page=${page}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

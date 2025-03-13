@@ -67,9 +67,7 @@ const ProfilePage = () => {
 
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/posts/${userId}/posts?page=${page}&limit=5`,
+        `/api/posts/${userId}/posts?page=${page}&limit=5`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

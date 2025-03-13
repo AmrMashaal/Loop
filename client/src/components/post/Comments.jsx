@@ -197,9 +197,7 @@ const Comments = ({
 
     try {
       const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/likes/${id}/${showLikesType}?page=${likesPage}`,
+        `/api/likes/${id}/${showLikesType}?page=${likesPage}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
