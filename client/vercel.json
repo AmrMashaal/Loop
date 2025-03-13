@@ -4,8 +4,5 @@
       "source": "/api/:path*",
       "destination": "https://loop-backend-theta.vercel.app/:path*"
     }
-  ],
-  "redirects": [],
-  "headers": [],
-  "routes": [{ "src": "/(.*)", "dest": "/" }]
+  ]
 }
