@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://loop-backend-theta.vercel.app/:path*"
+      "destination": "https://${VITE_API_URL}/:path*"
     },
     {
       "source": "/(.*)",
