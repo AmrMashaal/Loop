@@ -5,11 +5,15 @@
       "destination": "https://loop-backend-theta.vercel.app/:path*"
     }
   ],
-  "redirects": [
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/index.html",
-      "statusCode": 200
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=1, stale-while-revalidate"
+        }
+      ]
     }
   ]
 }
