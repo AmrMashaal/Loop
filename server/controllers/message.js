@@ -7,6 +7,10 @@ export const getMessages = async (req, res) => {
   const { page, limit = 15 } = req.query;
   const { senderId, receiverId } = req.params;
 
+  if (req.user.id !== senderId && req.user.id !== receiverId) {
+    return res.status(403).json({ message: "Forbidden!" });
+  }
+
   try {
     const messages = await Message.find({
       $or: [
@@ -40,6 +44,10 @@ export const sendMessage = async (req, res) => {
   const { senderId, receiverId } = req.params;
 
   let picturePath = null;
+
+  if (req.user.id !== senderId && req.user.id !== receiverId) {
+    return res.status(403).json({ message: "Forbidden!" });
+  }
 
   if (req.file) {
     try {

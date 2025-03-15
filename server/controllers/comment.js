@@ -154,11 +154,17 @@ export const deleteComment = async (req, res) => {
   const { commentId } = req.params;
 
   try {
-    const comments = await Comment.findByIdAndDelete(commentId);
+    const comments = await Comment.findById(commentId);
 
     if (!comments) {
       return res.status(404).json({ message: "comments is not found" });
     }
+
+    if (req.user.id !== comments.user.toString()) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }
+
+    await Comment.findByIdAndDelete(commentId);
 
     const replyCount = await Reply.countDocuments({ comment: commentId });
 
@@ -194,25 +200,25 @@ export const editComment = async (req, res) => {
   try {
     const comment = await Comment.findById(commentId);
 
-    if (req.user.id === comment.user.toString()) {
-      if (!comment) {
-        return res.status(404).json({ message: "comment is not found" });
-      }
-
-      comment.text = req.body.text;
-      comment.edited = true;
-
-      await comment.save();
-
-      await comment.populate(
-        "user",
-        "_id verified firstName lastName picturePath"
-      );
-
-      res.status(200).json(comment);
-    } else {
-      res.status(403).json({ message: "Forbidden!" });
+    if (req.user.id !== comment.user.toString()) {
+      return res.status(403).json({ message: "Forbidden!" });
     }
+
+    if (!comment) {
+      return res.status(404).json({ message: "comment is not found" });
+    }
+
+    comment.text = req.body.text;
+    comment.edited = true;
+
+    await comment.save();
+
+    await comment.populate(
+      "user",
+      "_id verified firstName lastName picturePath"
+    );
+
+    res.status(200).json(comment);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -223,6 +229,10 @@ export const pinComment = async (req, res) => {
 
   try {
     const comment = await Comment.findById(commentId);
+
+    if (req.user.id !== comment.user.toString()) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }  
 
     if (!comment) {
       return res.status(404).json({ message: "comment is not found" });

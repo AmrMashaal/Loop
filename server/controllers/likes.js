@@ -9,6 +9,10 @@ export const likePost = async (req, res) => {
 
   let newPost;
 
+  if (req.user.id !== userId.toString()) {
+    return res.status(403).json({ message: "Forbidden!" });
+  }
+
   try {
     const like = await Like.findOne({ userId, postId: id });
 
@@ -45,6 +49,10 @@ export const likeComment = async (req, res) => {
 
   let newComment;
 
+  if (req.user.id !== userId.toString()) {
+    return res.status(403).json({ message: "Forbidden!" });
+  }
+
   try {
     const like = await Like.findOne({ userId, commentId: id });
 
@@ -80,6 +88,10 @@ export const likeReply = async (req, res) => {
   const { id, userId } = req.params;
 
   let newReply;
+
+  if (req.user.id !== userId.toString()) {
+    return res.status(403).json({ message: "Forbidden!" });
+  }
 
   try {
     const like = await Like.findOne({ userId, replyId: id });
@@ -172,6 +184,10 @@ export const likeRepost = async (req, res) => {
   const { id, userId } = req.params;
 
   let newRepost;
+
+  if (req.user.id !== userId.toString()) {
+    return res.status(403).json({ message: "Forbidden!" });
+  }
 
   try {
     const like = await Like.findOne({ userId, repostId: id });
