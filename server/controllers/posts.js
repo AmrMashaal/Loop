@@ -192,7 +192,11 @@ export const getUserPosts = async (req, res) => {
 
       let reposts = await Repost.find({
         userId,
-        $or: [{ privacy: "public" }, { privacy: "friends" }],
+        $or: [
+          { privacy: "public" },
+          { privacy: "friends" },
+          { privacy: "private" },
+        ],
       })
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
@@ -357,24 +361,28 @@ export const deletePost = async (req, res) => {
   let deletedPost;
 
   try {
-    deletedPost = await Post.findByIdAndDelete(id);
+    deletedPost = await Post.findById(id);
+
+    if (deletedPost && deletedPost.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }
 
     if (deletedPost) {
+      await Post.findByIdAndDelete(id);
       await Notification.deleteMany({ linkId: id });
-
       await Comment.deleteMany({ postId: id });
     } else {
-      deletedPost = await Repost.findByIdAndDelete(id).populate(
-        "postId",
-        "_id"
-      );
+      deletedPost = await Repost.findById(id).populate("postId", "_id");
 
+      if (deletedPost && deletedPost.userId.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Forbidden!" });
+      }
+
+      await Repost.findByIdAndDelete(id);
       await Post.findByIdAndUpdate(deletedPost.postId._id, {
         $inc: { shareCount: -1 },
       });
-
       await Notification.deleteMany({ linkId: id });
-
       await Comment.deleteMany({ repostId: id });
     }
 
@@ -392,6 +400,10 @@ export const editPost = async (req, res) => {
   try {
     post = await Post.findById(postId);
 
+    if (post && post.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }
+
     if (post) {
       post.description = req.body.description;
       post.edited = true;
@@ -408,6 +420,11 @@ export const editPost = async (req, res) => {
       res.status(200).json(postWithIsLiked);
     } else {
       post = await Repost.findOne({ _id: postId });
+
+      if (post && post.userId.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Forbidden!" });
+      }
+
       post.description = req.body.description;
       post.edited = true;
 
@@ -444,13 +461,12 @@ export const pinPost = async (req, res) => {
   try {
     post = await Post.findById(postId);
 
-    if (post) {
-      if (post.pinned) {
-        post.pinned = false;
-      } else {
-        post.pinned = true;
-      }
+    if (post && post.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }
 
+    if (post) {
+      post.pinned = !post.pinned;
       await post.save();
 
       const isLiked = await Like.findOne({
@@ -469,12 +485,11 @@ export const pinPost = async (req, res) => {
         )
         .populate("userId", "firstName lastName picturePath verified _id");
 
-      if (post.pinned) {
-        post.pinned = false;
-      } else {
-        post.pinned = true;
+      if (post && post.userId.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Forbidden!" });
       }
 
+      post.pinned = !post.pinned;
       await post.save();
 
       const isLiked = await Like.findOne({
@@ -532,9 +547,12 @@ export const changePrivacy = async (req, res) => {
   try {
     post = await Post.findById(postId);
 
+    if (post && post.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }
+
     if (post) {
       post.privacy = req.body.privacy;
-
       await post.save();
 
       const isLiked = await Like.findOne({
@@ -557,6 +575,14 @@ export const changePrivacy = async (req, res) => {
           "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
         )
         .populate("userId", "firstName lastName picturePath verified _id");
+
+      if (
+        post &&
+        (post.userId.toString() !== req.user.id ||
+          post.userId._id !== req.user.id)
+      ) {
+        return res.status(403).json({ message: "Forbidden!" });
+      }
 
       const isLiked = await Like.findOne({
         userId: req.user.id,
