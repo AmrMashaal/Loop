@@ -161,19 +161,21 @@ export const getUserPosts = async (req, res) => {
   const { page, limit = 5 } = req.query;
   const { userId } = req.params;
 
+  let userPosts;
+
   try {
     const userFriends = await Friend.find({
       $or: [
-        { sender: userId, status: "accepted" },
-        { receiver: userId, status: "accepted" },
+        { sender: req.user.id, status: "accepted" },
+        { receiver: req.user.id, status: "accepted" },
       ],
     });
 
-    const friendsIds = userFriends.map((fr) => {
-      return fr.sender.toString() === userId
+    const friendsIds = userFriends.map((fr) =>
+      fr.sender.toString() === req.user.id
         ? fr.receiver.toString()
-        : fr.sender.toString();
-    });
+        : fr.sender.toString()
+    );
 
     const isFriend = userFriends.some((friend) => {
       return (
@@ -181,8 +183,6 @@ export const getUserPosts = async (req, res) => {
         friend.receiver.toString() === req.user.id
       );
     });
-
-    let userPosts;
 
     if (userId === req.user.id) {
       userPosts = await Post.find({ userId })
@@ -192,6 +192,7 @@ export const getUserPosts = async (req, res) => {
 
       let reposts = await Repost.find({
         userId,
+        $or: [{ privacy: "public" }, { privacy: "friends" }],
       })
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
@@ -279,7 +280,7 @@ export const getUserPosts = async (req, res) => {
 
         const postId =
           post?.postId?.privacy === "friends" &&
-          !friendsIds.includes(req.user.id) &&
+          !friendsIds.includes(post.postId.userId.toString()) &&
           post.postId.userId.toString() !== req.user.id
             ? null
             : post.postId;
