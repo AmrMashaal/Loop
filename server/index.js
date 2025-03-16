@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import app from "./api/index.js";
 import { initSocket } from "./utils/socket.js";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const server = http.createServer(app);
@@ -41,7 +42,6 @@ serverConnection();
 
 async function updateAll() {
   try {
-
   } catch (error) {
     console.error("Error updating ?s:", error);
   }
