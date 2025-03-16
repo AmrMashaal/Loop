@@ -7,25 +7,25 @@ export const authLimiter = rateLimit({
 });
 
 export const messageLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 10,
+  windowMs: 10 * 1000, // 10 seconds
+  max: 20,
   message: "Too many messages sent. Please wait.",
 });
 
 export const postLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
+  windowMs: 1 * 60 * 1000, // 1 minute
   max: 5,
   message: "Too many posts. Please wait.",
 });
 
 export const commentLimiter = rateLimit({
-  windowMs: 2 * 60 * 1000, // 2 minutes
+  windowMs: 1 * 60 * 1000, // 1 minute
   max: 10,
   message: "Too many comments. Slow down!",
 });
 
 export const replyLimiter = rateLimit({
-  windowMs: 2 * 60 * 1000, // 2 minutes
+  windowMs: 1 * 60 * 1000, // 1 minute
   max: 15,
   message: "Too many replies. Please slow down!",
 });

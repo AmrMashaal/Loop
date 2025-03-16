@@ -49,6 +49,10 @@ export const createPost = async (req, res) => {
   try {
     // Destructure and set post details
     const { userId, description, textAddition, privacy } = req.body;
+    
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden!" });
+    }
     const user = await User.findById(userId);
 
     const newPost = new Post({
