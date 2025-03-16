@@ -50,9 +50,7 @@ export const sendMessage = async (req, res) => {
     return res.status(401).json({ message: "Unauthorized!" });
   }
 
-  if (senderId === receiverId) {
-    return res.status(400).json({ message: "You cannot message yourself!" });
-  }
+  
 
   if (req.file) {
     try {
