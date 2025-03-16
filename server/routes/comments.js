@@ -10,6 +10,7 @@ import {
 } from "../controllers/comment.js";
 import { verifyToken } from "../middleware/auth.js";
 import { upload } from "../config/multer.js";
+import { commentLimiter } from "../middleware/limiter.js";
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.get(
 
 router.post(
   "/postComment/:postId",
+  commentLimiter,
   verifyToken,
   upload.single("picture"),
   postCommentOriginal
@@ -29,6 +31,7 @@ router.post(
 
 router.post(
   "/repostComment/:repostId",
+  commentLimiter,
   verifyToken,
   upload.single("picture"),
   repostComment

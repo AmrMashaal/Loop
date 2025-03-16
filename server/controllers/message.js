@@ -41,12 +41,17 @@ const compressImage = async (buffer) => {
 };
 
 export const sendMessage = async (req, res) => {
-  const { senderId, receiverId } = req.params;
+  const senderId = req.user.id;
+  const { receiverId } = req.params;
 
   let picturePath = null;
 
-  if (req.user.id !== senderId && req.user.id !== receiverId) {
-    return res.status(403).json({ message: "Forbidden!" });
+  if (!senderId) {
+    return res.status(401).json({ message: "Unauthorized!" });
+  }
+
+  if (senderId === receiverId) {
+    return res.status(400).json({ message: "You cannot message yourself!" });
   }
 
   if (req.file) {
