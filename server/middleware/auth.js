@@ -8,6 +8,8 @@ export const verifyToken = async (req, res, next) => {
 
     if (token.startsWith("Bearer ")) {
       token = token.slice(7, token.length).trimLeft();
+
+      if (!token) return res.status(403).json({ message: "not authorized" });
     }
 
     const verified = jwt.verify(token, process.env.JWT_SECRET);
