@@ -6,6 +6,6 @@ import { authLimiter } from "../middleware/limiter.js";
 const router = express.Router();
 
 router.post("/register", authLimiter, upload.single("picture"), register);
-router.post("/login", login);
+router.post("/login", authLimiter, login);
 
 export default router;
