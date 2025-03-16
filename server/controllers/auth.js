@@ -55,9 +55,7 @@ export const register = async (req, res) => {
     const isUsernameExisted = await User.findOne({ username });
 
     if (isUsernameExisted) {
-      return res
-        .status(400)
-        .json({ message: "This Username Is Already Existed" });
+      return res.status(400).json({ message: "This Username Already Exists" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -88,6 +86,10 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: "Please fill in all fields." });
+  }
 
   try {
     const user = await User.findOne({ username });
