@@ -95,10 +95,7 @@ const Form = () => {
   const [dataExisted, setDataExisted] = useState({
     username: false,
   });
-  const [loginError, setLoginError] = useState({
-    username: false,
-    password: false,
-  });
+  const [loginError, setLoginError] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageError, setImageError] = useState(null);
 
@@ -178,12 +175,8 @@ const Form = () => {
 
       setLoginError(false);
 
-      if (loggedIn.message === "Wrong password.") {
-        setLoginError({ username: false, password: true });
-      }
-
-      if (loggedIn.message === "User does not exist.") {
-        setLoginError({ username: true, password: false });
+      if (loggedIn.message) {
+        setLoginError(true);
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -561,12 +554,6 @@ const Form = () => {
                 }}
               />
 
-              {loginError.username && (
-                <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  the username does not exist
-                </Typography>
-              )}
-
               <TextField
                 label="Password"
                 type="password"
@@ -580,9 +567,9 @@ const Form = () => {
                   gridColumn: "span 4",
                 }}
               />
-              {loginError.password && (
+              {loginError && (
                 <Typography color="error" fontSize="12px" whiteSpace="nowrap">
-                  wrong password
+                  invalid username or password
                 </Typography>
               )}
             </Box>
