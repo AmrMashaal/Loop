@@ -17,6 +17,7 @@ import friendRoutes from "../routes/friends.js";
 import replyRoutes from "../routes/reply.js";
 import lastMessageRoutes from "../routes/lastMessage.js";
 import repostRoutes from "../routes/reposts.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ const app = express();
 // Middleware
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(cookieParser());
 app.use(morgan("common"));
 app.use(express.json({ limit: "30mb", extended: true }));
 app.use(express.urlencoded({ limit: "30mb", extended: true }));

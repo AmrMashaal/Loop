@@ -505,7 +505,7 @@ const Comments = ({
             com._id === replyData.id
               ? {
                   ...com,
-                  replies: [data, ...(com?.replies || [])],
+                  replies: [...(com?.replies || []), data],
                 }
               : com
           )
