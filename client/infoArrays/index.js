@@ -191,7 +191,6 @@ export const occupations = [
   "Border Patrol Agent",
   "Prison Guard",
   "Correctional Officer",
-  "Mern Stack Developer",
   "Real Estate Broker",
   "Construction Foreman",
   "Building Inspector",
