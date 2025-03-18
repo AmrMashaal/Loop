@@ -4,8 +4,6 @@ import { Server } from "socket.io";
 import app from "./api/index.js";
 import { initSocket } from "./utils/socket.js";
 import dotenv from "dotenv";
-import User from "./models/User.js";
-import Post from "./models/Post.js";
 
 dotenv.config();
 

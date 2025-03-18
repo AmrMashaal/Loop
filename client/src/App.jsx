@@ -61,7 +61,7 @@ const App = () => {
 
       const friends = await response.json();
 
-      const friendsIds = friends.map((ele) => {
+      const friendsIds = friends?.map((ele) => {
         return ele.sender === user._id ? ele.receiver : ele.sender;
       });
 

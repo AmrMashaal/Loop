@@ -4,6 +4,8 @@ import User from "../models/User.js";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
 import cloudinary from "../utils/cloudinary.js";
+import fs from "fs";
+import path from "path";
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
@@ -11,6 +13,10 @@ const compressImage = async (buffer) => {
     .jpeg({ quality: 80 })
     .toBuffer();
 };
+
+const PRIVATE_KEY = process.env.JWT_PRIVATE_KEY.replace(/\\n/g, "\n");
+
+console.log(PRIVATE_KEY);
 
 export const register = async (req, res) => {
   let picturePath = null;
@@ -100,7 +106,9 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid user or password." });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id }, PRIVATE_KEY, {
+      algorithm: "RS256",
+    });
 
     delete user.password;
 
