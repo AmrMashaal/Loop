@@ -17,6 +17,7 @@ import socket from "../../components/socket";
 import ProfileFriends from "../../components/friends/ProfileFriends";
 import ProfileAbout from "../../components/profile/ProfileAbout";
 import { posts, setIsOverFlow, setPosts } from "../../App";
+import ProfileBadges from "../../components/profile/ProfileBadges";
 
 const ProfilePage = () => {
   const [page, setPage] = useState(1);
@@ -347,6 +348,27 @@ const ProfilePage = () => {
                   Friends
                 </Typography>
               </Link>
+
+              <Link to={`/profile/${userId}/badges`}>
+                <Typography
+                  fontSize="18px"
+                  p="3px"
+                  color={
+                    location.pathname.split("/")[3] === "badges"
+                      ? "#00D5FA"
+                      : palette.neutral.medium
+                  }
+                  borderBottom={
+                    location.pathname.split("/")[3] === "badges" &&
+                    "3px solid #00D5FA"
+                  }
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                  className="opacityBox"
+                  onClick={() => setPage(1)}
+                >
+                  Badges
+                </Typography>
+              </Link>
             </Box>
 
             <Box
@@ -362,6 +384,10 @@ const ProfilePage = () => {
 
               {location.pathname.split("/")[3] === "friends" && (
                 <ProfileFriends userParam={userId} />
+              )}
+
+              {location.pathname.split("/")[3] === "badges" && (
+                <ProfileBadges userParam={userId} userInfo={userInfo} isNonMobileScreens={isNonMobileScreens}/>
               )}
 
               <Box

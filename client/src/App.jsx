@@ -155,6 +155,11 @@ const App = () => {
             />
             {/* -------------------------------------------------------- */}
             <Route
+              path="/profile/:userId/badges"
+              element={isAuth ? <ProfilePage /> : <Navigate to="/login" />}
+            />
+            {/* -------------------------------------------------------- */}
+            <Route
               path="/search/:searchValue"
               element={isAuth ? <SearchPage /> : <Navigate to="/login" />}
             />
