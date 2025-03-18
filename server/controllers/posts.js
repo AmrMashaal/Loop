@@ -14,6 +14,7 @@ const compressImage = async (buffer) => {
     .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 80 })
+    .withMetadata()
     .toBuffer();
 };
 
