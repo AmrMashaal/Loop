@@ -11,6 +11,7 @@ import Repost from "../models/Repost.js";
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
+    .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 80 })
     .toBuffer();
@@ -52,7 +53,7 @@ export const createPost = async (req, res) => {
     if (userId !== req.user.id) {
       return res.status(403).json({ message: "Forbidden!" });
     }
-    
+
     const user = await User.findById(userId);
 
     const newPost = new Post({

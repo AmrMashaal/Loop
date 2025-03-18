@@ -89,6 +89,7 @@ export const getComments = async (req, res) => {
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
+    .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 80 })
     .toBuffer();
@@ -232,7 +233,7 @@ export const pinComment = async (req, res) => {
 
     if (req.user.id !== comment.user.toString()) {
       return res.status(403).json({ message: "Forbidden!" });
-    }  
+    }
 
     if (!comment) {
       return res.status(404).json({ message: "comment is not found" });

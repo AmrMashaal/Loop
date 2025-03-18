@@ -7,6 +7,7 @@ import cloudinary from "../utils/cloudinary.js";
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
+    .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 80 })
     .toBuffer();
