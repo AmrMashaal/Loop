@@ -387,7 +387,7 @@ const ProfilePage = () => {
               )}
 
               {location.pathname.split("/")[3] === "badges" && (
-                <ProfileBadges userParam={userId} userInfo={userInfo} isNonMobileScreens={isNonMobileScreens}/>
+                <ProfileBadges userParam={userId} userInfo={userInfo} />
               )}
 
               <Box

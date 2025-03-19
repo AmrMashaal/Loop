@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import { Box, useTheme } from "@mui/system";
 
-const ProfileBadges = ({isNonMobileScreens}) => {
+const ProfileBadges = () => {
   const { palette } = useTheme();
 
   return (
