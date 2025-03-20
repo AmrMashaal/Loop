@@ -4,6 +4,6 @@ import {getBadges} from "../controllers/badge.js";
 
 const router = express.Router();
 
-router.get("/", verifyToken, getBadges);
+router.get("/:userId", verifyToken, getBadges);
 
 export default router;

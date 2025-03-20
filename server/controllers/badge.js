@@ -1,8 +1,10 @@
 import Badge from "../models/Badge.js";
 
 export const getBadges = async (req, res) => {
+  const { userId } = req.params;
+
   try {
-    const badges = await Badge.find({ userId: req.user.id });
+    const badges = await Badge.find({ userId });
 
     res.status(200).json(badges);
   } catch (error) {

@@ -17,7 +17,7 @@ const ProfileBadges = ({ token, userId }) => {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/badges/", {
+      const response = await fetch(`/api/badges/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
