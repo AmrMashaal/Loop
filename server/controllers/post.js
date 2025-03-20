@@ -84,9 +84,9 @@ export const createPost = async (req, res) => {
       $or: [{ privacy: "public" }, { privacy: "friends" }],
     });
 
-    const isBadge = await Badge.findOne({ name: "First Post", userId });
+    const isBadge = await Badge.findOne({ type: "post", userId });
 
-    if (postsCount === 1 && !isBadge) {
+    if (postsCount === 1 || !isBadge) {
       const badge = new Badge({
         name: "Keyboard Rookie",
         description: "User has created his first post",
