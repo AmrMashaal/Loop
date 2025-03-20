@@ -285,7 +285,9 @@ const ProfilePage = () => {
             <Box
               m="10px 25px"
               display="flex"
-              gap="30px"
+              flexWrap="wrap"
+              gap="20px"
+              alignItems="center"
               justifyContent={isNonMobileScreens ? "start" : "center"}
             >
               <Link to={`/profile/${userId}`}>
@@ -387,7 +389,12 @@ const ProfilePage = () => {
               )}
 
               {location.pathname.split("/")[3] === "badges" && (
-                <ProfileBadges userParam={userId} userInfo={userInfo} />
+                <ProfileBadges
+                  userParam={userId}
+                  userInfo={userInfo}
+                  token={token}
+                  userId={userId}
+                />
               )}
 
               <Box

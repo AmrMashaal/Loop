@@ -6,8 +6,17 @@ const badgeSchema = new mongoose.Schema(
     description: { type: String, required: true },
     icon: { type: String, required: true },
     criteria: { type: String, required: true },
-    level: { type: Number, required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    level: { type: String, required: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
+    type: {
+      type: String,
+      enum: ["post", "comment", "like", "friend", "reply", "share", "firstUsers"],
+      required: true,
+    },
   },
   { timestamps: true }
 );

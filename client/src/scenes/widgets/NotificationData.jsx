@@ -11,6 +11,7 @@ import {
   Newspaper,
   Comment,
   Reply,
+  Star,
 } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 import { useEffect } from "react";
@@ -144,6 +145,8 @@ const NotificationData = ({
                     ntf?.type === "comment" ||
                     ntf?.type === "reply"
                   ? `/post/${ntf?.linkId}`
+                  : ntf?.type === "badge"
+                  ? `/profile/${user._id}/badges`
                   : ""
               }
               key={ntf?._id}
@@ -152,13 +155,16 @@ const NotificationData = ({
             >
               <Box display="flex" alignItems="center" gap="10px" my="5px">
                 <Box position="relative">
-                  <UserImage
-                    image={
-                      ntf?.senderId === user._id
-                        ? ntf?.receiverId?.picturePath
-                        : ntf?.senderId?.picturePath
-                    }
-                  />
+                  {ntf.type !== "badge" && (
+                    <UserImage
+                      image={
+                        ntf?.senderId === user._id
+                          ? ntf?.receiverId?.picturePath
+                          : ntf?.senderId?.picturePath
+                      }
+                    />
+                  )}
+
                   {ntf?.type === "like" && (
                     <FavoriteOutlined
                       sx={{
@@ -227,6 +233,20 @@ const NotificationData = ({
                         bgcolor: "#0095fa",
                         borderRadius: "50%",
                         p: "4px",
+                      }}
+                    />
+                  )}
+
+                  {ntf?.type === "badge" && (
+                    <Star
+                      sx={{
+                        fontSize: "50px",
+                        background: "linear-gradient(to right, orange, yellow)",
+                        borderRadius: "50%",
+                        p: "4px",
+                        ml: "10px",
+                        boxShadow: "-1px 3px 0px 0 rgba(0, 0, 0, 0.1)",
+                        color: "black"
                       }}
                     />
                   )}

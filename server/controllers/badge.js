@@ -1,4 +1,4 @@
-import Badge from "../models/badge.js";
+import Badge from "../models/Badge.js";
 
 export const getBadges = async (req, res) => {
   try {
