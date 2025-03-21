@@ -14,7 +14,15 @@ const badgeSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["post", "comment", "like", "friend", "reply", "share", "firstUsers"],
+      enum: [
+        "post",
+        "comment",
+        "like",
+        "friend",
+        "reply",
+        "share",
+        "firstUsers",
+      ],
       required: true,
     },
   },
