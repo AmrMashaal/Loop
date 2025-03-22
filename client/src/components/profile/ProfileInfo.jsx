@@ -433,7 +433,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                     width="fit-content"
                     display="flex"
                     alignItems="center"
-                    gap="5px"
+                    gap="10px"
                     flexWrap="wrap"
                     justifyContent="center"
                     m={isNonMobileScreens ? undefined : "auto"}
