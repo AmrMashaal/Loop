@@ -126,7 +126,7 @@ const ProfileBadges = ({ token, userId }) => {
               </Typography>
             )}
 
-            {bd?.level === "platinum" && (
+            {bd?.level === "platinum" && bd?.type !== "firstUsers" && (
               <Star
                 sx={{
                   fontSize: "100px",
@@ -139,6 +139,27 @@ const ProfileBadges = ({ token, userId }) => {
                   color: "black",
                 }}
               />
+            )}
+
+            {bd?.type === "firstUsers" && (
+              <Typography
+                fontSize="40px"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                borderRadius="50%"
+                p="20px"
+                width="100px"
+                height="100px"
+                sx={{
+                  background: "linear-gradient(-55deg, #d67212, #ffec8b)",
+                  boxShadow:
+                    "-1px 3px 0px 0 rgba(0, 0, 0, 0.1), inset 0px 4px 10px rgba(0, 0, 0, 0.2)",
+                  border: "1px solid #ecb155",
+                }}
+              >
+                <img src="/assets/3_22_2025 5_32_59 AM.png" width="56" alt="" />
+              </Typography>
             )}
 
             <Typography

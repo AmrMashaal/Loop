@@ -4,7 +4,6 @@ import { Server } from "socket.io";
 import app from "./api/index.js";
 import { initSocket } from "./utils/socket.js";
 import dotenv from "dotenv";
-import User from "./models/User.js";
 
 dotenv.config();
 
@@ -43,8 +42,7 @@ serverConnection();
 
 // async function updateAll() {
 //   try {
-//   
-//   
+
 //   } catch (error) {
 //     console.error("Error updating ?s:", error);
 //   }
