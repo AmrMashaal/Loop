@@ -12,6 +12,7 @@ import {
   Comment,
   Reply,
   Star,
+  Person,
 } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 import { useEffect } from "react";
@@ -246,7 +247,22 @@ const NotificationData = ({
                         p: "4px",
                         ml: "10px",
                         boxShadow: "-1px 3px 0px 0 rgba(0, 0, 0, 0.1)",
-                        color: "black"
+                        color: "black",
+                      }}
+                    />
+                  )}
+
+                  {ntf?.type === "follow" && (
+                    <Person
+                      sx={{
+                        position: "absolute",
+                        bottom: "-4px",
+                        right: "0",
+                        fontSize: "27px",
+                        color: "white",
+                        bgcolor: "#6593a0",
+                        borderRadius: "50%",
+                        p: "4px",
                       }}
                     />
                   )}

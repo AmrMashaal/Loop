@@ -36,6 +36,11 @@ const RightChat = ({
 
   // ----------------------------------------------------------
 
+  const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+  const testArabic = (text) => {
+    return regexArabic.test(text)
+  };
+
   return (
     <Box
       position="relative"
@@ -89,6 +94,7 @@ const RightChat = ({
               {msg?.text && (
                 <Typography
                   p="10px 10px 3px"
+                  sx={{direction: testArabic(msg.text) ? "rtl" : "ltr"}}
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(
                       convertTextLink(
@@ -171,7 +177,7 @@ const RightChat = ({
               } else if (
                 !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
               ) {
-                setImageError("This file is not supported");xxxxxx
+                setImageError("This file is not supported");
               }
             }}
           >
@@ -227,6 +233,7 @@ const RightChat = ({
             background: "#171723",
             color: "white",
             borderRadius: "5px",
+            direction: testArabic(message) ? "rtl" : "ltr",
           }}
           placeholder="write a message..."
           onChange={(e) => {

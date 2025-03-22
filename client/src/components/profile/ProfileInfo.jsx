@@ -1,6 +1,15 @@
 /* eslint-disable react/prop-types */
 import { Box, useMediaQuery } from "@mui/system";
-import { VerifiedOutlined, WorkOutlineOutlined } from "@mui/icons-material";
+import {
+  Add,
+  HourglassBottom,
+  Message,
+  NotificationAdd,
+  Notifications,
+  People,
+  VerifiedOutlined,
+  WorkOutlineOutlined,
+} from "@mui/icons-material";
 import { Button, Skeleton, Tooltip, Typography } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +30,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
   const [changePassword, setChangePassword] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const [isFriendSettings, setIsFriendSettings] = useState(false);
+  const [isFollower, setIsFollower] = useState(false);
   const [friendship, setFriendship] = useState({});
   const [friendSettings, setFriendSettings] = useState("");
   const [img, setImg] = useState("");
@@ -138,9 +148,30 @@ const ProfileInfo = ({ userInfo, userId }) => {
     }
   };
 
+  const followStatus = async () => {
+    try {
+      const response = await fetch(`/api/follow/${userId}/isFollower`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      setIsFollower(data);
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
+    }
+  };
+
   useEffect(() => {
     if (userInfo?._id !== user?._id && userId !== user?._id) {
       friendshipStatus();
+      followStatus();
     }
   }, [userInfo, userId]);
 
@@ -159,7 +190,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   document.addEventListener("click", (event) => {
     const buttonId = document.getElementById("addRemoveFriendId");
-    if (event.target !== buttonId) {
+    if (!buttonId.contains(event.target)) {
       setIsFriendSettings(false);
     }
   });
@@ -178,9 +209,29 @@ const ProfileInfo = ({ userInfo, userId }) => {
     } else if (friendship?.status === "accepted") {
       return "Friends";
     } else if (friendship?.status === "not a friend") {
-      return "Add";
+      return "Add Friend";
     } else if (!friendship?.status) {
       return "Loading...";
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const response = await fetch(`/api/follow/${userInfo?._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      setIsFollower(data ? true : false);
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -380,6 +431,11 @@ const ProfileInfo = ({ userInfo, userId }) => {
                   <Box
                     position="relative"
                     width="fit-content"
+                    display="flex"
+                    alignItems="center"
+                    gap="5px"
+                    flexWrap="wrap"
+                    justifyContent="center"
                     m={isNonMobileScreens ? undefined : "auto"}
                   >
                     {/* ----------------Friend Status button---------------- */}
@@ -425,8 +481,44 @@ const ProfileInfo = ({ userInfo, userId }) => {
                         }
                       }}
                     >
-                      {handleStatus()}
+                      {friendship?.status &&
+                        (friendship?.status === "accepted" ? (
+                          <People />
+                        ) : friendship?.status === "pending" ? (
+                          <HourglassBottom />
+                        ) : (
+                          <Add />
+                        ))}
+
+                      <Typography fontWeight="600" ml="3px">
+                        {handleStatus()}
+                      </Typography>
                     </Button>
+
+                    {userInfo?._id !== user._id && (
+                      <Button
+                        id="addRemoveFriendId"
+                        sx={{
+                          height: "100%",
+                          whiteSpace: "nowrap",
+                          mx: "10px",
+                          marginTop: userInfo?.bio.length ? "12px" : "0",
+                          padding: "5px 23px",
+                          border: "2px solid",
+                          color: mode === "light" ? "#5c5c5c" : "#c1c1c1",
+                          textTransform: "capitalize",
+                          fontSize: "14px",
+                          borderRadius: "20px",
+                        }}
+                        onClick={handleFollow}
+                      >
+                        {isFollower ? <Notifications /> : <NotificationAdd />}
+
+                        <Typography fontWeight="600" ml="10px">
+                          {isFollower ? "Unfollow" : "Follow"}
+                        </Typography>
+                      </Button>
+                    )}
 
                     {userInfo?._id !== user._id && (
                       <Link to={`/chat/${userInfo._id}`}>
@@ -438,7 +530,6 @@ const ProfileInfo = ({ userInfo, userId }) => {
                             marginTop: userInfo?.bio.length ? "12px" : "0",
                             padding: "5px 23px",
                             border: "2px solid",
-                            fontWeight: "600",
                             textTransform: "capitalize",
                             fontSize: "14px",
                             borderRadius: "20px",
@@ -446,7 +537,11 @@ const ProfileInfo = ({ userInfo, userId }) => {
                             width: "113px",
                           }}
                         >
-                          Chat
+                          <Message />
+
+                          <Typography fontWeight="600" ml="7px">
+                            Chat
+                          </Typography>
                         </Button>
                       </Link>
                     )}

@@ -13,7 +13,7 @@ export const getNotification = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit)
       .sort({ createdAt: -1 })
-      .populate("senderId receiverId", "picturePath");
+      .populate("senderId receiverId", "picturePath firstName");
 
     if (!notifications) {
       return res.status(404).json({ message: "User is not found" });
