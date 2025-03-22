@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Follow from "../models/follow.js";
+import Follow from "../models/Follow.js";
 import Notification from "../models/notification.js";
 import User from "../models/User.js";
 
