@@ -142,8 +142,7 @@ const ProfileBadges = ({ token, userId }) => {
             )}
 
             {bd?.type === "firstUsers" && (
-              <Typography
-                fontSize="40px"
+              <Box
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
@@ -154,12 +153,17 @@ const ProfileBadges = ({ token, userId }) => {
                 sx={{
                   background: "linear-gradient(-55deg, #d67212, #ffec8b)",
                   boxShadow:
-                    "-1px 3px 0px 0 rgba(0, 0, 0, 0.1), inset 0px 4px 10px rgba(0, 0, 0, 0.2)",
+                    "0px 0px 20px 0px rgb(226 171 93), inset 0px 4px 10px rgba(0, 0, 0, 0.2)",
                   border: "1px solid #ecb155",
                 }}
               >
-                <img src="/assets/3_22_2025 5_32_59 AM.png" style={{userSelect: "none", pointerEvents: "none"}} width="56" alt="" />
-              </Typography>
+                <img
+                  src="/assets/3_22_2025 5_32_59 AM.png"
+                  style={{ userSelect: "none", pointerEvents: "none" }}
+                  width="56"
+                  alt=""
+                />
+              </Box>
             )}
 
             <Typography
