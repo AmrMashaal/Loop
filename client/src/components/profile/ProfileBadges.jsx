@@ -158,7 +158,7 @@ const ProfileBadges = ({ token, userId }) => {
                   border: "1px solid #ecb155",
                 }}
               >
-                <img src="/assets/3_22_2025 5_32_59 AM.png" width="56" alt="" />
+                <img src="/assets/3_22_2025 5_32_59 AM.png" style={{userSelect: "none", pointerEvents: "none"}} width="56" alt="" />
               </Typography>
             )}
 
