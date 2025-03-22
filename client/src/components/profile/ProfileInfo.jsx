@@ -505,10 +505,14 @@ const ProfileInfo = ({ userInfo, userId }) => {
                           marginTop: userInfo?.bio.length ? "12px" : "0",
                           padding: "5px 23px",
                           border: "2px solid",
-                          color: mode === "light" ? "#5c5c5c" : "#c1c1c1",
                           textTransform: "capitalize",
                           fontSize: "14px",
                           borderRadius: "20px",
+                          color: isFollower
+                            ? undefined
+                            : mode === "light"
+                            ? "#5c5c5c"
+                            : "#c1c1c1",
                         }}
                         onClick={handleFollow}
                       >
