@@ -412,11 +412,19 @@ const ProfileInfo = ({ userInfo, userId }) => {
                   sx={{ userSelect: "none" }}
                 >
                   <Typography fontSize="17px">
-                    {formatLikesCount(userInfo?.followersCount)} follower
+                    <span style={{ fontWeight: "500", marginRight: "3px" }}>
+                      {formatLikesCount(userInfo?.followersCount)}
+                    </span>
+                    follower
                     {formatLikesCount(userInfo?.followersCount) > 1 ? "s" : ""}
                   </Typography>
                   -
-                  <Typography fontSize="17px">{userInfo?.followingCount} following</Typography>
+                  <Typography fontSize="17px">
+                    <span style={{ fontWeight: "500", marginRight: "3px" }}>
+                      {formatLikesCount(userInfo?.followingCount)}
+                    </span>
+                    following
+                  </Typography>
                 </Box>
 
                 <Typography

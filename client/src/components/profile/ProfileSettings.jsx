@@ -498,6 +498,7 @@ const ProfileSettings = ({
                                 height: "140px",
                                 width: "450px",
                                 objectFit: "cover",
+                                maxWidth: "100%",
                               }}
                             />
                           </Box>
