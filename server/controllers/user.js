@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import Friend from "../models/Friend.js";
 import cloudinary from "../utils/cloudinary.js";
+import Follow from "../models/Follow.js";
 
 // ---------------------------------------------------------------
 
@@ -16,7 +17,16 @@ export const getUser = async (req, res) => {
 
     const { password, ...dataWithoutPassword } = user.toObject();
 
-    res.status(200).json(dataWithoutPassword);
+    const userWithFollowers = await Follow.countDocuments({ following: id });
+    const userWithFollowings = await Follow.countDocuments({ follower: id });
+
+    const data = {
+      ...dataWithoutPassword,
+      followersCount: userWithFollowers,
+      followingCount: userWithFollowings,
+    };
+
+    res.status(200).json(data);
   } catch (err) {
     return res.status(404).json({ message: err.message });
   }

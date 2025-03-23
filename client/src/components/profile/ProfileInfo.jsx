@@ -271,6 +271,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
         display="flex"
         justifyContent="space-between"
         className={isNonMobileScreens ? "profileContainer" : ""}
+        mb="40px"
       >
         <Box
           position="relative"
@@ -399,6 +400,24 @@ const ProfileInfo = ({ userInfo, userId }) => {
                   </Box>
                 </Box>
 
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent={isNonMobileScreens ? "flex-start" : "center"}
+                  gap="20px"
+                  mt="5px"
+                  mb="-5px"
+                  color={medium}
+                  sx={{userSelect: "none"}}
+                >
+                  <Typography>
+                    {userInfo?.followersCount} follower
+                    {userInfo?.followersCount > 1 ? "s" : ""}
+                  </Typography>
+
+                  <Typography>{userInfo?.followingCount} following</Typography>
+                </Box>
+
                 <Typography
                   color={mode === "light" ? "#5c5c5c" : "#c1c1c1"}
                   maxWidth="550px"
@@ -444,7 +463,6 @@ const ProfileInfo = ({ userInfo, userId }) => {
                       sx={{
                         height: "100%",
                         whiteSpace: "nowrap",
-                        mx: "10px",
                         marginTop: userInfo?.bio.length ? "12px" : "0",
                         padding: "5px 23px",
                         border: "2px solid",
@@ -501,7 +519,6 @@ const ProfileInfo = ({ userInfo, userId }) => {
                         sx={{
                           height: "100%",
                           whiteSpace: "nowrap",
-                          mx: "10px",
                           marginTop: userInfo?.bio.length ? "12px" : "0",
                           padding: "5px 23px",
                           border: "2px solid",
@@ -518,7 +535,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                       >
                         {isFollower ? <Notifications /> : <NotificationAdd />}
 
-                        <Typography fontWeight="600" ml="10px">
+                        <Typography fontWeight="600" ml="4px">
                           {isFollower ? "Unfollow" : "Follow"}
                         </Typography>
                       </Button>
@@ -529,7 +546,6 @@ const ProfileInfo = ({ userInfo, userId }) => {
                         <Button
                           sx={{
                             height: "100%",
-                            mx: "10px",
                             whiteSpace: "nowrap",
                             marginTop: userInfo?.bio.length ? "12px" : "0",
                             padding: "5px 23px",
