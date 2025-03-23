@@ -88,7 +88,7 @@ const UserWidget = ({ userId, picturePath }) => {
                     zIndex: "2",
                     pointerEvents: "none",
                     userSelect: "none",
-                    background: "beige",
+                    background: "#a89090",
                   }}
                 ></Box>
               )}

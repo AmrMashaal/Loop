@@ -263,7 +263,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
         <Box
           height="300px"
           sx={{
-            background: userInfo?.background ? undefined : "beige",
+            background: userInfo?.background ? undefined : "#a89090",
           }}
         ></Box>
       )}
@@ -461,7 +461,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                     width="fit-content"
                     display="flex"
                     alignItems="center"
-                    gap="10px"
+                    gap={isNonMobileScreens ? "10px" : "15px"}
                     flexWrap="wrap"
                     justifyContent="center"
                     m={isNonMobileScreens ? undefined : "auto"}
