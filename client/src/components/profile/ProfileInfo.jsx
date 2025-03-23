@@ -22,6 +22,7 @@ import DeleteComponent from "../post/DeleteComponent";
 import { setFriends } from "../../../state";
 import ChangePassword from "./ChangePassword";
 import { setIsOverFlow } from "../../App";
+import { formatLikesCount } from "../../frequentFunctions";
 
 const ProfileInfo = ({ userInfo, userId }) => {
   const [profileSettings, setProfileSettings] = useState(false);
@@ -410,11 +411,12 @@ const ProfileInfo = ({ userInfo, userId }) => {
                   color={medium}
                   sx={{ userSelect: "none" }}
                 >
-                  <Typography>
-                    {userInfo?.followersCount} follower
-                    {userInfo?.followersCount > 1 ? "s" : ""}
+                  <Typography fontSize="17px">
+                    {formatLikesCount(userInfo?.followersCount)} follower
+                    {formatLikesCount(userInfo?.followersCount) > 1 ? "s" : ""}
                   </Typography>
-                  -<Typography>{userInfo?.followingCount} following</Typography>
+                  -
+                  <Typography fontSize="17px">{userInfo?.followingCount} following</Typography>
                 </Box>
 
                 <Typography
