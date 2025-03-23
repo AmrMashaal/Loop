@@ -4,6 +4,8 @@ import {
   LocationOnOutlined,
   WorkOutlineOutlined,
   VerifiedOutlined,
+  Person,
+  PersonOutline,
 } from "@mui/icons-material";
 import {
   Box,
@@ -18,6 +20,7 @@ import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { formatLikesCount } from "../../frequentFunctions";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [theUser, setTheUser] = useState(null);
@@ -135,6 +138,26 @@ const UserWidget = ({ userId, picturePath }) => {
             <Divider />
 
             <Box p="1rem 0" zIndex="2" position="relative">
+              <Box display="flex" alignItems="center" gap="10px">
+                <PersonOutline style={{ fontSize: "26px" }} />
+
+                <Box
+                  color={medium}
+                  display="flex"
+                  gap="5px"
+                  alignItems="center"
+                >
+                  <Typography fontSize="14px">
+                    {formatLikesCount(theUser?.followersCount)}
+                  </Typography>
+
+                  <Typography fontSize="14px">
+                    Follower
+                    {theUser?.followersCount > 1 && "s"}
+                  </Typography>
+                </Box>
+              </Box>
+
               <Box
                 display="flex"
                 alignItems="center"
