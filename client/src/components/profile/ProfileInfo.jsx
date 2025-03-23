@@ -404,18 +404,17 @@ const ProfileInfo = ({ userInfo, userId }) => {
                   display="flex"
                   alignItems="center"
                   justifyContent={isNonMobileScreens ? "flex-start" : "center"}
-                  gap="20px"
+                  gap="10px"
                   mt="5px"
                   mb="-5px"
                   color={medium}
-                  sx={{userSelect: "none"}}
+                  sx={{ userSelect: "none" }}
                 >
                   <Typography>
                     {userInfo?.followersCount} follower
                     {userInfo?.followersCount > 1 ? "s" : ""}
                   </Typography>
-
-                  <Typography>{userInfo?.followingCount} following</Typography>
+                  -<Typography>{userInfo?.followingCount} following</Typography>
                 </Box>
 
                 <Typography
