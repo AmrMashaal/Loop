@@ -9,6 +9,7 @@ import cloudinary from "../utils/cloudinary.js";
 import Repost from "../models/Repost.js";
 import Badge from "../models/Badge.js";
 import Notification from "../models/notification.js";
+import Follow from "../models/Follow.js";
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
@@ -226,9 +227,17 @@ export const getFeedPosts = async (req, res) => {
         : fr.sender.toString();
     });
 
+    const following = await Follow.find({ follower: id }).select("following");
+
+    const followingIds = following.map((f) => f.following.toString());
+
     let posts = await Post.find({
       $or: [
         { privacy: "friends", userId: { $in: friendsIds } },
+        {
+          privacy: "public",
+          userId: { $in: [...friendsIds, ...followingIds] },
+        },
         { privacy: "public" },
       ],
     })
@@ -250,7 +259,13 @@ export const getFeedPosts = async (req, res) => {
     let reposts = await Repost.find({
       $or: [
         { privacy: "friends", userId: { $in: friendsIds } },
-        { privacy: "public" },
+        {
+          privacy: "public",
+          userId: { $in: [...friendsIds, ...followingIds] },
+        },
+        {
+          privacy: "public",
+        },
       ],
     })
       .sort({ createdAt: -1 })
