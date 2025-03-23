@@ -60,6 +60,7 @@ const Comments = ({
   const [likesPage, setLikesPage] = useState(1);
   const [CommentUserId, setCommentUserId] = useState(null);
   const [commentId, setCommentId] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPinnedComment, setIsPinnedComment] = useState(false);
   const [postLikeLoading, setPostLikeLoading] = useState(false);
@@ -155,6 +156,7 @@ const Comments = ({
         }
       } finally {
         setLoading(false);
+        setImagePreview(null);
       }
     }
   };
@@ -477,6 +479,7 @@ const Comments = ({
 
   const handleSubmitReply = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     if ((commentInfo.trim().length !== 0 || image) && !loading) {
       const formData = new FormData();
@@ -549,6 +552,7 @@ const Comments = ({
         setCommentInfo("");
         setImage("");
         setInputType("comment");
+        setImagePreview(null);
       }
     }
   };
@@ -1123,6 +1127,7 @@ const Comments = ({
             else if (inputType === "reply") handleSubmitReply(e);
           }}
           style={{ position: "relative" }}
+          
         >
           <InputBase
             type="text"
@@ -1136,6 +1141,7 @@ const Comments = ({
               else if (e.target.value.length > 300)
                 setCommentInfo(e.target.value.slice(0, 300));
             }}
+            disabled={loading}
             sx={{
               border: "1px solid #7a7a7a",
               borderRadius: !commentInfo && "50px",
@@ -1173,6 +1179,7 @@ const Comments = ({
               transform: "translateY(-50%)",
             }}
             type="submit"
+            disabled={loading}
           >
             <Send />
           </IconButton>
@@ -1180,7 +1187,7 @@ const Comments = ({
 
         {isImage && (
           <Box
-            border={`2px solid ${palette.neutral.medium}`}
+            border={`2px dashed ${palette.neutral.medium}`}
             padding="1rem"
             mt="15px"
             sx={{
@@ -1197,6 +1204,7 @@ const Comments = ({
                 const fileExtension = file.name.split(".").pop().toLowerCase();
                 if (["jpg", "jpeg", "png", "webp"].includes(fileExtension)) {
                   setImage(file);
+                  setImagePreview(URL.createObjectURL(file));
                   setImageError(null);
                 } else if (
                   !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
@@ -1208,8 +1216,7 @@ const Comments = ({
               {({ getRootProps, getInputProps }) => (
                 <Box
                   {...getRootProps()}
-                  border={`2px dashed ${palette.primary.main}`}
-                  padding="1rem"
+                  padding="10px"
                   sx={{ cursor: "pointer" }}
                 >
                   <input {...getInputProps()} />
@@ -1222,11 +1229,17 @@ const Comments = ({
                     </FlexBetween>
                   ) : (
                     <FlexBetween>
-                      <Typography>
-                        {image.name.length > 20
-                          ? `${image.name.slice(0, 20) + "..."}`
-                          : image.name}
-                      </Typography>
+                      <Box>
+                        <img
+                          src={imagePreview}
+                          alt="preview"
+                          style={{
+                            height: "200px",
+                            width: "200px",
+                            objectFit: "cover",
+                          }}
+                        />
+                      </Box>
 
                       <IconButton
                         onClick={(e) => {

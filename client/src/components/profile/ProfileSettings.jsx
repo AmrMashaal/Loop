@@ -183,6 +183,8 @@ const ProfileSettings = ({
       }
     } finally {
       setLoading(false);
+      setProfileImagePreview(null);
+      setBackgroundImagePreview(null);
     }
   };
 
