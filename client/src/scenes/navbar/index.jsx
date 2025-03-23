@@ -186,10 +186,8 @@ const Navbar = ({ isProfile }) => {
   }, []);
 
   useEffect(() => {
-    if (openRequests) {
-      friendsRequest();
-    }
-  }, [openRequests]);
+    friendsRequest();
+  }, []);
 
   useEffect(() => {
     if (import.meta.env.VITE_NODE_ENV !== "production") {
@@ -397,7 +395,7 @@ const Navbar = ({ isProfile }) => {
             onClick={() => setOpenRequests(true)}
           >
             <People sx={{ fontSize: "25px" }} />
-            {user?.friendsRequest?.length > 0 && (
+            {friendsRequestData?.length > 0 && (
               <Typography
                 position="absolute"
                 right="0px"
@@ -408,8 +406,8 @@ const Navbar = ({ isProfile }) => {
                 fontSize="11px"
                 color="white"
               >
-                {user?.friendsRequest?.length < 100
-                  ? user?.friendsRequest?.length
+                {friendsRequestData?.length < 100
+                  ? friendsRequestData?.length
                   : "+99"}
               </Typography>
             )}
@@ -834,7 +832,7 @@ const Navbar = ({ isProfile }) => {
                 >
                   <PeopleOutline sx={{ fontSize: "25px" }} />
 
-                  {user?.friendsRequest?.length > 0 && (
+                  {friendsRequestData?.length > 0 && (
                     <Typography
                       position="absolute"
                       right="0px"
@@ -845,8 +843,8 @@ const Navbar = ({ isProfile }) => {
                       fontSize="11px"
                       color="white"
                     >
-                      {user?.friendsRequest?.length < 100
-                        ? user?.friendsRequest?.length
+                      {friendsRequestData?.length < 100
+                        ? friendsRequestData?.length
                         : "+99"}
                     </Typography>
                   )}

@@ -148,7 +148,7 @@ const NotificationData = ({
                   ? `/post/${ntf?.linkId}`
                   : ntf?.type === "badge"
                   ? `/profile/${user._id}/badges`
-                  : ""
+                  : ntf?.linkId
               }
               key={ntf?._id}
               className="opacityBox"

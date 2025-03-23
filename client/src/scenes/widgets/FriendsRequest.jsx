@@ -37,6 +37,12 @@ const FriendsRequest = ({
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
       }
+    } finally {
+      setFriendRequestData((prev) => {
+        return prev.filter((ele) => {
+          return ele._id !== friendId;
+        });
+      });
     }
   };
   // -------------------------------------------------------
@@ -59,6 +65,12 @@ const FriendsRequest = ({
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
       }
+    } finally {
+      setFriendRequestData((prev) => {
+        return prev.filter((ele) => {
+          return ele._id !== friendId;
+        });
+      });
     }
   };
 

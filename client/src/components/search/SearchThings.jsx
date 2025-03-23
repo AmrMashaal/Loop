@@ -211,7 +211,13 @@ const SearchThings = ({
                             )}
                           </Box>
 
-                          <Typography fontSize="13px" color={medium}>
+                          <Typography
+                            fontSize="13px"
+                            color={medium}
+                            whiteSpace="nowrap"
+                            overflow="hidden"
+                            textOverflow="ellipsis"
+                          >
                             {user.occupation}
                           </Typography>
                         </Box>
