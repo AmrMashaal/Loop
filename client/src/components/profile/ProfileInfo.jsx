@@ -552,7 +552,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                             textTransform: "capitalize",
                             fontSize: "14px",
                             borderRadius: "20px",
-                            color: mode === "light" ? "black" : "white",
+                            color: mode === "light" ? "#5c5c5c" : "#c1c1c1",
                             width: "113px",
                           }}
                         >
