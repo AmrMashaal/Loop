@@ -4,7 +4,6 @@ import {
   LocationOnOutlined,
   WorkOutlineOutlined,
   VerifiedOutlined,
-  Person,
   PersonOutline,
 } from "@mui/icons-material";
 import {

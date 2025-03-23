@@ -648,6 +648,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
         <ProfileSettings
           setProfileSettings={setProfileSettings}
           setChangePassword={setChangePassword}
+          isNonMobileScreens={isNonMobileScreens}
         />
       )}
 

@@ -23,9 +23,15 @@ import FlexBetween from "../FlexBetween";
 import { Facebook, Instagram, LinkedIn, X, YouTube } from "@mui/icons-material";
 // import Cropper from "react-easy-crop";
 
-const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
+const ProfileSettings = ({
+  setProfileSettings,
+  setChangePassword,
+  isNonMobileScreens,
+}) => {
   const [usernameError, setUsernameError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const [backgroundImagePreview, setBackgroundImagePreview] = useState(null);
   // const [crop, setCrop] = useState({ x: 0, y: 0 });
   // const [zoom, setZoom] = useState(1);
   // const [imagePreview, setImagePreview] = useState(null);
@@ -398,8 +404,8 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
               <InputLabel sx={{ mb: "-20px" }}>Profile Picture</InputLabel>
 
               <Box
-                border={`2px solid ${palette.neutral.medium}`}
-                padding="1rem"
+                border={`2px dashed ${palette.neutral.medium}`}
+                padding="10px"
                 sx={{
                   gridColumn: "span 4",
                   borderRadius: "4px",
@@ -412,27 +418,31 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                   multiple={false}
                   onDrop={(acceptedFiles) => {
                     setFieldValue("picturePath", acceptedFiles[0]);
+                    setProfileImagePreview(
+                      URL.createObjectURL(acceptedFiles[0])
+                    );
                     // setImagePreview(URL.createObjectURL(acceptedFiles[0]));
                   }}
                 >
                   {({ getRootProps, getInputProps }) => (
-                    <Box
-                      {...getRootProps()}
-                      border={`2px dashed ${palette.primary.main}`}
-                      padding="1rem"
-                    >
+                    <Box {...getRootProps()} padding="1rem">
                       <input {...getInputProps()} />
                       {!values.picturePath ? (
                         <p>Add Profile Picture Here</p>
                       ) : (
                         <FlexBetween>
-                          <Typography>
-                            {values.picturePath.name.length > 30
-                              ? `${
-                                  values.picturePath.name.slice(0, 30) + "..."
-                                }`
-                              : values.picturePath.name}
-                          </Typography>
+                          <Box>
+                            <img
+                              src={profileImagePreview}
+                              alt="preview"
+                              style={{
+                                height: "120px",
+                                width: "120px",
+                                objectFit: "cover",
+                                borderRadius: "50%",
+                              }}
+                            />
+                          </Box>
                           <IconButton>
                             <EditOutLinedIcon />
                           </IconButton>
@@ -452,8 +462,8 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
               <InputLabel sx={{ mb: "-20px" }}>Background</InputLabel>
 
               <Box
-                border={`2px solid ${palette.neutral.medium}`}
-                padding="1rem"
+                border={`2px dashed ${palette.neutral.medium}`}
+                padding="10px"
                 sx={{
                   gridColumn: "span 4",
                   borderRadius: "4px",
@@ -466,24 +476,29 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                   multiple={false}
                   onDrop={(acceptedFiles) => {
                     setFieldValue("background", acceptedFiles[0]);
+                    setBackgroundImagePreview(
+                      URL.createObjectURL(acceptedFiles[0])
+                    );
                   }}
                 >
                   {({ getRootProps, getInputProps }) => (
-                    <Box
-                      {...getRootProps()}
-                      border={`2px dashed ${palette.primary.main}`}
-                      padding="1rem"
-                    >
+                    <Box {...getRootProps()} padding="1rem">
                       <input {...getInputProps()} />
                       {!values.background ? (
                         <p>Add Background Here</p>
                       ) : (
                         <FlexBetween>
-                          <Typography>
-                            {values.background.name.length > 30
-                              ? `${values.background.name.slice(0, 30) + "..."}`
-                              : values.background.name}
-                          </Typography>
+                          <Box>
+                            <img
+                              src={backgroundImagePreview}
+                              alt="preview"
+                              style={{
+                                height: "140px",
+                                width: "450px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </Box>
                           <IconButton>
                             <EditOutLinedIcon />
                           </IconButton>
