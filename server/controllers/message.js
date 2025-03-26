@@ -27,6 +27,11 @@ export const getMessages = async (req, res) => {
       return res.status(404).json({ message: "There is no message" });
     }
 
+    await Message.updateMany(
+      { _id: { $in: messages.map((message) => message._id) } },
+      { watched: true }
+    );
+
     res.status(200).json(messages);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -14,6 +14,7 @@ const messageSchema = new mongoose.Schema(
     },
     picturePath: String,
     text: {type: String, maxlength: 1500},
+    watched: { type: Boolean, default: false },
   },
   {
     timestamps: true,
