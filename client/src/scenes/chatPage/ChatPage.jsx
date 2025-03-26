@@ -20,6 +20,7 @@ const ChatPage = ({ socket, fromNav }) => {
   const [imageError, setImageError] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [historyLoad, setHistoryLoad] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [wrongPassword, setWrongPassword] = useState(false);
   const [showSroll, setShowSroll] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -84,6 +85,8 @@ const ChatPage = ({ socket, fromNav }) => {
       image.length !== 0 ||
       message.length > 1500
     ) {
+      setLoading(true);
+
       const formData = new FormData();
 
       formData.append("text", message);
@@ -118,6 +121,7 @@ const ChatPage = ({ socket, fromNav }) => {
       } finally {
         setImage("");
         setMessage("");
+        setLoading(false);
       }
     }
   };
@@ -441,6 +445,7 @@ const ChatPage = ({ socket, fromNav }) => {
             isNonMobileScreens={isNonMobileScreens}
             setMessage={setMessage}
             message={message}
+            loading={loading}
           />
         )}
 

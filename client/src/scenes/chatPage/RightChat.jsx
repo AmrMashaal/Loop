@@ -22,6 +22,7 @@ const RightChat = ({
   isNonMobileScreens,
   setMessage,
   message,
+  loading,
 }) => {
   const [showImage, setShowImage] = useState(false);
   const [imageName, setImageName] = useState("");
@@ -38,7 +39,7 @@ const RightChat = ({
 
   const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const testArabic = (text) => {
-    return regexArabic.test(text)
+    return regexArabic.test(text);
   };
 
   return (
@@ -94,7 +95,7 @@ const RightChat = ({
               {msg?.text && (
                 <Typography
                   p="10px 10px 3px"
-                  sx={{direction: testArabic(msg.text) ? "rtl" : "ltr"}}
+                  sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(
                       convertTextLink(
@@ -244,11 +245,13 @@ const RightChat = ({
             }
           }}
           value={message}
+          disabled={loading}
         />
 
         <IconButton
           type="submit"
           sx={{ background: "#4281d7", marginLeft: "7px" }}
+          disabled={loading}
         >
           <Send style={{ color: "black" }} />
         </IconButton>
