@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import UserImage from "../../components/UserImage";
 import OpenPhoto from "../../components/OpenPhoto";
 import { setIsOverFlow } from "../../App";
-import { DeleteOutlined, Image, Send } from "@mui/icons-material";
+import { Check, DeleteOutlined, Image, Send } from "@mui/icons-material";
 import Dropzone from "react-dropzone";
 import { convertTextLink } from "../../frequentFunctions";
 import DOMPurify from "dompurify";
@@ -51,99 +51,191 @@ const RightChat = ({
       width="100%"
       mb="75px"
     >
-      {messages?.map((msg) => {
+      {messages?.map((msg, index) => {
         return (
-          <Box
-            key={msg?._id}
-            width="100%"
-            display="flex"
-            justifyContent={msg?.senderId?._id === user._id ? "end" : "start"}
-            alignItems="center"
-          >
-            {msg?.senderId?._id !== user._id && (
-              <>{<UserImage size="45" image={msg?.senderId?.picturePath} />}</>
-            )}
-
+          <Box key={msg?._id}>
             <Box
-              m="15px 10px"
-              borderRadius="5px"
-              maxWidth="65%"
-              position="relative"
-              bgcolor={msg?.senderId?._id === user._id ? "#3168a2" : "#2b2d3d"}
-              color="white"
-              sx={{
-                wordBreak: "break-word",
-                ":before": {
-                  content: "''",
-                  position: "absolute",
-                  borderTop: `9px solid ${
-                    msg?.senderId?._id === user._id ? "#3168a2" : "#2b2d3d"
-                  } `,
-                  borderRight: "7px solid transparent",
-                  borderLeft: "7px solid transparent",
-                  borderBottom: "7px solid transparent",
-                  transform:
-                    msg?.senderId?._id === user._id
-                      ? "rotate(-47deg)"
-                      : "rotate(40deg)",
-                  bottom: msg?.senderId?._id === user._id ? "-8.1px" : "-9.1px",
-                  left: msg?.senderId?._id === user._id ? undefined : "-6.4px",
-                  right: msg?.senderId?._id === user._id ? "-7px" : undefined,
-                },
-              }}
+              width="100%"
+              display="flex"
+              justifyContent={msg?.senderId?._id === user._id ? "end" : "start"}
+              alignItems="center"
             >
-              {msg?.text && (
-                <Typography
-                  p="10px 10px 3px"
-                  sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      convertTextLink(
-                        msg?.text.length > 180
-                          ? msg?.text.slice(0, 179)
-                          : msg.text
-                      ),
-                      {
-                        ADD_ATTR: ["target", "rel"],
-                      }
-                    ),
-                  }}
-                />
+              {msg?.senderId?._id !== user._id && (
+                <>
+                  {<UserImage size="45" image={msg?.senderId?.picturePath} />}
+                </>
               )}
 
-              {msg?.picturePath && msg?.picturePath && (
-                <img
-                  src={msg?.picturePath}
-                  style={{
-                    maxWidth: "100%",
-                    width: "350px",
-                    marginTop: msg?.text ? "6px" : "0",
-                    maxHeight: "400px",
-                    objectFit: "cover",
-                    cursor: "pointer",
-                    userSelect: "none",
-                  }}
-                  alt=""
-                  onClick={() => {
-                    setShowImage(true), setImageName(msg?.picturePath);
-                  }}
-                />
-              )}
-
-              <Typography
-                color={msg?.senderId?._id === user._id ? "#c4c4c4" : "#939393"}
-                textAlign="right"
-                fontSize="11px"
-                sx={{ userSelect: "none" }}
-                p="7px 10px"
+              <Box
+                m="15px 10px"
+                borderRadius="5px"
+                maxWidth="65%"
+                position="relative"
+                bgcolor={
+                  msg?.senderId?._id === user._id ? "#3168a2" : "#2b2d3d"
+                }
+                color="white"
+                sx={{
+                  wordBreak: "break-word",
+                  ":before": {
+                    content: "''",
+                    position: "absolute",
+                    borderTop: `9px solid ${
+                      msg?.senderId?._id === user._id ? "#3168a2" : "#2b2d3d"
+                    } `,
+                    borderRight: "7px solid transparent",
+                    borderLeft: "7px solid transparent",
+                    borderBottom: "7px solid transparent",
+                    transform:
+                      msg?.senderId?._id === user._id
+                        ? "rotate(-47deg)"
+                        : "rotate(40deg)",
+                    bottom:
+                      msg?.senderId?._id === user._id ? "-8.1px" : "-9.1px",
+                    left:
+                      msg?.senderId?._id === user._id ? undefined : "-6.4px",
+                    right: msg?.senderId?._id === user._id ? "-7px" : undefined,
+                  },
+                }}
               >
-                {realTime(msg?.createdAt)}
-              </Typography>
-            </Box>
+                {msg?.text && (
+                  <Typography
+                    p="10px 10px 3px"
+                    sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(
+                        convertTextLink(
+                          msg?.text.length > 180
+                            ? msg?.text.slice(0, 179)
+                            : msg.text
+                        ),
+                        {
+                          ADD_ATTR: ["target", "rel"],
+                        }
+                      ),
+                    }}
+                  />
+                )}
 
-            {msg?.senderId?._id === user._id && (
-              <UserImage size="45" image={user.picturePath} />
-            )}
+                {msg?.picturePath && msg?.picturePath && (
+                  <img
+                    src={msg?.picturePath}
+                    style={{
+                      maxWidth: "100%",
+                      width: "350px",
+                      marginTop: msg?.text ? "6px" : "0",
+                      maxHeight: "400px",
+                      objectFit: "cover",
+                      cursor: "pointer",
+                      userSelect: "none",
+                    }}
+                    alt=""
+                    onClick={() => {
+                      setShowImage(true), setImageName(msg?.picturePath);
+                    }}
+                  />
+                )}
+
+                <Typography
+                  color={
+                    msg?.senderId?._id === user._id ? "#c4c4c4" : "#939393"
+                  }
+                  textAlign="right"
+                  fontSize="11px"
+                  sx={{ userSelect: "none" }}
+                  p="7px 10px"
+                >
+                  {realTime(msg?.createdAt)}
+                </Typography>
+              </Box>
+
+              {msg?.senderId?._id === user._id && (
+                <UserImage size="45" image={user.picturePath} />
+              )}
+            </Box>
+            {msg?.senderId?._id === user._id &&
+              messages?.length - 1 === index &&
+              msg?.watched && (
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap="5px"
+                  justifyContent="flex-end"
+                  mr="33px"
+                  mt="-8px"
+                >
+                  <Typography
+                    color="#939393"
+                    textAlign="right"
+                    fontSize="11px"
+                    mt="-6px"
+                    sx={{ userSelect: "none" }}
+                  >
+                    seen
+                  </Typography>
+
+                  <Box>
+                    <Check
+                      sx={{
+                        fontSize: "15px",
+                        mb: "2px",
+                        color: "#62aeff",
+                      }}
+                    />
+
+                    <Check
+                      sx={{
+                        fontSize: "15px",
+                        mb: "2px",
+                        color: "#62aeff",
+                        ml: "-9px",
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
+
+            {msg?.senderId?._id === user._id &&
+              messages?.length - 1 === index &&
+              !msg?.watched && (
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap="5px"
+                  justifyContent="flex-end"
+                  mr="33px"
+                  mt="-8px"
+                >
+                  <Typography
+                    color="#939393"
+                    textAlign="right"
+                    fontSize="11px"
+                    mt="-6px"
+                    sx={{ userSelect: "none" }}
+                  >
+                    sent
+                  </Typography>
+
+                  <Box>
+                    <Check
+                      sx={{
+                        fontSize: "15px",
+                        mb: "2px",
+                        color: "#939393",
+                      }}
+                    />
+
+                    <Check
+                      sx={{
+                        fontSize: "15px",
+                        mb: "2px",
+                        color: "#939393",
+                        ml: "-9px",
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
           </Box>
         );
       })}
@@ -253,7 +345,11 @@ const RightChat = ({
           sx={{ background: "#4281d7", marginLeft: "7px" }}
           disabled={loading}
         >
-          <Send style={{ color: "black" }} />
+          {!loading ? (
+            <Send style={{ color: "black" }} />
+          ) : (
+            <Box className="loadingAnimation" width="20px" height="20px"></Box>
+          )}
         </IconButton>
       </form>
 

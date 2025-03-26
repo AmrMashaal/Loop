@@ -54,6 +54,8 @@ const ChatPage = ({ socket, fromNav }) => {
 
       const reversedMessages = messages.reverse();
 
+      console.log(reversedMessages)
+
       if (reset) {
         setMessages(reversedMessages);
       } else {
