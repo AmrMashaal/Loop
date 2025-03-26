@@ -238,7 +238,6 @@ export const getFeedPosts = async (req, res) => {
           privacy: "public",
           userId: { $in: [...friendsIds, ...followingIds] },
         },
-        { privacy: "public" },
       ],
     })
       .sort({ createdAt: -1 })
@@ -262,9 +261,6 @@ export const getFeedPosts = async (req, res) => {
         {
           privacy: "public",
           userId: { $in: [...friendsIds, ...followingIds] },
-        },
-        {
-          privacy: "public",
         },
       ],
     })
