@@ -28,7 +28,7 @@ export const getMessages = async (req, res) => {
     }
 
     await Message.updateMany(
-      { _id: { $in: messages.map((message) => message._id) } },
+      { _id: { $in: messages.map((message) => message._id) }, receiverId: req.user.id },
       { watched: true }
     );
 
