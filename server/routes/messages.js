@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyToken } from "../middleware/auth.js";
-import { getMessages, sendMessage } from "../controllers/message.js";
+import { getMessages, sendMessage, setEmoji } from "../controllers/message.js";
 import { upload } from "../config/multer.js";
 import { messageLimiter } from "../middleware/limiter.js";
 
@@ -15,5 +15,8 @@ router.post(
   upload.single("picture"),
   sendMessage
 );
+
+router.patch("/:messageId/emoji", messageLimiter, verifyToken, setEmoji);
+
 
 export default router;

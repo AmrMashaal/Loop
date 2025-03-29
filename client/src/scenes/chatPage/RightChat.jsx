@@ -5,13 +5,20 @@ import { useEffect, useState } from "react";
 import UserImage from "../../components/UserImage";
 import OpenPhoto from "../../components/OpenPhoto";
 import { setIsOverFlow } from "../../App";
-import { Check, DeleteOutlined, Image, Send } from "@mui/icons-material";
+import {
+  Check,
+  DeleteOutlined,
+  EmojiEmotions,
+  Image,
+  Send,
+} from "@mui/icons-material";
 import Dropzone from "react-dropzone";
 import { convertTextLink } from "../../frequentFunctions";
 import DOMPurify from "dompurify";
 
 const RightChat = ({
   messages,
+  setMessages,
   user,
   realTime,
   handleFormSubmit,
@@ -23,8 +30,11 @@ const RightChat = ({
   setMessage,
   message,
   loading,
+  token,
 }) => {
   const [showImage, setShowImage] = useState(false);
+  const [displayEmojiPicker, setDisplayEmojiPicker] = useState(false);
+  const [messageId, setMessageId] = useState(null);
   const [imageName, setImageName] = useState("");
 
   useEffect(() => {
@@ -40,6 +50,34 @@ const RightChat = ({
   const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const testArabic = (text) => {
     return regexArabic.test(text);
+  };
+
+  // ----------------------------------------------------------
+
+  const handleEmoji = async (emj, messageId) => {
+    console.log("emoji", emj, messageId);
+    try {
+      const response = await fetch(`/api/messages/${messageId}/emoji`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ emoji: emj }),
+      });
+
+      const emojis = await response.json();
+
+      setMessages((prev) => {
+        return prev?.map((msg) => {
+          return msg?._id === messageId ? { ...msg, emoji: emojis } : msg;
+        });
+      });
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.log(error);
+      }
+    }
   };
 
   return (
@@ -96,6 +134,11 @@ const RightChat = ({
                       msg?.senderId?._id === user._id ? undefined : "-6.4px",
                     right: msg?.senderId?._id === user._id ? "-7px" : undefined,
                   },
+                  ":hover": {
+                    ".emojiIcon": {
+                      display: "flex",
+                    },
+                  },
                 }}
               >
                 {msg?.text && (
@@ -147,6 +190,114 @@ const RightChat = ({
                 >
                   {realTime(msg?.createdAt)}
                 </Typography>
+
+                <Box
+                  position="absolute"
+                  bottom="-20px"
+                  left={msg?.senderId?._id === user._id ? "-10px" : undefined}
+                  right={msg?.senderId?._id === user._id ? undefined : "0"}
+                  p={Object.values(msg?.emoji)?.length !== 0 ? "2px" : "5px"}
+                  width={
+                    Object.values(msg?.emoji)?.length !== 0 ? "unset" : "24px"
+                  }
+                  height={
+                    Object.values(msg?.emoji)?.length !== 0 ? "unset" : "24px"
+                  }
+                  bgcolor="#2b2d3d"
+                  borderRadius={
+                    Object.values(msg?.emoji)?.length > 1 ? "4px" : "50%"
+                  }
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  border="1px solid ##212121"
+                  boxShadow="0px 0px 5px 0 #00000029"
+                  sx={{
+                    cursor: "pointer",
+                    ":hover": {
+                      display: "flex",
+                    },
+                  }}
+                  onClick={() => {
+                    setDisplayEmojiPicker(!displayEmojiPicker);
+                    setMessageId(msg?._id);
+                  }}
+                >
+                  {Object.values(msg?.emoji)?.length !== 0 ? (
+                    Object.values(msg?.emoji)?.map((emj) => {
+                      return emj;
+                    })
+                  ) : (
+                    <EmojiEmotions
+                      sx={{
+                        color: "#939393",
+                        fontSize: "13px",
+                      }}
+                    />
+                  )}
+                </Box>
+
+                {displayEmojiPicker && msg?._id === messageId && (
+                  <Box
+                    border="1px solid #212121"
+                    boxShadow="0px 0px 5px 0 #00000029"
+                    borderRadius="40px"
+                    position="absolute"
+                    zIndex="9999"
+                    bottom="15px"
+                    left={msg?.senderId?._id === user._id ? undefined : "0"}
+                    right={msg?.senderId?._id === user._id ? "0" : undefined}
+                    p="6px"
+                    bgcolor="#2b2d3d"
+                    sx={{ userSelect: "none" }}
+                    display="flex"
+                    gap="5px"
+                  >
+                    {["💖", "😂", "😢", "😲", "😡", "🤙"].map((emj, index) => {
+                      return (
+                        <Box
+                          key={index}
+                          bgcolor={
+                            msg?.emoji[user._id] === emj ? "#8484846e" : ""
+                          }
+                          borderRadius="50%"
+                          p="2px"
+                        >
+                          <Typography
+                            fontSize="27px"
+                            sx={{
+                              cursor: "pointer",
+                              transition: ".3s",
+                              ":hover": {
+                                transform: "scale(1.2)",
+                              },
+                            }}
+                            onClick={() => {
+                              handleEmoji(emj, msg?._id);
+                              setDisplayEmojiPicker(false);
+                            }}
+                          >
+                            {emj}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                )}
+
+                {displayEmojiPicker && (
+                  <Box
+                    position="fixed"
+                    top="0"
+                    left="0"
+                    width="100%"
+                    height="100%"
+                    onClick={() => {
+                      setDisplayEmojiPicker(false);
+                      setMessageId(null);
+                    }}
+                  />
+                )}
               </Box>
 
               {msg?.senderId?._id === user._id && (

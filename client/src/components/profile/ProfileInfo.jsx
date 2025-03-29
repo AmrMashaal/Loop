@@ -191,7 +191,8 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   document.addEventListener("click", (event) => {
     const buttonId = document.getElementById("addRemoveFriendId");
-    if (!buttonId.contains(event.target)) {
+
+    if (buttonId && !buttonId.contains(event.target)) {
       setIsFriendSettings(false);
     }
   });

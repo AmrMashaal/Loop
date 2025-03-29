@@ -2,6 +2,7 @@ import sharp from "sharp";
 import Message from "../models/Message.js";
 import { v4 as uuidv4 } from "uuid";
 import cloudinary from "../utils/cloudinary.js";
+import mongoose from "mongoose";
 
 export const getMessages = async (req, res) => {
   const { page, limit = 15 } = req.query;
@@ -28,7 +29,10 @@ export const getMessages = async (req, res) => {
     }
 
     await Message.updateMany(
-      { _id: { $in: messages.map((message) => message._id) }, receiverId: req.user.id },
+      {
+        _id: { $in: messages.map((message) => message._id) },
+        receiverId: req.user.id,
+      },
       { watched: true }
     );
 
@@ -50,6 +54,10 @@ const compressImage = async (buffer) => {
 export const sendMessage = async (req, res) => {
   const senderId = req.user.id;
   const { receiverId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+    return res.status(400).json({ message: "Invalid receiverId" });
+  }
 
   let picturePath = null;
 
@@ -94,6 +102,38 @@ export const sendMessage = async (req, res) => {
     await data.populate("senderId receiverId", "picturePath _id");
 
     res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const setEmoji = async (req, res) => {
+  const { messageId } = req.params;
+  const { emoji } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(messageId)) {
+    return res.status(400).json({ message: "Invalid messageId" });
+  }
+
+  try {
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    if (
+      message.emoji.has(req.user.id) &&
+      message.emoji.get(req.user.id) === emoji
+    ) {
+      message.emoji.delete(req.user.id);
+    } else {
+      message.emoji.set(req.user.id, emoji);
+    }
+
+    await message.save();
+
+    res.status(200).json(message.emoji);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

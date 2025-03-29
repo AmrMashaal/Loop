@@ -13,8 +13,9 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     picturePath: String,
-    text: {type: String, maxlength: 1500},
+    text: { type: String, maxlength: 1500 },
     watched: { type: Boolean, default: false },
+    emoji: {type: Map, of: String, default: {}},
   },
   {
     timestamps: true,

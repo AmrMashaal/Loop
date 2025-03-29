@@ -295,6 +295,10 @@ export const getFeedPosts = async (req, res) => {
       (a, b) => b.createdAt - a.createdAt
     );
 
+    if (page === "1") {
+      
+    }
+
     res.status(200).json(posts);
   } catch (err) {
     res.status(404).json({ message: err.message });

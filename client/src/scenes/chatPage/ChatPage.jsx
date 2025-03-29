@@ -54,8 +54,6 @@ const ChatPage = ({ socket, fromNav }) => {
 
       const reversedMessages = messages.reverse();
 
-      console.log(reversedMessages)
-
       if (reset) {
         setMessages(reversedMessages);
       } else {
@@ -433,6 +431,7 @@ const ChatPage = ({ socket, fromNav }) => {
         {userId && !initialLoad && (
           <RightChat
             messages={messages}
+            setMessages={setMessages}
             user={user}
             mode={mode}
             decryptMessage={decryptMessage}
@@ -448,6 +447,7 @@ const ChatPage = ({ socket, fromNav }) => {
             setMessage={setMessage}
             message={message}
             loading={loading}
+            token={token}
           />
         )}
 
