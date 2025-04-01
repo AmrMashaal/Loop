@@ -268,21 +268,6 @@ const Navbar = ({ isProfile }) => {
         transition: isProfile ? ".3s" : undefined,
       }}
     >
-      <img
-        src="\assets\ramadan.png"
-        alt=""
-        style={{
-          position: "absolute",
-          top: "10px",
-          left: "0",
-          width: "180px",
-          transform: "rotate(-20deg)",
-          zIndex: "-1",
-          userSelect: "none",
-          pointerEvents: "none",
-        }}
-      />
-
       <FlexBetween gap="15px">
         <Box
           display="flex"
