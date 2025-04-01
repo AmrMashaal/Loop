@@ -18,7 +18,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../../state";
 import Dropzone from "react-dropzone";
-import { countries, occupations } from "../../../infoArrays";
+import { countries } from "../../../infoArrays";
 import { DeleteOutlined } from "@mui/icons-material";
 
 const registerSchema = yup.object().shape({
@@ -491,49 +491,6 @@ const Form = () => {
                   {errors.location}
                 </Typography>
               )}
-
-              <Box
-                sx={{
-                  gridColumn: "span 4",
-                }}
-              >
-                <InputLabel id="occupation-lable" sx={{ mb: "10px" }}>
-                  Occupation
-                </InputLabel>
-
-                <Select
-                  name="occupation"
-                  displayEmpty
-                  value={values.occupation}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={
-                    Boolean(touched.occupation) && Boolean(errors.occupation)
-                  }
-                  labelId="occupation-lable"
-                  sx={{ width: "100%" }}
-                >
-                  <MenuItem value="">Select a occupation</MenuItem>
-                  {occupations.map((occupation) => {
-                    return (
-                      <MenuItem value={occupation} key={occupation}>
-                        {occupation}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-
-                {Boolean(touched.occupation) && Boolean(errors.occupation) && (
-                  <Typography
-                    color="error"
-                    m="10px 0 0px 0"
-                    fontSize="12px"
-                    whiteSpace="nowrap"
-                  >
-                    {errors.occupation}
-                  </Typography>
-                )}
-              </Box>
             </Box>
           ) : (
             <Box

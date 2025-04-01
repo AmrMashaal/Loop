@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
       instagram: String,
       linkedin: String,
     },
-    occupation: String,
+    occupation: {type: String, maxlength: 50},
     location: String,
   },
   { timestamps: true }

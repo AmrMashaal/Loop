@@ -16,6 +16,10 @@ const messageSchema = new mongoose.Schema(
     text: { type: String, maxlength: 1500 },
     watched: { type: Boolean, default: false },
     emoji: {type: Map, of: String, default: {}},
+    reply: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "message",
+    },
   },
   {
     timestamps: true,

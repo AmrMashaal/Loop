@@ -22,7 +22,15 @@ export const getMessages = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate("senderId receiverId", "picturePath _id");
+      .populate("senderId receiverId", "picturePath _id firstName lastName")
+      .populate({
+        path: "reply",
+        select: "senderId text picturePath _id",
+        populate: {
+          path: "senderId",
+          select: "firstName lastName _id",
+        },
+      });
 
     if (!messages) {
       return res.status(404).json({ message: "There is no message" });
@@ -55,11 +63,15 @@ export const sendMessage = async (req, res) => {
   const senderId = req.user.id;
   const { receiverId } = req.params;
 
+  let picturePath = null;
+  let reply =
+    req.body.reply && mongoose.Types.ObjectId.isValid(req.body.reply)
+      ? req.body.reply
+      : null;
+
   if (!mongoose.Types.ObjectId.isValid(receiverId)) {
     return res.status(400).json({ message: "Invalid receiverId" });
   }
-
-  let picturePath = null;
 
   if (!senderId) {
     return res.status(401).json({ message: "Unauthorized!" });
@@ -95,11 +107,24 @@ export const sendMessage = async (req, res) => {
       senderId: senderId,
       text: req.body.text,
       picturePath,
+      ...(reply && { reply: reply }),
     });
 
     const data = await message.save();
 
-    await data.populate("senderId receiverId", "picturePath _id");
+    await data.populate(
+      "senderId receiverId",
+      "picturePath _id firstName lastName"
+    );
+
+    await data.populate({
+      path: "reply",
+      select: "senderId text picturePath _id",
+      populate: {
+        path: "senderId",
+        select: "firstName lastName _id",
+      },
+    });
 
     res.status(200).json(data);
   } catch (error) {

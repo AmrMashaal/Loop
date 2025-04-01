@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Dropzone from "react-dropzone";
 import EditOutLinedIcon from "@mui/icons-material/EditOutlined";
-import { countries, occupations } from "../../../infoArrays";
+import { countries } from "../../../infoArrays";
 import { Box, useTheme } from "@mui/system";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from "../../../state";
@@ -26,7 +26,7 @@ import { Facebook, Instagram, LinkedIn, X, YouTube } from "@mui/icons-material";
 const ProfileSettings = ({
   setProfileSettings,
   setChangePassword,
-  isNonMobileScreens,
+  // isNonMobileScreens,
 }) => {
   const [usernameError, setUsernameError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ const ProfileSettings = ({
     birthdate: user.birthdate,
     bio: user.bio,
     location: user.location,
-    occupation: user.occupation,
+    occupation: user?.occupation,
     background: "",
     picturePath: "",
     facebook: user?.links?.facebook || "",
@@ -103,7 +103,11 @@ const ProfileSettings = ({
       ),
     bio: yup.string().max(101),
     location: yup.string().required("Please select a location"),
-    occupation: yup.string().required("Please select a location"),
+    occupation: yup
+      .string()
+      .max(50)
+      .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters")
+      .required("Please select a location"),
     background: yup
       .mixed()
       .notRequired()
@@ -274,6 +278,21 @@ const ProfileSettings = ({
                 }}
               />
 
+              <TextField
+                label="Occupation"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.occupation}
+                name="occupation"
+                error={
+                  Boolean(touched.occupation) && Boolean(errors.occupation)
+                }
+                helperText={touched.occupation && errors.occupation}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+
               <Box sx={{ gridColumn: "span 4" }}>
                 <InputLabel>Gender</InputLabel>
                 <Box display="flex" alignItems="center" gap="10px" my="10px">
@@ -355,6 +374,7 @@ const ProfileSettings = ({
                   );
                 })}
               </Select>
+
               {Boolean(touched.location) && Boolean(errors.location) && (
                 <Typography
                   color="error"
@@ -363,41 +383,6 @@ const ProfileSettings = ({
                   whiteSpace="nowrap"
                 >
                   {errors.location}
-                </Typography>
-              )}
-
-              <InputLabel id="occupation-lable" sx={{ mb: "-20px" }}>
-                Occupation
-              </InputLabel>
-
-              <Select
-                name="occupation"
-                displayEmpty
-                value={values.occupation}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={
-                  Boolean(touched.occupation) && Boolean(errors.occupation)
-                }
-                labelId="occupation-lable"
-              >
-                <MenuItem value="">Select a occupation</MenuItem>
-                {occupations.map((occupation) => {
-                  return (
-                    <MenuItem value={occupation} key={occupation}>
-                      {occupation}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-              {Boolean(touched.occupation) && Boolean(errors.occupation) && (
-                <Typography
-                  color="error"
-                  m="-19px 0 -20px 0"
-                  fontSize="12px"
-                  whiteSpace="nowrap"
-                >
-                  {errors.occupation}
                 </Typography>
               )}
 

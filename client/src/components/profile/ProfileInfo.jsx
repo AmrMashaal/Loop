@@ -435,7 +435,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                   m="15px 0 5px"
                   sx={{ wordBreak: "break-word" }}
                 >
-                  {userInfo?.bio && userInfo?.bio}
+                  {userInfo?._id === user._id ? user?.bio : userInfo?.bio}
                 </Typography>
 
                 {user._id === userId || user.username === userId ? (

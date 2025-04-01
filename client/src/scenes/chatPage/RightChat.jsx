@@ -7,9 +7,11 @@ import OpenPhoto from "../../components/OpenPhoto";
 import { setIsOverFlow } from "../../App";
 import {
   Check,
+  Close,
   DeleteOutlined,
   EmojiEmotions,
   Image,
+  Reply,
   Send,
 } from "@mui/icons-material";
 import Dropzone from "react-dropzone";
@@ -31,6 +33,8 @@ const RightChat = ({
   message,
   loading,
   token,
+  replyMessage,
+  setReplyMessage,
 }) => {
   const [showImage, setShowImage] = useState(false);
   const [displayEmojiPicker, setDisplayEmojiPicker] = useState(false);
@@ -55,7 +59,6 @@ const RightChat = ({
   // ----------------------------------------------------------
 
   const handleEmoji = async (emj, messageId) => {
-    console.log("emoji", emj, messageId);
     try {
       const response = await fetch(`/api/messages/${messageId}/emoji`, {
         method: "PATCH",
@@ -75,7 +78,7 @@ const RightChat = ({
       });
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
-        console.log(error);
+        console.error(error);
       }
     }
   };
@@ -103,6 +106,83 @@ const RightChat = ({
                   {<UserImage size="45" image={msg?.senderId?.picturePath} />}
                 </>
               )}
+
+              <Reply
+                sx={{
+                  cursor: "pointer",
+                  ":hover": {
+                    display: "flex",
+                  },
+                  bgcolor: "#2b2d3d",
+                  borderRadius: "50%",
+                  p: "2px",
+                  width: "24px",
+                  height: "24px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  border: "1px solid ##212121",
+                  color: "#939393",
+                  fontSize: "13px",
+                  mx: "5px",
+                  order: msg?.senderId?._id === user._id ? -1 : 2,
+                }}
+                onClick={() => setReplyMessage(msg)}
+              />
+
+              <Box
+                p={
+                  msg?.emoji && Object.values(msg?.emoji)?.length !== 0
+                    ? "2px"
+                    : "5px"
+                }
+                width={
+                  msg?.emoji && Object.values(msg?.emoji)?.length !== 0
+                    ? "unset"
+                    : "24px"
+                }
+                height={
+                  msg?.emoji && Object.values(msg?.emoji)?.length !== 0
+                    ? "unset"
+                    : "24px"
+                }
+                bgcolor="#2b2d3d"
+                borderRadius={
+                  msg?.emoji && Object.values(msg?.emoji)?.length > 1
+                    ? "4px"
+                    : "50%"
+                }
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                border="1px solid ##212121"
+                boxShadow="0px 0px 5px 0 #00000029"
+                sx={{
+                  cursor: "pointer",
+                  ":hover": {
+                    display: "flex",
+                  },
+                  order: msg?.senderId?._id === user._id ? -1 : 1,
+                }}
+                onClick={() => {
+                  setDisplayEmojiPicker(!displayEmojiPicker);
+                  setMessageId(msg?._id);
+                }}
+              >
+                {msg?.emoji && Object.values(msg?.emoji)?.length !== 0 ? (
+                  msg?.emoji &&
+                  Object.values(msg?.emoji)?.map((emj) => {
+                    return emj;
+                  })
+                ) : (
+                  <EmojiEmotions
+                    sx={{
+                      color: "#939393",
+                      fontSize: "13px",
+                    }}
+                  />
+                )}
+              </Box>
 
               <Box
                 m="15px 10px"
@@ -141,21 +221,75 @@ const RightChat = ({
                   },
                 }}
               >
+                {msg?.reply && (
+                  <Box
+                    width="100%"
+                    bgcolor="#2b2d3d"
+                    display="flex"
+                    justifyContent="space-between"
+                    borderRadius="5px 5px 0 0"
+                    borderLeft={`5px solid ${
+                      user._id === msg?.reply?.senderId?._id
+                        ? "#3a65a5"
+                        : "lightgreen"
+                    }`}
+                  >
+                    <Box
+                      display="flex"
+                      alignItems="start"
+                      gap="5px"
+                      flexDirection="column"
+                      p="7px"
+                      sx={{ userSelect: "none" }}
+                    >
+                      <Typography
+                        color={
+                          user._id === msg?.reply?.senderId?._id
+                            ? "#527ec0"
+                            : "lightGreen"
+                        }
+                        fontSize="11px"
+                        maxWidth="85%"
+                        overflow="hidden"
+                        whiteSpace="nowrap"
+                        textOverflow="ellipsis"
+                      >
+                        {msg?.reply?.senderId?.firstName}{" "}
+                        {msg?.reply?.senderId?.lastName}
+                      </Typography>
+
+                      <Typography
+                        fontSize="12px"
+                        color="#939393"
+                        maxWidth="315px"
+                        className="truncated-text"
+                      >
+                        {msg?.reply?.text}
+                      </Typography>
+                    </Box>
+
+                    <Box display="flex" alignItems="center" gap="5px">
+                      {msg?.reply?.picturePath && (
+                        <img
+                          src={msg?.reply?.picturePath}
+                          width="64px"
+                          height="57px"
+                          style={{ objectFit: "cover" }}
+                          alt=""
+                        />
+                      )}
+                    </Box>
+                  </Box>
+                )}
+
                 {msg?.text && (
                   <Typography
                     p="10px 10px 3px"
                     sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(
-                        convertTextLink(
-                          msg?.text.length > 180
-                            ? msg?.text.slice(0, 179)
-                            : msg.text
-                        ),
-                        {
-                          ADD_ATTR: ["target", "rel"],
-                        }
-                      ),
+                      __html: DOMPurify.sanitize(convertTextLink(msg.text), {
+                        ADD_ATTR: ["target", "rel"],
+                      }),
                     }}
                   />
                 )}
@@ -190,52 +324,6 @@ const RightChat = ({
                 >
                   {realTime(msg?.createdAt)}
                 </Typography>
-
-                <Box
-                  position="absolute"
-                  bottom="-20px"
-                  left={msg?.senderId?._id === user._id ? "-10px" : undefined}
-                  right={msg?.senderId?._id === user._id ? undefined : "0"}
-                  p={Object.values(msg?.emoji)?.length !== 0 ? "2px" : "5px"}
-                  width={
-                    Object.values(msg?.emoji)?.length !== 0 ? "unset" : "24px"
-                  }
-                  height={
-                    Object.values(msg?.emoji)?.length !== 0 ? "unset" : "24px"
-                  }
-                  bgcolor="#2b2d3d"
-                  borderRadius={
-                    Object.values(msg?.emoji)?.length > 1 ? "4px" : "50%"
-                  }
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  border="1px solid ##212121"
-                  boxShadow="0px 0px 5px 0 #00000029"
-                  sx={{
-                    cursor: "pointer",
-                    ":hover": {
-                      display: "flex",
-                    },
-                  }}
-                  onClick={() => {
-                    setDisplayEmojiPicker(!displayEmojiPicker);
-                    setMessageId(msg?._id);
-                  }}
-                >
-                  {Object.values(msg?.emoji)?.length !== 0 ? (
-                    Object.values(msg?.emoji)?.map((emj) => {
-                      return emj;
-                    })
-                  ) : (
-                    <EmojiEmotions
-                      sx={{
-                        color: "#939393",
-                        fontSize: "13px",
-                      }}
-                    />
-                  )}
-                </Box>
 
                 {displayEmojiPicker && msg?._id === messageId && (
                   <Box
@@ -391,118 +479,196 @@ const RightChat = ({
         );
       })}
 
-      <form
-        style={{
+      <Box
+        position="fixed"
+        bottom="-1px"
+        left={isNonMobileScreens ? "287px" : "0"}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        sx={{
           width: isNonMobileScreens ? "80%" : "100%",
-          position: "fixed",
-          bottom: "-1px",
-          height: "75px",
-          left: isNonMobileScreens ? "287px" : "50%",
-          textAlign: "center",
-          backgroundColor: "#20232d",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 8px 0",
-          transform: !isNonMobileScreens && "translateX(-50%)",
         }}
-        onSubmit={handleFormSubmit}
       >
-        <Box sx={{ cursor: "pointer" }}>
-          <Dropzone
-            accept=".jpg,.jpeg,.png,.webp"
-            multiple={false}
-            onDrop={(acceptedFiles) => {
-              const file = acceptedFiles[0];
-              const fileExtension = file.name.split(".").pop().toLowerCase();
-              if (["jpg", "jpeg", "png", "webp"].includes(fileExtension)) {
-                setImage(file);
-                setImageError(null);
-              } else if (
-                !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
-              ) {
-                setImageError("This file is not supported");
-              }
-            }}
+        {replyMessage && (
+          <Box
+            width={isNonMobileScreens ? "75%" : "100%"}
+            bgcolor="#2b2d3d"
+            display="flex"
+            justifyContent="space-between"
+            borderRadius="5px 5px 0 0"
+            borderLeft={`5px solid ${
+              user._id === replyMessage?.senderId?._id
+                ? "#3a65a5"
+                : "lightgreen"
+            }`}
           >
-            {({ getRootProps, getInputProps }) => (
-              <Box {...getRootProps()} position="relative">
-                <input {...getInputProps()} />
+            <Box
+              display="flex"
+              alignItems="start"
+              gap="5px"
+              flexDirection="column"
+              p="7px"
+              sx={{ userSelect: "none" }}
+            >
+              <Typography
+                color={
+                  user._id === replyMessage?.senderId?._id
+                    ? "#527ec0"
+                    : "lightGreen"
+                }
+                fontSize="11px"
+              >
+                {replyMessage?.senderId?.firstName}{" "}
+                {replyMessage?.senderId?.lastName}
+              </Typography>
 
-                <IconButton style={{ marginRight: "5px" }}>
-                  <Image
-                    className={imageError && "wrongImage"}
-                    sx={{ color: "#4281d7" }}
-                  />
-                </IconButton>
+              <Typography
+                fontSize="12px"
+                color="#939393"
+                maxWidth="315px"
+                className="truncated-text"
+              >
+                {replyMessage?.text}
+              </Typography>
+            </Box>
 
-                {image && (
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setImageError(null);
-                      setImage(null);
-                    }}
-                    sx={{
-                      position: "absolute",
-                      top: "-15px",
-                      right: "-7px",
-                    }}
-                  >
-                    <DeleteOutlined
-                      sx={{
-                        fontSize: "23px",
-                        color: "white",
-                        background: "#dc3c3c75",
-                        borderRadius: "50%",
-                        padding: "2px",
-                      }}
+            <Box display="flex" alignItems="center" gap="5px">
+              {replyMessage?.picturePath && (
+                <img
+                  src={replyMessage?.picturePath}
+                  width="64px"
+                  height="57px"
+                  style={{ objectFit: "cover" }}
+                  alt=""
+                />
+              )}
+
+              <IconButton onClick={() => setReplyMessage(null)}>
+                <Close
+                  sx={{
+                    color: "#939393",
+                    fontSize: "17px",
+                  }}
+                />
+              </IconButton>
+            </Box>
+          </Box>
+        )}
+
+        <form
+          style={{
+            width: "100%",
+            height: "75px",
+            textAlign: "center",
+            backgroundColor: "#20232d",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 8px 0",
+          }}
+          onSubmit={handleFormSubmit}
+        >
+          <Box sx={{ cursor: "pointer" }}>
+            <Dropzone
+              accept=".jpg,.jpeg,.png,.webp"
+              multiple={false}
+              onDrop={(acceptedFiles) => {
+                const file = acceptedFiles[0];
+                const fileExtension = file.name.split(".").pop().toLowerCase();
+                if (["jpg", "jpeg", "png", "webp"].includes(fileExtension)) {
+                  setImage(file);
+                  setImageError(null);
+                } else if (
+                  !["jpg", "jpeg", "png", "webp"].includes(fileExtension)
+                ) {
+                  setImageError("This file is not supported");
+                }
+              }}
+            >
+              {({ getRootProps, getInputProps }) => (
+                <Box {...getRootProps()} position="relative">
+                  <input {...getInputProps()} />
+
+                  <IconButton style={{ marginRight: "5px" }}>
+                    <Image
+                      className={imageError && "wrongImage"}
+                      sx={{ color: "#4281d7" }}
                     />
                   </IconButton>
-                )}
-              </Box>
+
+                  {image && (
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setImageError(null);
+                        setImage(null);
+                      }}
+                      sx={{
+                        position: "absolute",
+                        top: "-15px",
+                        right: "-7px",
+                      }}
+                    >
+                      <DeleteOutlined
+                        sx={{
+                          fontSize: "23px",
+                          color: "white",
+                          background: "#dc3c3c75",
+                          borderRadius: "50%",
+                          padding: "2px",
+                        }}
+                      />
+                    </IconButton>
+                  )}
+                </Box>
+              )}
+            </Dropzone>
+          </Box>
+
+          <input
+            type="text"
+            style={{
+              width: isNonMobileScreens ? "60%" : "90%",
+              padding: "14px 10px",
+              outline: "none",
+              border: "none",
+              fontFamily: "Rubik,sans-serif",
+              zIndex: "1",
+              background: "#171723",
+              color: "white",
+              borderRadius: "5px",
+              direction: testArabic(message) ? "rtl" : "ltr",
+            }}
+            placeholder="write a message..."
+            onChange={(e) => {
+              if (e.target.value.length > 1500) {
+                setMessage(e.target.value.slice(0, 1480));
+              } else {
+                setMessage(e.target.value);
+              }
+            }}
+            value={message}
+            disabled={loading}
+          />
+
+          <IconButton
+            type="submit"
+            sx={{ background: "#4281d7", marginLeft: "7px" }}
+            disabled={loading}
+          >
+            {!loading ? (
+              <Send style={{ color: "black" }} />
+            ) : (
+              <Box
+                className="loadingAnimation"
+                width="20px"
+                height="20px"
+              ></Box>
             )}
-          </Dropzone>
-        </Box>
-
-        <input
-          type="text"
-          style={{
-            width: isNonMobileScreens ? "60%" : "90%",
-            padding: "14px 10px",
-            outline: "none",
-            border: "none",
-            fontFamily: "Rubik,sans-serif",
-            zIndex: "1",
-            background: "#171723",
-            color: "white",
-            borderRadius: "5px",
-            direction: testArabic(message) ? "rtl" : "ltr",
-          }}
-          placeholder="write a message..."
-          onChange={(e) => {
-            if (e.target.value.length > 1500) {
-              setMessage(e.target.value.slice(0, 1480));
-            } else {
-              setMessage(e.target.value);
-            }
-          }}
-          value={message}
-          disabled={loading}
-        />
-
-        <IconButton
-          type="submit"
-          sx={{ background: "#4281d7", marginLeft: "7px" }}
-          disabled={loading}
-        >
-          {!loading ? (
-            <Send style={{ color: "black" }} />
-          ) : (
-            <Box className="loadingAnimation" width="20px" height="20px"></Box>
-          )}
-        </IconButton>
-      </form>
+          </IconButton>
+        </form>
+      </Box>
 
       {showImage && (
         <OpenPhoto photo={imageName} setIsImagOpen={setShowImage} />

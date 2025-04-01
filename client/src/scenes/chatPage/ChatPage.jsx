@@ -15,8 +15,9 @@ import WrongPassword from "../../components/WrongPassword";
 const ChatPage = ({ socket, fromNav }) => {
   const [message, setMessage] = useState("");
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState(null);
+  const [replyMessage, setReplyMessage] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [historyLoad, setHistoryLoad] = useState(true);
@@ -91,6 +92,8 @@ const ChatPage = ({ socket, fromNav }) => {
 
       formData.append("text", message);
 
+      formData.append("reply", replyMessage?._id);
+
       if (image) {
         formData.append("picture", image);
         formData.append("picturePath", image.name);
@@ -122,6 +125,13 @@ const ChatPage = ({ socket, fromNav }) => {
         setImage("");
         setMessage("");
         setLoading(false);
+        setReplyMessage("");
+        setTimeout(() => {
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+          });
+        }, 100);
       }
     }
   };
@@ -448,6 +458,8 @@ const ChatPage = ({ socket, fromNav }) => {
             message={message}
             loading={loading}
             token={token}
+            setReplyMessage={setReplyMessage}
+            replyMessage={replyMessage}
           />
         )}
 
@@ -458,9 +470,9 @@ const ChatPage = ({ socket, fromNav }) => {
         {userId && (
           <Box
             position="fixed"
-            bottom="100px"
-            bgcolor="white"
-            color="black"
+            bottom="135px"
+            bgcolor="#2f2f2f"
+            color="white"
             right={isNonMobileScreens ? "180px" : "15px"}
             p="5px"
             display="flex"

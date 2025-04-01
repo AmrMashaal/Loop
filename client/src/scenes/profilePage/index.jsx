@@ -257,25 +257,25 @@ const ProfilePage = () => {
             flexDirection="column"
             mt={() => {
               if (!isNonMobileScreens && userInfo?.bio?.length >= 180) {
-                return "502px";
+                return "612px";
               } else if (
                 isNonMobileScreens &&
                 userInfo?.bio &&
                 userInfo?.bio.length < 180
               ) {
-                return "250px";
+                return "270px";
               } else if (
                 !isNonMobileScreens &&
                 userInfo?.bio &&
                 !userInfo?.bio.length < 180
               ) {
-                return "378px";
+                return "398px";
               } else if (isNonMobileScreens && !userInfo?.bio) {
-                return "210px";
+                return "230px";
               } else if (!isNonMobileScreens && !userInfo?.bio) {
-                return "320px";
+                return "350px";
               } else if (isNonMobileScreens && userInfo?.bio?.length >= 180) {
-                return "330px";
+                return "350px";
               }
             }}
             className="profileContainer"

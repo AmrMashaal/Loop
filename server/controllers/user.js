@@ -181,7 +181,7 @@ export const editUser = async (req, res) => {
 
     const updatedUser = await user.save();
 
-    const { password, ...UserData } = updateduser.toObject();
+    const { password, ...UserData } = updatedUser.toObject(); 
 
     res.status(200).json(UserData);
   } catch (err) {
