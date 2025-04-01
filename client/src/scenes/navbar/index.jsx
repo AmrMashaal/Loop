@@ -37,7 +37,7 @@ const Navbar = ({ isProfile }) => {
   const [isSearch, setIsSearch] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
   const [isDeleteNotifications, setIsDeleteNotifications] = useState(false);
-  const [returnNavColor, setReturnNavColor] = useState(true);
+  const [returnNavColor, setReturnNavColor] = useState(false);
   const [requestLoading, setRequestLoading] = useState(true);
   const [isClickProfile, setIsClickProfile] = useState(false);
   const [friendsRequestData, setFriendRequestData] = useState([]);
@@ -250,10 +250,20 @@ const Navbar = ({ isProfile }) => {
     }
   };
 
+  const navBgColor = () => {
+    if (isProfile && returnNavColor) {
+      return undefined;
+    } else if (!isNonMobileScreens) {
+      return alt;
+    } else {
+      return mode === "dark" ? "#1a1a1a87" : "#ffffff82";
+    }
+  };
+
   return (
     <FlexBetween
       padding="10px"
-      bgcolor={isProfile && returnNavColor ? undefined : alt}
+      bgcolor={navBgColor}
       p="12px 30px"
       position="fixed"
       top="-1px"
@@ -266,6 +276,8 @@ const Navbar = ({ isProfile }) => {
             ? undefined
             : "-1px 11px 11px 0px #00000008",
         transition: isProfile ? ".3s" : undefined,
+        backdropFilter:
+          isNonMobileScreens && !returnNavColor ? "blur(20px)" : undefined,
       }}
     >
       <FlexBetween gap="15px">
