@@ -37,7 +37,7 @@ const Navbar = ({ isProfile }) => {
   const [isSearch, setIsSearch] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
   const [isDeleteNotifications, setIsDeleteNotifications] = useState(false);
-  const [returnNavColor, setReturnNavColor] = useState(false);
+  const [returnNavColor, setReturnNavColor] = useState(isProfile);
   const [requestLoading, setRequestLoading] = useState(true);
   const [isClickProfile, setIsClickProfile] = useState(false);
   const [friendsRequestData, setFriendRequestData] = useState([]);
