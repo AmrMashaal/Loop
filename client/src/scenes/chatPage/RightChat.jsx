@@ -17,6 +17,7 @@ import {
 import Dropzone from "react-dropzone";
 import { convertTextLink } from "../../frequentFunctions";
 import DOMPurify from "dompurify";
+import { Link } from "react-router-dom";
 
 const RightChat = ({
   messages,
@@ -102,9 +103,9 @@ const RightChat = ({
               alignItems="center"
             >
               {msg?.senderId?._id !== user._id && (
-                <>
+                <Link to={`/profile/${msg?.senderId?._id}`}>
                   {<UserImage size="45" image={msg?.senderId?.picturePath} />}
-                </>
+                </Link>
               )}
 
               <Reply
@@ -389,7 +390,9 @@ const RightChat = ({
               </Box>
 
               {msg?.senderId?._id === user._id && (
-                <UserImage size="45" image={user.picturePath} />
+                <Link to={`/profile/${user._id}`}>
+                  <UserImage size="45" image={user.picturePath} />
+                </Link>
               )}
             </Box>
             {msg?.senderId?._id === user._id &&
