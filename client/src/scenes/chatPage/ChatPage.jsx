@@ -240,7 +240,12 @@ const ChatPage = ({ socket, fromNav }) => {
     setPageNumber(1);
 
     if (!initialLoad) {
-      window.scrollTo(0, document.body.scrollHeight);
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 500)
     }
   }, [userId, initialLoad]);
 
@@ -435,6 +440,7 @@ const ChatPage = ({ socket, fromNav }) => {
             user={user}
             setTitle={setTitle}
             userId={userId}
+            setMessages={setMessages}
           />
         )}
 

@@ -16,6 +16,7 @@ const LeftChat = ({
   user,
   setTitle,
   userId,
+  setMessages,
 }) => {
   const token = useSelector((state) => state.token);
 
@@ -168,6 +169,7 @@ const LeftChat = ({
                       : ele?._id
                   }`}
                   style={{ margin: "20px 0", display: "block" }}
+                  onClick={() => setMessages([])}
                 >
                   <Box
                     display="flex"
