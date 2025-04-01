@@ -56,7 +56,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
   return (
     <>
-      <WidgetWrapper position="sticky" top="87px" overflow="hidden">
+      <WidgetWrapper position="sticky" top="80px" overflow="hidden">
         {!userLoading ? (
           <>
             <Link to={`/profile/${userId}`}>

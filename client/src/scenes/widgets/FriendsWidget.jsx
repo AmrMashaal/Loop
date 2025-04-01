@@ -78,7 +78,7 @@ const FriendsWidget = ({
   }, [userId]);
 
   return (
-    <WidgetWrapper position="sticky" top="87px">
+    <WidgetWrapper position="sticky" top="80px">
       <FlexBetween>
         <Typography
           fontSize={isNonMobileScreens ? "20px" : "16px"}

@@ -262,9 +262,8 @@ const Navbar = ({ isProfile }) => {
 
   return (
     <FlexBetween
-      padding="10px"
       bgcolor={navBgColor}
-      p="12px 30px"
+      p="8px 30px"
       position="fixed"
       top="-1px"
       left="0"
