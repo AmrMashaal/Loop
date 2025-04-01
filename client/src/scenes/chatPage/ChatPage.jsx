@@ -15,8 +15,8 @@ import WrongPassword from "../../components/WrongPassword";
 const ChatPage = ({ socket, fromNav }) => {
   const [message, setMessage] = useState("");
   const [title, setTitle] = useState("");
-  const [replyMessage, setReplyMessage] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [replyMessage, setReplyMessage] = useState(null);
   const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
@@ -441,6 +441,7 @@ const ChatPage = ({ socket, fromNav }) => {
             setTitle={setTitle}
             userId={userId}
             setMessages={setMessages}
+            setReplyMessage={setReplyMessage}
           />
         )}
 
