@@ -98,6 +98,7 @@ const Form = () => {
   const [loginError, setLoginError] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageError, setImageError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { palette } = useTheme();
 
@@ -112,6 +113,8 @@ const Form = () => {
   const location = useLocation();
 
   const register = async (values, onSubmitProps) => {
+    setLoading(true);
+
     try {
       const formData = new FormData();
 
@@ -143,10 +146,14 @@ const Form = () => {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   const login = async (values, onSubmitProps) => {
+    setLoading(true);
+
     try {
       const formData = new FormData();
 
@@ -182,6 +189,8 @@ const Form = () => {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -560,7 +569,11 @@ const Form = () => {
               }}
               onClick={handleFormSubmit}
             >
-              {location.pathname === "/signup" ? "REGISTER" : "Login"}
+              {loading
+                ? "Loading.."
+                : location.pathname === "/signup"
+                ? "REGISTER"
+                : "Login"}
             </Button>
 
             <Link
