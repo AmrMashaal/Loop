@@ -274,7 +274,7 @@ const Navbar = ({ isProfile }) => {
             : "-1px 11px 11px 0px #00000008",
         transition: isProfile ? ".3s" : undefined,
       }}
-      className="navbarHolder"
+      className={!returnNavColor ? "navbarHolder" : ""}
     >
       <FlexBetween gap="15px">
         <Box
