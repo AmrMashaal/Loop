@@ -296,7 +296,45 @@ export const getFeedPosts = async (req, res) => {
     );
 
     if (page === "1") {
-      
+      const friendSuggesions = await Friend.find({
+        $or: [
+          {
+            sender: friendsIds[Math.floor(Math.random() * friendsIds.length)],
+            status: "accepted",
+          },
+          {
+            receiver: friendsIds[Math.floor(Math.random() * friendsIds.length)],
+            status: "accepted",
+          },
+          {
+            sender: friendsIds[Math.floor(Math.random() * friendsIds.length)],
+            status: "pending",
+          },
+          {
+            receiver: friendsIds[Math.floor(Math.random() * friendsIds.length)],
+            status: "pending",
+          },
+        ],
+      })
+        .limit(5)
+        .populate("sender receiver", "firstName lastName picturePath _id");
+
+      const friendSuggestionsWithFollow = await Follow.find({
+        $or: [
+          {
+            follower: friendsIds[Math.floor(Math.random() * friendsIds.length)],
+          },
+          {
+            follower: following[Math.floor(Math.random() * following.length)],
+          },
+        ],
+      })
+        .limit(5)
+        .populate("following", "firstName lastName picturePath _id");
+
+      const mapFriendSuggestions = friendSuggesions.map((fr) => {
+        return fr.sender._id.toString()
+      });
     }
 
     res.status(200).json(posts);

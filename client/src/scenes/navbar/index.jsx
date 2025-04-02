@@ -253,8 +253,6 @@ const Navbar = ({ isProfile }) => {
   const navBgColor = () => {
     if (isProfile && returnNavColor) {
       return undefined;
-    } else if (!isNonMobileScreens) {
-      return alt;
     } else {
       return mode === "dark" ? "#1a1a1a87" : "#ffffff82";
     }
@@ -275,9 +273,8 @@ const Navbar = ({ isProfile }) => {
             ? undefined
             : "-1px 11px 11px 0px #00000008",
         transition: isProfile ? ".3s" : undefined,
-        backdropFilter:
-          isNonMobileScreens && !returnNavColor ? "blur(20px)" : undefined,
       }}
+      className="navbarHolder"
     >
       <FlexBetween gap="15px">
         <Box

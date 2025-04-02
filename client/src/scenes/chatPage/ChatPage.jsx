@@ -206,6 +206,13 @@ const ChatPage = ({ socket, fromNav }) => {
       const handleReceiveMessage = (data) => {
         if (data?.senderId?._id === userId) {
           setMessages((prevMessages) => [...prevMessages, data]);
+
+          setTimeout(() => {
+            window.scrollTo({
+              top: document.body.scrollHeight,
+              behavior: "smooth",
+            });
+          }, 100);
         } else if (data?.senderId?._id !== userId) {
           startNotificationSound();
         }
@@ -240,12 +247,12 @@ const ChatPage = ({ socket, fromNav }) => {
     setPageNumber(1);
 
     if (!initialLoad) {
-    setTimeout(() => {
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth",
-      });
-    }, 500)
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 500);
     }
   }, [userId, initialLoad]);
 
