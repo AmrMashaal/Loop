@@ -248,8 +248,8 @@ export const getFeedPosts = async (req, res) => {
         .limit(limit);
     } else {
       posts = await Post.find({
-        _id: { $in: ["67c0e95cc6489e642bf59fee", "67bfc09c888321a31b7122ec"] },
-      }).sort({ createdAt: 1 });
+        _id: "67c0e95cc6489e642bf59fee",
+      }).sort({ createdAt: -1 });
     }
 
     const postsWithIsLiked = await Promise.all(

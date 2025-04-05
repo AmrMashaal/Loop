@@ -408,414 +408,150 @@ const PostWidget = ({
               ? JSON.parse(ele?.textAddition)
               : "";
 
-            if (
-              (posts.length > 4
-                ? index === 3 || index === 30 || index === 80
-                : index === 0) &&
-              location.pathname === "/"
-            ) {
-              return (
-                <Box
-                  key={index + 123}
-                  my="20px"
-                  position="relative"
-                  height="252px"
-                >
-                  <Typography
-                    textAlign="left"
-                    fontSize="18px"
-                    fontWeight="500"
-                    color={medium}
-                    mb="10px"
-                    mt="20px"
-                    sx={{ userSelect: "none" }}
-                  >
-                    suggested for you
-                  </Typography>
-
-                  <ArrowForward
-                    sx={{
-                      borderRadius: "50%",
-                      bgcolor: palette.neutral.light,
-                      width: "30px",
-                      height: "30px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "600",
-                      p: "5px",
-                      top: "50%",
-                      right: "-5px",
-                      position: "absolute",
-                      transform: "translateY(-50%)",
-                      zIndex: "1",
-                      cursor: "pointer",
-                      border: `1px solid ${palette.neutral.main}`,
-                      transition: ".3s",
-                      ":hover": {
-                        opacity: ".8",
-                      },
-                    }}
-                    onClick={() => {
-                      const scrollableDiv = document.querySelector(
-                        ".scrollable" + index
-                      );
-
-                      scrollableDiv.scrollBy({
-                        top: 0,
-                        left: scrollableDiv.clientWidth,
-                        behavior: "smooth",
-                      });
-                    }}
-                  />
-
-                  <Box
-                    display="flex"
-                    gap="10px"
-                    overflow="auto"
-                    maxWidth="100%"
-                    position="absolute"
-                    sx={{ scrollbarWidth: "none" }}
-                    className={`scrollable${index}`}
-                  >
-                    {followSuggestions?.map((fol, followIndex) => {
-                      return (
-                        <Link
-                          to={`/profile/${fol?._id}`}
-                          key={followIndex}
-                          target="_blank"
-                        >
-                          <Box
-                            display="flex"
-                            gap="12px"
-                            alignItems="center"
-                            justifyContent="center"
-                            flexDirection="column"
-                            width="150px"
-                            p="15px 10px"
-                            borderRadius="9px"
-                            bgcolor={palette.background.alt}
-                          >
-                            <UserImage image={fol.picturePath} size="80" />
-
-                            <Box textAlign="center">
-                              <Box
-                                display={fol.verified ? "flex" : "unset"}
-                                gap="2px"
-                                alignItems="center"
-                              >
-                                <Typography
-                                  maxWidth="100px"
-                                  fontSize="14px"
-                                  overflow="hidden"
-                                  textOverflow="ellipsis"
-                                  whiteSpace="nowrap"
-                                  textAlign="center"
-                                >
-                                  {fol.firstName} {fol.lastName}
-                                </Typography>
-
-                                {fol.verified && (
-                                  <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                                )}
-                              </Box>
-
-                              <Typography
-                                fontSize="12px"
-                                color={medium}
-                                overflow="hidden"
-                                textOverflow="ellipsis"
-                                whiteSpace="nowrap"
-                                maxWidth="100px"
-                                textAlign="center"
-                              >
-                                @{fol.username}
-                              </Typography>
-                            </Box>
-
-                            <Button
-                              fullWidth
-                              sx={{
-                                backgroundColor: fol?.isFollowed
-                                  ? palette.neutral.light
-                                  : "rgb(0 151 250)",
-                                color: fol?.isFollowed
-                                  ? palette.neutral.main
-                                  : "white",
-                                transition: ".3s",
-                                "&:hover": {
-                                  opacity: "0.8",
-                                  backgroundColor: fol?.isFollowed
-                                    ? "white"
-                                    : "rgb(0 151 250)",
-                                },
-                              }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleFollow(fol._id);
-                              }}
-                              disabled={followLoadingId === fol._id}
-                            >
-                              {followLoadingId === fol._id
-                                ? "Loading..."
-                                : fol?.isFollowed
-                                ? "Followed"
-                                : "Follow"}
-                            </Button>
-                          </Box>
-                        </Link>
-                      );
-                    })}
-                  </Box>
-
-                  <ArrowBack
-                    sx={{
-                      borderRadius: "50%",
-                      bgcolor: palette.neutral.light,
-                      width: "30px",
-                      height: "30px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: "600",
-                      p: "5px",
-                      top: "50%",
-                      left: "-5px",
-                      position: "absolute",
-                      transform: "translateY(-50%)",
-                      cursor: "pointer",
-                      zIndex: "1",
-                      border: `1px solid ${palette.neutral.main}`,
-                      transition: ".3s",
-                      ":hover": {
-                        opacity: ".8",
-                      },
-                    }}
-                    onClick={() => {
-                      const scrollableDiv = document.querySelector(
-                        ".scrollable" + index
-                      );
-
-                      scrollableDiv.scrollBy({
-                        top: 0,
-                        left: -scrollableDiv.clientWidth,
-                        behavior: "smooth",
-                      });
-                    }}
-                  />
-                </Box>
-              );
-            }
-
             return (
-              <WidgetWrapper mb="10px" key={index}>
-                <FlexBetween>
-                  <Link
-                    to={`/profile/${
-                      typeof ele.userId === "object"
-                        ? ele.userId._id
-                        : ele.userId
-                    }`}
-                  >
-                    <FlexBetween gap="10px">
-                      <Box sx={{ cursor: "pointer" }}>
-                        <UserImage
-                          image={
-                            typeof ele.userId === "object"
-                              ? ele.userId.picturePath
-                              : ele.userPicturePath
-                          }
-                          size="40px"
-                        />
-                      </Box>
-
-                      <Box>
-                        <Box
-                          sx={{ cursor: "pointer" }}
-                          display="flex"
-                          alignItems="center"
-                          gap="4px"
-                        >
-                          <Typography fontSize="14px" className="opacityBox">
-                            {typeof ele.userId === "object"
-                              ? ele.userId.firstName
-                              : ele.firstName}{" "}
-                            {typeof ele.userId === "object"
-                              ? ele.userId.lastName
-                              : ele.lastName}
-                          </Typography>
-
-                          {typeof ele.userId === "object" &&
-                          ele.userId.verified ? (
-                            <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                          ) : ele.verified ? (
-                            <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                          ) : undefined}
+              <Box key={index}>
+                <WidgetWrapper mb="10px">
+                  <FlexBetween>
+                    <Link
+                      to={`/profile/${
+                        typeof ele.userId === "object"
+                          ? ele.userId._id
+                          : ele.userId
+                      }`}
+                    >
+                      <FlexBetween gap="10px">
+                        <Box sx={{ cursor: "pointer" }}>
+                          <UserImage
+                            image={
+                              typeof ele.userId === "object"
+                                ? ele.userId.picturePath
+                                : ele.userPicturePath
+                            }
+                            size="40px"
+                          />
                         </Box>
 
-                        <Typography
-                          fontSize="11px"
-                          color={medium}
-                          display="flex"
-                          alignItems="center"
-                          gap="3px"
-                          sx={{ userSelect: "none" }}
-                        >
-                          {timeAgo(ele?.createdAt)}{" "}
-                          {ele?.privacy === "public" ? (
-                            <Public sx={{ fontSize: "15px" }} />
-                          ) : ele?.privacy === "friends" ? (
-                            <People sx={{ fontSize: "15px" }} />
-                          ) : (
-                            <Lock sx={{ fontSize: "15px" }} />
-                          )}
-                          {ele?.edited && (
-                            <Typography fontWeight="500" fontSize="11px">
-                              | Edited
+                        <Box>
+                          <Box
+                            sx={{ cursor: "pointer" }}
+                            display="flex"
+                            alignItems="center"
+                            gap="4px"
+                          >
+                            <Typography fontSize="14px" className="opacityBox">
+                              {typeof ele.userId === "object"
+                                ? ele.userId.firstName
+                                : ele.firstName}{" "}
+                              {typeof ele.userId === "object"
+                                ? ele.userId.lastName
+                                : ele.lastName}
                             </Typography>
-                          )}
-                          {ele?.pinned &&
-                            location.pathname.split("/")[1] === "profile" && (
-                              <Box
-                                display="flex"
-                                alignItems="center"
-                                gap="2px"
-                                fontWeight="500"
-                                fontSize="11px"
-                              >
-                                | Pinned
-                                <PushPinOutlined sx={{ fontSize: "14px" }} />
-                              </Box>
+
+                            {typeof ele.userId === "object" &&
+                            ele.userId.verified ? (
+                              <VerifiedOutlined sx={{ color: "#15a1ed" }} />
+                            ) : ele.verified ? (
+                              <VerifiedOutlined sx={{ color: "#15a1ed" }} />
+                            ) : undefined}
+                          </Box>
+
+                          <Typography
+                            fontSize="11px"
+                            color={medium}
+                            display="flex"
+                            alignItems="center"
+                            gap="3px"
+                            sx={{ userSelect: "none" }}
+                          >
+                            {timeAgo(ele?.createdAt)}{" "}
+                            {ele?.privacy === "public" ? (
+                              <Public sx={{ fontSize: "15px" }} />
+                            ) : ele?.privacy === "friends" ? (
+                              <People sx={{ fontSize: "15px" }} />
+                            ) : (
+                              <Lock sx={{ fontSize: "15px" }} />
                             )}
-                        </Typography>
-                      </Box>
-                    </FlexBetween>
-                  </Link>
+                            {ele?.edited && (
+                              <Typography fontWeight="500" fontSize="11px">
+                                | Edited
+                              </Typography>
+                            )}
+                            {ele?.pinned &&
+                              location.pathname.split("/")[1] === "profile" && (
+                                <Box
+                                  display="flex"
+                                  alignItems="center"
+                                  gap="2px"
+                                  fontWeight="500"
+                                  fontSize="11px"
+                                >
+                                  | Pinned
+                                  <PushPinOutlined sx={{ fontSize: "14px" }} />
+                                </Box>
+                              )}
+                          </Typography>
+                        </Box>
+                      </FlexBetween>
+                    </Link>
 
-                  {typeof ele.userId === "object" &&
-                  ele.userId._id === user._id ? (
-                    <IconButton
-                      onClick={() => {
-                        setIsDots(true),
-                          setPostInfo({ postId: ele._id, userId: ele.userId });
-                      }}
-                    >
-                      <MoreHoriz />
-                    </IconButton>
-                  ) : ele.userId === user._id ? (
-                    <IconButton
-                      onClick={() => {
-                        setIsDots(true),
-                          setPostInfo({ postId: ele._id, userId: ele.userId });
-                      }}
-                    >
-                      <MoreHoriz />
-                    </IconButton>
-                  ) : undefined}
-                </FlexBetween>
+                    {typeof ele.userId === "object" &&
+                    ele.userId._id === user._id ? (
+                      <IconButton
+                        onClick={() => {
+                          setIsDots(true),
+                            setPostInfo({
+                              postId: ele._id,
+                              userId: ele.userId,
+                            });
+                        }}
+                      >
+                        <MoreHoriz />
+                      </IconButton>
+                    ) : ele.userId === user._id ? (
+                      <IconButton
+                        onClick={() => {
+                          setIsDots(true),
+                            setPostInfo({
+                              postId: ele._id,
+                              userId: ele.userId,
+                            });
+                        }}
+                      >
+                        <MoreHoriz />
+                      </IconButton>
+                    ) : undefined}
+                  </FlexBetween>
 
-                <Box
-                  border={textAddition?.value === "quotation" && "2px solid "}
-                  p={textAddition?.value === "quotation" && "15px"}
-                  m={
-                    textAddition?.value === "quotation"
-                      ? "15px 0 8px"
-                      : ele?.picturePath && ele?.description
-                      ? "10px 0 0"
-                      : ele?.description && !ele?.picturePath
-                      ? "14px 00 0"
-                      : undefined
-                  }
-                  textAlign={
-                    (textAddition?.value === "quotation" ||
-                      textAddition.type === "color") &&
-                    "center"
-                  }
-                  sx={{
-                    p: textAddition.type === "color" && "160px 25px",
-                    background:
-                      textAddition.type === "color" && textAddition.value,
-                    cursor: textAddition.type === "color" && "pointer",
-                    color:
-                      textAddition.type === "color" &&
-                      textAddition.value !==
-                        "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
-                      "white",
-                  }}
-                  onClick={() => {
-                    if (textAddition?.type === "color") {
-                      setIsPostClicked(true),
-                        setPostClickType("post"),
-                        setPostClickData({
-                          firstName: ele?.firstName,
-                          lastName: ele?.lastName,
-                          picturePath: ele?.picturePath,
-                          userPicturePath: ele?.userPicturePath,
-                          description: ele?.description,
-                          _id: ele?._id,
-                          userId: ele?.userId,
-                          verified: ele?.verified,
-                        });
-                    }
-                  }}
-                >
-                  <Typography
-                    position="relative"
-                    fontWeight={textAddition?.value === "bold" && "bold"}
-                    fontSize={
-                      typeof ele.userId === "object"
-                        ? "14px"
-                        : howIsText(
-                            ele?.description,
-                            ele?.picturePath,
-                            textAddition
-                          )
-                    }
-                    color={
-                      textAddition?.value ===
-                        "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
-                      mode === "light" &&
-                      "black"
-                    }
-                    textTransform={
+                  <Box
+                    border={textAddition?.value === "quotation" && "2px solid "}
+                    p={textAddition?.value === "quotation" && "15px"}
+                    m={
                       textAddition?.value === "quotation"
-                        ? "capitalize"
-                        : textAddition?.value === "uppercase"
-                        ? "uppercase"
+                        ? "15px 0 8px"
+                        : ele?.picturePath && ele?.description
+                        ? "10px 0 0"
+                        : ele?.description && !ele?.picturePath
+                        ? "14px 00 0"
                         : undefined
                     }
-                    sx={{
-                      wordBreak: "break-word",
-                      lineHeight: "1.7",
-                      direction: testArabic(ele?.description) && "rtl",
-                      textAlign: textAddition.type === "color",
-                      p: textAddition?.value === "quotation" && "25px",
-                    }}
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(
-                        convertTextLink(
-                          ele?.description?.length > 180
-                            ? ele?.description?.slice(0, 179)
-                            : ele?.description
-                        ),
-                        {
-                          ADD_ATTR: ["target", "rel"],
-                        }
-                      ),
-                    }}
-                    className={
-                      textAddition?.value === "quotation" && "postText"
+                    textAlign={
+                      (textAddition?.value === "quotation" ||
+                        textAddition.type === "color") &&
+                      "center"
                     }
-                  />
-
-                  {ele?.description?.length > 180 && (
-                    <span
-                      style={{
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        userSelect: "none",
-                      }}
-                      onClick={() => {
+                    sx={{
+                      p: textAddition.type === "color" && "160px 25px",
+                      background:
+                        textAddition.type === "color" && textAddition.value,
+                      cursor: textAddition.type === "color" && "pointer",
+                      color:
+                        textAddition.type === "color" &&
+                        textAddition.value !==
+                          "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
+                        "white",
+                    }}
+                    onClick={() => {
+                      if (textAddition?.type === "color") {
                         setIsPostClicked(true),
                           setPostClickType("post"),
                           setPostClickData({
@@ -828,195 +564,471 @@ const PostWidget = ({
                             userId: ele?.userId,
                             verified: ele?.verified,
                           });
+                      }
+                    }}
+                  >
+                    <Typography
+                      position="relative"
+                      fontWeight={textAddition?.value === "bold" && "bold"}
+                      fontSize={
+                        typeof ele.userId === "object"
+                          ? "14px"
+                          : howIsText(
+                              ele?.description,
+                              ele?.picturePath,
+                              textAddition
+                            )
+                      }
+                      color={
+                        textAddition?.value ===
+                          "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
+                        mode === "light" &&
+                        "black"
+                      }
+                      textTransform={
+                        textAddition?.value === "quotation"
+                          ? "capitalize"
+                          : textAddition?.value === "uppercase"
+                          ? "uppercase"
+                          : undefined
+                      }
+                      sx={{
+                        wordBreak: "break-word",
+                        lineHeight: "1.7",
+                        direction: testArabic(ele?.description) && "rtl",
+                        textAlign: textAddition.type === "color",
+                        p: textAddition?.value === "quotation" && "25px",
                       }}
-                    >
-                      ...more
-                    </span>
-                  )}
-                </Box>
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(
+                          convertTextLink(
+                            ele?.description?.length > 180
+                              ? ele?.description?.slice(0, 179)
+                              : ele?.description
+                          ),
+                          {
+                            ADD_ATTR: ["target", "rel"],
+                          }
+                        ),
+                      }}
+                      className={
+                        textAddition?.value === "quotation" && "postText"
+                      }
+                    />
 
-                {ele.picturePath && (
-                  <PostImg
-                    setIsPostClicked={setIsPostClicked}
-                    setPostClickData={setPostClickData}
-                    setPostClickType={setPostClickType}
-                    ele={ele}
-                  />
-                )}
-
-                {typeof ele.userId === "object" && (
-                  <Box borderRadius="0.75rem">
-                    {ele?.postId?.picturePath && (
-                      <PostImg
-                        setIsPostClicked={setIsPostClicked}
-                        setPostClickType={setPostClickType}
-                        setPostClickData={setPostClickData}
-                        ele={ele.postId}
-                        isRepost={true}
-                      />
+                    {ele?.description?.length > 180 && (
+                      <span
+                        style={{
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          userSelect: "none",
+                        }}
+                        onClick={() => {
+                          setIsPostClicked(true),
+                            setPostClickType("post"),
+                            setPostClickData({
+                              firstName: ele?.firstName,
+                              lastName: ele?.lastName,
+                              picturePath: ele?.picturePath,
+                              userPicturePath: ele?.userPicturePath,
+                              description: ele?.description,
+                              _id: ele?._id,
+                              userId: ele?.userId,
+                              verified: ele?.verified,
+                            });
+                        }}
+                      >
+                        ...more
+                      </span>
                     )}
+                  </Box>
 
-                    <Box
-                      mt={ele?.postId?.picturePath ? "-17px" : "13px"}
-                      border="1px solid"
-                      borderColor={palette.neutral.light}
-                      p="10px"
-                    >
-                      {ele?.postId !== null ? (
-                        <Link
-                          to={`/profile/${ele?.postId?.userId}`}
-                          style={{ width: "fit-content", display: "block" }}
-                        >
-                          <Box gap="10px" display="flex" alignItems="center">
-                            <Box sx={{ cursor: "pointer" }}>
-                              <UserImage
-                                image={
-                                  typeof ele?.userId === "object"
-                                    ? ele?.postId?.userPicturePath
-                                    : ele?.userPicturePath
-                                }
-                                size="40px"
-                              />
-                            </Box>
+                  {ele.picturePath && (
+                    <PostImg
+                      setIsPostClicked={setIsPostClicked}
+                      setPostClickData={setPostClickData}
+                      setPostClickType={setPostClickType}
+                      ele={ele}
+                    />
+                  )}
 
-                            <Box>
-                              <Box
-                                sx={{ cursor: "pointer" }}
-                                display="flex"
-                                alignItems="center"
-                                gap="4px"
-                              >
-                                <Typography
-                                  fontSize="14px"
-                                  className="opacityBox"
-                                >
-                                  {typeof ele?.userId === "object"
-                                    ? ele?.postId?.firstName
-                                    : ele?.firstName}{" "}
-                                  {typeof ele?.userId === "object"
-                                    ? ele?.postId?.lastName
-                                    : ele?.lastName}
-                                </Typography>
+                  {typeof ele.userId === "object" && (
+                    <Box borderRadius="0.75rem">
+                      {ele?.postId?.picturePath && (
+                        <PostImg
+                          setIsPostClicked={setIsPostClicked}
+                          setPostClickType={setPostClickType}
+                          setPostClickData={setPostClickData}
+                          ele={ele.postId}
+                          isRepost={true}
+                        />
+                      )}
 
-                                {ele.postId?.verified && (
-                                  <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                                )}
+                      <Box
+                        mt={ele?.postId?.picturePath ? "-17px" : "13px"}
+                        border="1px solid"
+                        borderColor={palette.neutral.light}
+                        p="10px"
+                      >
+                        {ele?.postId !== null ? (
+                          <Link
+                            to={`/profile/${ele?.postId?.userId}`}
+                            style={{ width: "fit-content", display: "block" }}
+                          >
+                            <Box gap="10px" display="flex" alignItems="center">
+                              <Box sx={{ cursor: "pointer" }}>
+                                <UserImage
+                                  image={
+                                    typeof ele?.userId === "object"
+                                      ? ele?.postId?.userPicturePath
+                                      : ele?.userPicturePath
+                                  }
+                                  size="40px"
+                                />
                               </Box>
 
-                              <Typography
-                                fontSize="11px"
-                                color={medium}
-                                display="flex"
-                                alignItems="center"
-                                gap="3px"
-                                sx={{ userSelect: "none" }}
-                              >
-                                {timeAgo(ele?.postId?.createdAt)}{" "}
-                                {ele?.postId?.privacy === "public" ? (
-                                  <Public sx={{ fontSize: "15px" }} />
-                                ) : ele?.postId?.privacy === "friends" ? (
-                                  <People sx={{ fontSize: "15px" }} />
-                                ) : (
-                                  <Lock sx={{ fontSize: "15px" }} />
-                                )}
-                                {ele?.edited && (
-                                  <Typography fontWeight="500" fontSize="11px">
-                                    | Edited
+                              <Box>
+                                <Box
+                                  sx={{ cursor: "pointer" }}
+                                  display="flex"
+                                  alignItems="center"
+                                  gap="4px"
+                                >
+                                  <Typography
+                                    fontSize="14px"
+                                    className="opacityBox"
+                                  >
+                                    {typeof ele?.userId === "object"
+                                      ? ele?.postId?.firstName
+                                      : ele?.firstName}{" "}
+                                    {typeof ele?.userId === "object"
+                                      ? ele?.postId?.lastName
+                                      : ele?.lastName}
                                   </Typography>
-                                )}
+
+                                  {ele.postId?.verified && (
+                                    <VerifiedOutlined
+                                      sx={{ color: "#15a1ed" }}
+                                    />
+                                  )}
+                                </Box>
+
+                                <Typography
+                                  fontSize="11px"
+                                  color={medium}
+                                  display="flex"
+                                  alignItems="center"
+                                  gap="3px"
+                                  sx={{ userSelect: "none" }}
+                                >
+                                  {timeAgo(ele?.postId?.createdAt)}{" "}
+                                  {ele?.postId?.privacy === "public" ? (
+                                    <Public sx={{ fontSize: "15px" }} />
+                                  ) : ele?.postId?.privacy === "friends" ? (
+                                    <People sx={{ fontSize: "15px" }} />
+                                  ) : (
+                                    <Lock sx={{ fontSize: "15px" }} />
+                                  )}
+                                  {ele?.edited && (
+                                    <Typography
+                                      fontWeight="500"
+                                      fontSize="11px"
+                                    >
+                                      | Edited
+                                    </Typography>
+                                  )}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Link>
+                        ) : (
+                          <Box display="flex" alignItems="center" gap="10px">
+                            <Lock sx={{ fontSize: "22px" }} />
+
+                            <Box>
+                              <Typography
+                                fontSize={isNonMobileScreens ? "15px" : "12px"}
+                                fontWeight="500"
+                              >
+                                This content isn&apos;t available right now
+                              </Typography>
+
+                              <Typography
+                                fontSize={isNonMobileScreens ? "12px" : "10px"}
+                                color={palette.text.secondary}
+                              >
+                                When this happens, it&apos;s usually because the
+                                owner only shared it with a small group of
+                                people, changed who can see it or it&apos;s been
+                                deleted.
                               </Typography>
                             </Box>
                           </Box>
-                        </Link>
-                      ) : (
-                        <Box display="flex" alignItems="center" gap="10px">
-                          <Lock sx={{ fontSize: "22px" }} />
+                        )}
 
-                          <Box>
+                        {ele?.postId?.description && (
+                          <>
                             <Typography
-                              fontSize={isNonMobileScreens ? "15px" : "12px"}
-                              fontWeight="500"
-                            >
-                              This content isn&apos;t available right now
-                            </Typography>
-
-                            <Typography
-                              fontSize={isNonMobileScreens ? "12px" : "10px"}
-                              color={palette.text.secondary}
-                            >
-                              When this happens, it&apos;s usually because the
-                              owner only shared it with a small group of people,
-                              changed who can see it or it&apos;s been deleted.
-                            </Typography>
-                          </Box>
-                        </Box>
-                      )}
-
-                      {ele?.postId?.description && (
-                        <>
-                          <Typography
-                            mt="10px"
-                            fontSize="15px"
-                            dangerouslySetInnerHTML={{
-                              __html: DOMPurify.sanitize(
-                                convertTextLink(
-                                  ele?.postId?.description?.length > 180
-                                    ? ele?.postId?.description.slice(0, 179)
-                                    : ele?.postId?.description
+                              mt="10px"
+                              fontSize="15px"
+                              dangerouslySetInnerHTML={{
+                                __html: DOMPurify.sanitize(
+                                  convertTextLink(
+                                    ele?.postId?.description?.length > 180
+                                      ? ele?.postId?.description.slice(0, 179)
+                                      : ele?.postId?.description
+                                  ),
+                                  {
+                                    ADD_ATTR: ["target", "rel"],
+                                  }
                                 ),
-                                {
-                                  ADD_ATTR: ["target", "rel"],
-                                }
-                              ),
-                            }}
-                          />
+                              }}
+                            />
 
-                          {ele?.postId?.description?.length > 180 && (
-                            <span
-                              style={{
-                                fontWeight: "600",
-                                cursor: "pointer",
-                                userSelect: "none",
-                              }}
-                              onClick={() => {
-                                setIsPostClicked(true),
-                                  setPostClickType("post"),
-                                  setPostClickData({
-                                    firstName: ele?.postId?.firstName,
-                                    lastName: ele?.postId?.lastName,
-                                    picturePath: ele?.postId?.picturePath,
-                                    userPicturePath:
-                                      ele?.postId?.userPicturePath,
-                                    description: ele?.postId?.description,
-                                    _id: ele?.postId?._id,
-                                    userId: ele?.postId?.userId,
-                                    verified: ele?.postId?.verified,
-                                  });
-                              }}
-                            >
-                              ...more
-                            </span>
-                          )}
-                        </>
-                      )}
+                            {ele?.postId?.description?.length > 180 && (
+                              <span
+                                style={{
+                                  fontWeight: "600",
+                                  cursor: "pointer",
+                                  userSelect: "none",
+                                }}
+                                onClick={() => {
+                                  setIsPostClicked(true),
+                                    setPostClickType("post"),
+                                    setPostClickData({
+                                      firstName: ele?.postId?.firstName,
+                                      lastName: ele?.postId?.lastName,
+                                      picturePath: ele?.postId?.picturePath,
+                                      userPicturePath:
+                                        ele?.postId?.userPicturePath,
+                                      description: ele?.postId?.description,
+                                      _id: ele?.postId?._id,
+                                      userId: ele?.postId?.userId,
+                                      verified: ele?.postId?.verified,
+                                    });
+                                }}
+                              >
+                                ...more
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Box>
                     </Box>
-                  </Box>
-                )}
+                  )}
 
-                <LikePost
-                  ele={ele}
-                  user={user}
-                  setShowLikes={setShowLikes}
-                  handleLike={handleLike}
-                  setIsPostClicked={setIsPostClicked}
-                  setPostClickData={setPostClickData}
-                  loading={clickLikeLoading}
-                  setPostInfo={setPostInfo}
-                  palette={palette}
-                  setIsShare={setIsShare}
-                  setPostClickType={setPostClickType}
-                />
-              </WidgetWrapper>
+                  <LikePost
+                    ele={ele}
+                    user={user}
+                    setShowLikes={setShowLikes}
+                    handleLike={handleLike}
+                    setIsPostClicked={setIsPostClicked}
+                    setPostClickData={setPostClickData}
+                    loading={clickLikeLoading}
+                    setPostInfo={setPostInfo}
+                    palette={palette}
+                    setIsShare={setIsShare}
+                    setPostClickType={setPostClickType}
+                  />
+                </WidgetWrapper>
+
+                {(posts.length > 4
+                  ? index === 3 || index === 30 || index === 80
+                  : index === 0) &&
+                  location.pathname === "/" && (
+                    <Box
+                      key={index + 123}
+                      my="20px"
+                      position="relative"
+                      height="252px"
+                    >
+                      <Typography
+                        textAlign="left"
+                        fontSize="18px"
+                        fontWeight="500"
+                        color={medium}
+                        mb="10px"
+                        mt="20px"
+                        sx={{ userSelect: "none" }}
+                      >
+                        suggested for you
+                      </Typography>
+
+                      <ArrowForward
+                        sx={{
+                          borderRadius: "50%",
+                          bgcolor: palette.neutral.light,
+                          width: "30px",
+                          height: "30px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "600",
+                          p: "5px",
+                          top: "50%",
+                          right: "-5px",
+                          position: "absolute",
+                          transform: "translateY(-50%)",
+                          zIndex: "1",
+                          cursor: "pointer",
+                          border: `1px solid ${palette.neutral.main}`,
+                          transition: ".3s",
+                          ":hover": {
+                            opacity: ".8",
+                          },
+                        }}
+                        onClick={() => {
+                          const scrollableDiv = document.querySelector(
+                            ".scrollable" + index
+                          );
+
+                          scrollableDiv.scrollBy({
+                            top: 0,
+                            left: scrollableDiv.clientWidth,
+                            behavior: "smooth",
+                          });
+                        }}
+                      />
+
+                      <Box
+                        display="flex"
+                        gap="10px"
+                        overflow="auto"
+                        maxWidth="100%"
+                        position="absolute"
+                        sx={{ scrollbarWidth: "none" }}
+                        className={`scrollable${index}`}
+                      >
+                        {followSuggestions?.map((fol, followIndex) => {
+                          return (
+                            <Link
+                              to={`/profile/${fol?._id}`}
+                              key={followIndex}
+                              target="_blank"
+                            >
+                              <Box
+                                display="flex"
+                                gap="12px"
+                                alignItems="center"
+                                justifyContent="center"
+                                flexDirection="column"
+                                width="150px"
+                                p="15px 10px"
+                                borderRadius="9px"
+                                bgcolor={palette.background.alt}
+                              >
+                                <UserImage image={fol.picturePath} size="80" />
+
+                                <Box textAlign="center">
+                                  <Box
+                                    display={fol.verified ? "flex" : "unset"}
+                                    gap="2px"
+                                    alignItems="center"
+                                  >
+                                    <Typography
+                                      maxWidth="100px"
+                                      fontSize="14px"
+                                      overflow="hidden"
+                                      textOverflow="ellipsis"
+                                      whiteSpace="nowrap"
+                                      textAlign="center"
+                                    >
+                                      {fol.firstName} {fol.lastName}
+                                    </Typography>
+
+                                    {fol.verified && (
+                                      <VerifiedOutlined
+                                        sx={{ color: "#15a1ed" }}
+                                      />
+                                    )}
+                                  </Box>
+
+                                  <Typography
+                                    fontSize="12px"
+                                    color={medium}
+                                    overflow="hidden"
+                                    textOverflow="ellipsis"
+                                    whiteSpace="nowrap"
+                                    maxWidth="100px"
+                                    textAlign="center"
+                                  >
+                                    @{fol.username}
+                                  </Typography>
+                                </Box>
+
+                                <Button
+                                  fullWidth
+                                  sx={{
+                                    backgroundColor: fol?.isFollowed
+                                      ? palette.neutral.light
+                                      : "rgb(0 151 250)",
+                                    color: fol?.isFollowed
+                                      ? palette.neutral.main
+                                      : "white",
+                                    transition: ".3s",
+                                    "&:hover": {
+                                      opacity: "0.8",
+                                      backgroundColor: fol?.isFollowed
+                                        ? "white"
+                                        : "rgb(0 151 250)",
+                                    },
+                                  }}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleFollow(fol._id);
+                                  }}
+                                  disabled={followLoadingId === fol._id}
+                                >
+                                  {followLoadingId === fol._id
+                                    ? "Loading..."
+                                    : fol?.isFollowed
+                                    ? "Followed"
+                                    : "Follow"}
+                                </Button>
+                              </Box>
+                            </Link>
+                          );
+                        })}
+                      </Box>
+
+                      <ArrowBack
+                        sx={{
+                          borderRadius: "50%",
+                          bgcolor: palette.neutral.light,
+                          width: "30px",
+                          height: "30px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "600",
+                          p: "5px",
+                          top: "50%",
+                          left: "-5px",
+                          position: "absolute",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                          zIndex: "1",
+                          border: `1px solid ${palette.neutral.main}`,
+                          transition: ".3s",
+                          ":hover": {
+                            opacity: ".8",
+                          },
+                        }}
+                        onClick={() => {
+                          const scrollableDiv = document.querySelector(
+                            ".scrollable" + index
+                          );
+
+                          scrollableDiv.scrollBy({
+                            top: 0,
+                            left: -scrollableDiv.clientWidth,
+                            behavior: "smooth",
+                          });
+                        }}
+                      />
+                    </Box>
+                  )}
+              </Box>
             );
           })}
 
