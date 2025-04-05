@@ -31,6 +31,14 @@ export const followUser = async (req, res) => {
 
       followResult = null;
 
+      await User.findByIdAndUpdate(userId, {
+        $inc: { followersCount: -1 },
+      });
+
+      await User.findByIdAndUpdate(myId, {
+        $inc: { followingCount: -1 },
+      });
+
       await Notification.deleteMany({
         type: "follow",
         receiverId: userId,
@@ -45,6 +53,14 @@ export const followUser = async (req, res) => {
       followResult = await follow.save();
 
       const firstName = await User.findById(myId, "firstName");
+
+      await User.findByIdAndUpdate(userId, {
+        $inc: { followersCount: 1 },
+      });
+
+      await User.findByIdAndUpdate(myId, {
+        $inc: { followingCount: 1 },
+      });
 
       const notification = new Notification({
         type: "follow",

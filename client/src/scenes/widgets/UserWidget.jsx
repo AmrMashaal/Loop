@@ -39,6 +39,7 @@ const UserWidget = ({ userId, picturePath }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
+ 
         setTheUser(data);
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV === "development") {

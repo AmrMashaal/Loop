@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema(
     },
     occupation: {type: String, maxlength: 50},
     location: String,
+    followersCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -443,7 +443,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
                   width="200px"
                   position="absolute"
                   top="35px"
-                  left={!isMobileScreens && "9%"}
+                  left={!isMobileScreens && "40%"}
                   display="flex"
                   gap="10px"
                   bgcolor={palette.neutral.light}

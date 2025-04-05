@@ -14,6 +14,7 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
   const [postLoading, setPostLoading] = useState(true);
   const [postClickType, setPostClickType] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
+  const [followSuggestions, setFollowSuggestions] = useState([]);
   const [postClickData, setPostClickData] = useState({
     picturePath: "",
     firstName: "",
@@ -52,14 +53,19 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
         }
       );
 
-      const newPosts = await response.json();
+      const data = await response.json();
+
+
+      if (pageNumber === 1 && data?.suggestions) {
+        setFollowSuggestions(data.suggestions);
+      }
 
       if (reset) {
-        setPosts(uiqueIt(newPosts));
+        setPosts(uiqueIt(data.posts));
       } else if (newPostsData.length === 0) {
-        setPosts(uiqueIt([...posts, ...newPosts]));
+        setPosts(uiqueIt([...posts, ...data.posts]));
       } else {
-        setPosts(uiqueIt([...posts, ...newPosts, ...newPostsData]));
+        setPosts(uiqueIt([...posts, ...data.posts, ...newPostsData]));
       }
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -122,6 +128,8 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
         postLoading={postLoading}
         socket={socket}
         setPostClickType={setPostClickType}
+        followSuggestions={followSuggestions}
+        setFollowSuggestions={setFollowSuggestions}
       />
     </Box>
   );

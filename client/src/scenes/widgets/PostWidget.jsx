@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { IconButton, Typography } from "@mui/material";
+import { Button, IconButton, Typography } from "@mui/material";
 import {
   VerifiedOutlined,
   MoreHoriz,
@@ -7,6 +7,8 @@ import {
   Public,
   Lock,
   People,
+  ArrowBack,
+  ArrowForward,
 } from "@mui/icons-material";
 import { Box, useMediaQuery, useTheme } from "@mui/system";
 import { useLocation, useParams } from "react-router-dom";
@@ -36,6 +38,8 @@ const PostWidget = ({
   setIsPostClicked,
   postLoading,
   setPostClickType,
+  followSuggestions,
+  setFollowSuggestions,
 }) => {
   const [showLikes, setShowLikes] = useState(false);
   const [likesLoading, setLikesLoading] = useState(false);
@@ -47,6 +51,7 @@ const PostWidget = ({
   const [isDots, setIsDots] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [postWhoDeleted, setPostWhoDeleted] = useState(null);
+  const [followLoadingId, setFollowLoadingId] = useState(null);
   const [postInfo, setPostInfo] = useState({ postId: null, userId: null });
   const [likeList, setLikeList] = useState({});
   const [clickLikeLoading, setClickLikeLoading] = useState({
@@ -363,6 +368,36 @@ const PostWidget = ({
     }
   };
 
+  const handleFollow = async (followedUser) => {
+    setFollowLoadingId(followedUser);
+
+    try {
+      const response = await fetch(`/api/follow/${followedUser}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      setFollowSuggestions((prev) => {
+        return prev.map((ele) => {
+          return ele._id === followedUser
+            ? { ...ele, isFollowed: Boolean(data) }
+            : ele;
+        });
+      });
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
+    } finally {
+      setFollowLoadingId(null);
+    }
+  };
+
   // eslint-disable-next-line react/prop-types
   return (
     <>
@@ -372,6 +407,205 @@ const PostWidget = ({
             const textAddition = ele?.textAddition
               ? JSON.parse(ele?.textAddition)
               : "";
+
+            if (
+              (posts.length > 4
+                ? index === 3 || index === 30 || index === 80
+                : index === 0) &&
+              location.pathname === "/"
+            ) {
+              return (
+                <Box
+                  key={index + 123}
+                  my="20px"
+                  position="relative"
+                  height="252px"
+                >
+                  <Typography
+                    textAlign="left"
+                    fontSize="18px"
+                    fontWeight="500"
+                    color={medium}
+                    mb="10px"
+                    mt="20px"
+                    sx={{ userSelect: "none" }}
+                  >
+                    suggested for you
+                  </Typography>
+
+                  <ArrowForward
+                    sx={{
+                      borderRadius: "50%",
+                      bgcolor: palette.neutral.light,
+                      width: "30px",
+                      height: "30px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "600",
+                      p: "5px",
+                      top: "50%",
+                      right: "-5px",
+                      position: "absolute",
+                      transform: "translateY(-50%)",
+                      zIndex: "1",
+                      cursor: "pointer",
+                      border: `1px solid ${palette.neutral.main}`,
+                      transition: ".3s",
+                      ":hover": {
+                        opacity: ".8",
+                      },
+                    }}
+                    onClick={() => {
+                      const scrollableDiv = document.querySelector(
+                        ".scrollable" + index
+                      );
+
+                      scrollableDiv.scrollBy({
+                        top: 0,
+                        left: scrollableDiv.clientWidth,
+                        behavior: "smooth",
+                      });
+                    }}
+                  />
+
+                  <Box
+                    display="flex"
+                    gap="10px"
+                    overflow="auto"
+                    maxWidth="100%"
+                    position="absolute"
+                    sx={{ scrollbarWidth: "none" }}
+                    className={`scrollable${index}`}
+                  >
+                    {followSuggestions?.map((fol, followIndex) => {
+                      return (
+                        <Link
+                          to={`/profile/${fol?._id}`}
+                          key={followIndex}
+                          target="_blank"
+                        >
+                          <Box
+                            display="flex"
+                            gap="12px"
+                            alignItems="center"
+                            justifyContent="center"
+                            flexDirection="column"
+                            width="150px"
+                            p="15px 10px"
+                            borderRadius="9px"
+                            bgcolor={palette.background.alt}
+                          >
+                            <UserImage image={fol.picturePath} size="80" />
+
+                            <Box textAlign="center">
+                              <Box
+                                display={fol.verified ? "flex" : "unset"}
+                                gap="2px"
+                                alignItems="center"
+                              >
+                                <Typography
+                                  maxWidth="100px"
+                                  fontSize="14px"
+                                  overflow="hidden"
+                                  textOverflow="ellipsis"
+                                  whiteSpace="nowrap"
+                                  textAlign="center"
+                                >
+                                  {fol.firstName} {fol.lastName}
+                                </Typography>
+
+                                {fol.verified && (
+                                  <VerifiedOutlined sx={{ color: "#15a1ed" }} />
+                                )}
+                              </Box>
+
+                              <Typography
+                                fontSize="12px"
+                                color={medium}
+                                overflow="hidden"
+                                textOverflow="ellipsis"
+                                whiteSpace="nowrap"
+                                maxWidth="100px"
+                                textAlign="center"
+                              >
+                                @{fol.username}
+                              </Typography>
+                            </Box>
+
+                            <Button
+                              fullWidth
+                              sx={{
+                                backgroundColor: fol?.isFollowed
+                                  ? palette.neutral.light
+                                  : "rgb(0 151 250)",
+                                color: fol?.isFollowed
+                                  ? palette.neutral.main
+                                  : "white",
+                                transition: ".3s",
+                                "&:hover": {
+                                  opacity: "0.8",
+                                  backgroundColor: fol?.isFollowed
+                                    ? "white"
+                                    : "rgb(0 151 250)",
+                                },
+                              }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleFollow(fol._id);
+                              }}
+                              disabled={followLoadingId === fol._id}
+                            >
+                              {followLoadingId === fol._id
+                                ? "Loading..."
+                                : fol?.isFollowed
+                                ? "Followed"
+                                : "Follow"}
+                            </Button>
+                          </Box>
+                        </Link>
+                      );
+                    })}
+                  </Box>
+
+                  <ArrowBack
+                    sx={{
+                      borderRadius: "50%",
+                      bgcolor: palette.neutral.light,
+                      width: "30px",
+                      height: "30px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: "600",
+                      p: "5px",
+                      top: "50%",
+                      left: "-5px",
+                      position: "absolute",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      zIndex: "1",
+                      border: `1px solid ${palette.neutral.main}`,
+                      transition: ".3s",
+                      ":hover": {
+                        opacity: ".8",
+                      },
+                    }}
+                    onClick={() => {
+                      const scrollableDiv = document.querySelector(
+                        ".scrollable" + index
+                      );
+
+                      scrollableDiv.scrollBy({
+                        top: 0,
+                        left: -scrollableDiv.clientWidth,
+                        behavior: "smooth",
+                      });
+                    }}
+                  />
+                </Box>
+              );
+            }
 
             return (
               <WidgetWrapper mb="10px" key={index}>
@@ -903,28 +1137,31 @@ const PostWidget = ({
 
       {postLoading && <PostSkeleton />}
 
-      {!postLoading && posts?.length === 0 && location.pathname === "/" && (
-        <Box
-          display="flex"
-          alignItems="center"
-          flexDirection="column"
-          mb="40px"
-          sx={{ userSelect: "none" }}
-        >
-          <img
-            src="\assets\repair.svg"
-            alt=""
-            width={isNonMobileScreens ? "400" : "250"}
-            style={{ pointerEvents: "none" }}
-          />
+      {!postLoading &&
+        posts?.length === 0 &&
+        !followSuggestions &&
+        location.pathname === "/" && (
+          <Box
+            display="flex"
+            alignItems="center"
+            flexDirection="column"
+            mb="40px"
+            sx={{ userSelect: "none" }}
+          >
+            <img
+              src="\assets\repair.svg"
+              alt=""
+              width={isNonMobileScreens ? "400" : "250"}
+              style={{ pointerEvents: "none" }}
+            />
 
-          <Typography fontSize="24px">Come back later</Typography>
+            <Typography fontSize="24px">Come back later</Typography>
 
-          <Typography color={palette.text.secondary} fontSize="15px">
-            Sorry there is a problem with the server
-          </Typography>
-        </Box>
-      )}
+            <Typography color={palette.text.secondary} fontSize="15px">
+              Sorry there is a problem with the server
+            </Typography>
+          </Box>
+        )}
 
       {!postLoading &&
         posts?.length === 0 &&

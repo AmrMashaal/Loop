@@ -32,6 +32,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
   const [addLoading, setAddLoading] = useState(false);
   const [isFriendSettings, setIsFriendSettings] = useState(false);
   const [isFollower, setIsFollower] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
   const [friendship, setFriendship] = useState({});
   const [friendSettings, setFriendSettings] = useState("");
   const [img, setImg] = useState("");
@@ -218,6 +219,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
   };
 
   const handleFollow = async () => {
+    setFollowLoading(true);
     try {
       const response = await fetch(`/api/follow/${userInfo?._id}`, {
         method: "POST",
@@ -234,6 +236,8 @@ const ProfileInfo = ({ userInfo, userId }) => {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
       }
+    } finally {
+      setFollowLoading(false);
     }
   };
 
@@ -542,6 +546,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                             : "#c1c1c1",
                         }}
                         onClick={handleFollow}
+                        disabled={followLoading}
                       >
                         {isFollower ? <Notifications /> : <NotificationAdd />}
 

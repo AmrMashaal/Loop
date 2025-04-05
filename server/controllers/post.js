@@ -211,7 +211,9 @@ export const createPost = async (req, res) => {
 
 export const getFeedPosts = async (req, res) => {
   const { page, limit = 5 } = req.query;
-  const { id } = req.user;
+  const id = req.user.id;
+
+  let posts;
 
   try {
     const friendsPromise = await Friend.find({
@@ -231,23 +233,29 @@ export const getFeedPosts = async (req, res) => {
 
     const followingIds = following.map((f) => f.following.toString());
 
-    let posts = await Post.find({
-      $or: [
-        { privacy: "friends", userId: { $in: friendsIds } },
-        {
-          privacy: "public",
-          userId: { $in: [...friendsIds, ...followingIds] },
-        },
-      ],
-    })
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+    if (followingIds.length > 0 || friendsIds.length > 0) {
+      posts = await Post.find({
+        $or: [
+          { privacy: "friends", userId: { $in: friendsIds } },
+          {
+            privacy: "public",
+            userId: { $in: [...friendsIds, ...followingIds] },
+          },
+        ],
+      })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
+    } else {
+      posts = await Post.find({
+        _id: { $in: ["67c0e95cc6489e642bf59fee", "67bfc09c888321a31b7122ec"] },
+      }).sort({ createdAt: 1 });
+    }
 
     const postsWithIsLiked = await Promise.all(
       posts.map(async (post) => {
         const isLiked = await Like.findOne({
-          userId: req.user.id,
+          userId: id,
           postId: post._id,
         });
 
@@ -276,14 +284,14 @@ export const getFeedPosts = async (req, res) => {
     const repostsWithIsLiked = await Promise.all(
       reposts.map(async (rep) => {
         const isLiked = await Like.findOne({
-          userId: req.user.id,
+          userId: id,
           repostId: rep._id,
         });
 
         const postId =
           rep?.postId?.privacy === "friends" &&
           !friendsIds.includes(rep.postId.userId.toString()) &&
-          rep.postId.userId.toString() !== req.user.id
+          rep.postId.userId.toString() !== id
             ? null
             : rep.postId;
 
@@ -291,50 +299,25 @@ export const getFeedPosts = async (req, res) => {
       })
     );
 
-    posts = [...postsWithIsLiked, ...repostsWithIsLiked].sort(
-      (a, b) => b.createdAt - a.createdAt
-    );
+    posts = [...postsWithIsLiked, ...repostsWithIsLiked];
+
+    if (followingIds.length > 0 || friendsIds.length > 0) {
+      posts = posts.sort((a, b) => b.createdAt - a.createdAt);
+    }
 
     if (page === "1") {
-      const friendSuggesions = await Friend.find({
-        $or: [
-          {
-            sender: friendsIds[Math.floor(Math.random() * friendsIds.length)],
-            status: "accepted",
-          },
-          {
-            receiver: friendsIds[Math.floor(Math.random() * friendsIds.length)],
-            status: "accepted",
-          },
-          {
-            sender: friendsIds[Math.floor(Math.random() * friendsIds.length)],
-            status: "pending",
-          },
-          {
-            receiver: friendsIds[Math.floor(Math.random() * friendsIds.length)],
-            status: "pending",
-          },
-        ],
+      const followSuggestion = await User.find({
+        _id: { $nin: [id, ...friendsIds, ...followingIds] },
       })
-        .limit(5)
-        .populate("sender receiver", "firstName lastName picturePath _id");
+        .sort({ verified: -1, followersCount: -1 })
+        .limit(30);
 
-      const friendSuggestionsWithFollow = await Follow.find({
-        $or: [
-          {
-            follower: friendsIds[Math.floor(Math.random() * friendsIds.length)],
-          },
-          {
-            follower: following[Math.floor(Math.random() * following.length)],
-          },
-        ],
-      })
-        .limit(5)
-        .populate("following", "firstName lastName picturePath _id");
-
-      const mapFriendSuggestions = friendSuggesions.map((fr) => {
-        return fr.sender._id.toString()
-      });
+      posts = {
+        suggestions: followSuggestion,
+        posts: posts,
+      };
+    } else {
+      posts = { posts };
     }
 
     res.status(200).json(posts);

@@ -199,170 +199,117 @@ const ProfileAbout = ({ userInfo }) => {
               </Typography>
 
               {userInfo?.links?.facebook && (
-                <Box display="flex" alignItems="center" mt="15px">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap="4px"
-                    color="text.secondary"
-                  >
-                    <Facebook />
-
-                    <Typography fontSize="15px" sx={{ userSelect: "none" }}>
-                      facebook :
-                    </Typography>
+                <Link
+                  to={userInfo?.links?.facebook}
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                >
+                  <Box display="flex" alignItems="center" mt="15px">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap="4px"
+                      color="text.secondary"
+                    >
+                      <Facebook />
+                      Facebook
+                    </Box>
                   </Box>
-
-                  <Link
-                    fontSize="17px"
-                    to={userInfo?.links?.facebook}
-                    target="_blank"
-                    style={{
-                      color: "#2f9cd0",
-                      fontWeight: "500",
-                      textDecoration: "underline",
-                      marginLeft: "5px",
-                      whiteSpace: "nowrap",
-                      maxWidth: "180px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {userInfo?.links?.facebook}
-                  </Link>
-                </Box>
+                </Link>
               )}
 
               {userInfo?.links?.instagram && (
-                <Box display="flex" alignItems="center" mt="15px">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap="4px"
-                    color="text.secondary"
-                  >
-                    <Instagram />
-
-                    <Typography fontSize="15px" sx={{ userSelect: "none" }}>
-                      instagram :
-                    </Typography>
+                <Link
+                  to={userInfo?.links?.instagram}
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                >
+                  <Box display="flex" alignItems="center" mt="15px">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap="4px"
+                      color="text.secondary"
+                    >
+                      <Instagram />
+                      Instagram
+                    </Box>
                   </Box>
-
-                  <Link
-                    fontSize="17px"
-                    to={userInfo?.links?.instagram}
-                    target="_blank"
-                    style={{
-                      color: "#2f9cd0",
-                      fontWeight: "500",
-                      textDecoration: "underline",
-                      marginLeft: "5px",
-                      whiteSpace: "nowrap",
-                      maxWidth: "180px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {userInfo?.links?.instagram}
-                  </Link>
-                </Box>
+                </Link>
               )}
 
               {userInfo?.links?.linkedin && (
-                <Box display="flex" alignItems="center" mt="15px">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap="4px"
-                    color="text.secondary"
-                  >
-                    <LinkedIn />
-
-                    <Typography fontSize="15px" sx={{ userSelect: "none" }}>
-                      linkedin :
-                    </Typography>
+                <Link
+                  to={userInfo?.links?.linkedin}
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                >
+                  <Box display="flex" alignItems="center" mt="15px">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap="4px"
+                      color="text.secondary"
+                    >
+                      <LinkedIn />
+                      Linkedin
+                    </Box>
                   </Box>
-
-                  <Link
-                    fontSize="17px"
-                    to={`${userInfo?.links?.linkedin}`}
-                    target="_blank"
-                    style={{
-                      color: "#2f9cd0",
-                      fontWeight: "500",
-                      textDecoration: "underline",
-                      marginLeft: "5px",
-                      whiteSpace: "nowrap",
-                      maxWidth: "180px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {userInfo?.links?.linkedin}
-                  </Link>
-                </Box>
+                </Link>
               )}
 
               {userInfo?.links?.x && (
-                <Box display="flex" alignItems="center" mt="15px">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap="4px"
-                    color="text.secondary"
-                  >
-                    <X />:
+                <Link
+                  to={userInfo?.links?.x}
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                >
+                  <Box display="flex" alignItems="center" mt="15px">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap="4px"
+                      color="text.secondary"
+                    >
+                      <X />X
+                    </Box>
                   </Box>
-
-                  <Link
-                    fontSize="17px"
-                    to={userInfo?.links?.x}
-                    target="_blank"
-                    style={{
-                      color: "#2f9cd0",
-                      fontWeight: "500",
-                      textDecoration: "underline",
-                      marginLeft: "5px",
-                      whiteSpace: "nowrap",
-                      maxWidth: "180px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {userInfo?.links?.x}
-                  </Link>
-                </Box>
+                </Link>
               )}
 
               {userInfo?.links?.youtube && (
-                <Box display="flex" alignItems="center" mt="15px">
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    gap="4px"
-                    color="text.secondary"
-                  >
-                    <YouTube />:
+                <Link
+                  to={userInfo?.links?.youtube}
+                  style={{
+                    userSelect: "none",
+                    fontWeight: "bold",
+                  }}
+                  target="_blank"
+                >
+                  <Box display="flex" alignItems="center" mt="15px">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap="4px"
+                      color="text.secondary"
+                    >
+                      <YouTube />
+                      YouTube
+                    </Box>
                   </Box>
-
-                  <Link
-                    fontSize="17px"
-                    to={userInfo?.links?.youtube}
-                    target="_blank"
-                    style={{
-                      color: "#2f9cd0",
-                      fontWeight: "500",
-                      textDecoration: "underline",
-                      marginLeft: "5px",
-                      whiteSpace: "nowrap",
-                      maxWidth: "180px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {userInfo?.links?.youtube}
-                  </Link>
-                </Box>
+                </Link>
               )}
             </Box>
           )}
