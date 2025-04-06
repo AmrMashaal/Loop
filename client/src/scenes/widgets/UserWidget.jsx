@@ -39,7 +39,7 @@ const UserWidget = ({ userId, picturePath }) => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
- 
+
         setTheUser(data);
       } catch (error) {
         if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -174,16 +174,18 @@ const UserWidget = ({ userId, picturePath }) => {
                 </Typography>
               </Box>
 
-              <Box display="flex" alignItems="center" gap="10px">
-                <WorkOutlineOutlined style={{ fontSize: "26px" }} />
-                <Typography
-                  color={medium}
-                  textTransform="capitalize"
-                  fontSize="14px"
-                >
-                  {theUser?.occupation}
-                </Typography>
-              </Box>
+              {theUser?.occupation && (
+                <Box display="flex" alignItems="center" gap="10px">
+                  <WorkOutlineOutlined style={{ fontSize: "26px" }} />
+                  <Typography
+                    color={medium}
+                    textTransform="capitalize"
+                    fontSize="14px"
+                  >
+                    {theUser?.occupation}
+                  </Typography>
+                </Box>
+              )}
             </Box>
 
             <Divider />
