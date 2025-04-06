@@ -106,8 +106,10 @@ const ProfileSettings = ({
     occupation: yup
       .string()
       .max(50)
-      .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters")
-      .required("Please select a location"),
+      .matches(
+        /^\p{L}+(\s\p{L}+)*$/u,
+        "You can just add alphabetic characters"
+      ),
     background: yup
       .mixed()
       .notRequired()

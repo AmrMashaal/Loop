@@ -376,7 +376,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                 <Typography
                   color={mode === "light" ? "#5c5c5c" : "#c1c1c1"}
                   fontSize="17px"
-                  m="5px 0 -6px"
+                  m="-2px 0 8px"
                 >
                   <span style={{ userSelect: "none" }}>@</span>
                   {userInfo?._id === user._id
@@ -384,28 +384,29 @@ const ProfileInfo = ({ userInfo, userId }) => {
                     : userInfo?.username}
                 </Typography>
 
-                <Box
-                  display="flex"
-                  gap={isNonMobileScreens ? "20px" : "4px"}
-                  mt="9px"
-                  flexDirection={isNonMobileScreens ? "row" : "column"}
-                >
+                {userInfo?.occupation && (
                   <Box
                     display="flex"
-                    alignItems="center"
-                    gap="6px"
-                    color={medium}
-                    justifyContent={isNonMobileScreens ? undefined : "center"}
+                    gap={isNonMobileScreens ? "20px" : "4px"}
+                    mt="9px"
+                    flexDirection={isNonMobileScreens ? "row" : "column"}
                   >
-                    <WorkOutlineOutlined />
-                    <Typography fontSize="17px">
-                      {userInfo?._id === user._id
-                        ? user.occupation
-                        : userInfo?.occupation}
-                    </Typography>
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap="6px"
+                      color={medium}
+                      justifyContent={isNonMobileScreens ? undefined : "center"}
+                    >
+                      <WorkOutlineOutlined />
+                      <Typography fontSize="17px">
+                        {userInfo?._id === user._id
+                          ? user.occupation
+                          : userInfo?.occupation}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
-
+                )}
                 <Box
                   display="flex"
                   alignItems="center"
