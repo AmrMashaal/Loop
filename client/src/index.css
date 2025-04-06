@@ -285,3 +285,19 @@ li {
   height: 100%;
   background-color: inherit;
 }
+
+.authInputes > div > fieldset {
+  border-radius: 50px;
+  -webkit-border-radius: 50px;
+  -moz-border-radius: 50px;
+  -ms-border-radius: 50px;
+  -o-border-radius: 50px;
+}
+
+.authInputes label {
+  padding-left: 10px;
+}
+
+.authInputes > div > input {
+  padding-left: 30px;
+}
