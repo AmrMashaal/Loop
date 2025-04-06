@@ -215,6 +215,10 @@ const ProfileAbout = ({ userInfo }) => {
                       alignItems="center"
                       gap="4px"
                       color="text.secondary"
+                      sx={{
+                        transition: ".3s",
+                        ":hover": { color: "black" },
+                      }}
                     >
                       <Facebook />
                       Facebook
@@ -238,6 +242,10 @@ const ProfileAbout = ({ userInfo }) => {
                       alignItems="center"
                       gap="4px"
                       color="text.secondary"
+                      sx={{
+                        transition: ".3s",
+                        ":hover": { color: "black" },
+                      }}
                     >
                       <Instagram />
                       Instagram
@@ -261,6 +269,10 @@ const ProfileAbout = ({ userInfo }) => {
                       alignItems="center"
                       gap="4px"
                       color="text.secondary"
+                      sx={{
+                        transition: ".3s",
+                        ":hover": { color: "black" },
+                      }}
                     >
                       <LinkedIn />
                       Linkedin
@@ -284,6 +296,10 @@ const ProfileAbout = ({ userInfo }) => {
                       alignItems="center"
                       gap="4px"
                       color="text.secondary"
+                      sx={{
+                        transition: ".3s",
+                        ":hover": { color: "black" },
+                      }}
                     >
                       <X />X
                     </Box>
@@ -306,6 +322,10 @@ const ProfileAbout = ({ userInfo }) => {
                       alignItems="center"
                       gap="4px"
                       color="text.secondary"
+                      sx={{
+                        transition: ".3s",
+                        ":hover": { color: "black" },
+                      }}
                     >
                       <YouTube />
                       YouTube
