@@ -161,23 +161,25 @@ const ProfileAbout = ({ userInfo }) => {
               <Typography fontSize="17px">{userInfo?.location}</Typography>
             </Box>
 
-            <Box
-              display="flex"
-              gap="8px"
-              alignItems="center"
-              mb="17px"
-              sx={{ gridColumn: "span 4" }}
-            >
-              <Typography
-                fontSize="15px"
-                sx={{ userSelect: "none" }}
-                color="text.secondary"
+            {userInfo?.occupation && (
+              <Box
+                display="flex"
+                gap="8px"
+                alignItems="center"
+                mb="17px"
+                sx={{ gridColumn: "span 4" }}
               >
-                occupation :
-              </Typography>
+                <Typography
+                  fontSize="15px"
+                  sx={{ userSelect: "none" }}
+                  color="text.secondary"
+                >
+                  occupation :
+                </Typography>
 
-              <Typography fontSize="17px">{userInfo?.occupation}</Typography>
-            </Box>
+                <Typography fontSize="17px">{userInfo?.occupation}</Typography>
+              </Box>
+            )}
           </Box>
 
           <Divider />
