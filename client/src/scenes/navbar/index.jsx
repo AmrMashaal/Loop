@@ -481,76 +481,6 @@ const Navbar = ({ isProfile }) => {
           </IconButton>
 
           <Box
-            p="3px"
-            width="130px"
-            height="36px"
-            mr="10px"
-            bgcolor={
-              isProfile && returnNavColor && mode === "light"
-                ? "#f0f0f0b3"
-                : isProfile && returnNavColor && mode === "dark"
-                ? "#33333391"
-                : neutrallLight
-            }
-            borderRadius="50px"
-            position="relative"
-            boxShadow="inset -1px 2px 3px 2px #00000045"
-            outline={`${
-              isProfile && returnNavColor && mode === "light"
-                ? "#f0f0f0b3"
-                : isProfile && returnNavColor && mode === "dark"
-                ? "#33333391"
-                : neutrallLight
-            } solid 5px`}
-            sx={{ cursor: "pointer" }}
-            onClick={() => dispatch(setMode())}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
-                backgroundColor: mode === "dark" ? "#3e3e3e" : neutrallLight,
-                transition: ".3s",
-                left: mode === "dark" ? "0" : "89px",
-                boxShadow: "0px 0px 10px 0px #00000054",
-                width: "41px",
-                height: "41px",
-                borderRadius: "50%",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: "11",
-                ":hover": {
-                  background: mode === "dark" ? neutrallLight : "#dedede",
-                },
-              }}
-            >
-              {theme.palette.mode === "light" ? (
-                <LightMode sx={{ fontSize: "25px" }} />
-              ) : (
-                <DarkMode sx={{ fontSize: "25px" }} />
-              )}
-            </Box>
-
-            <Typography
-              position="absolute"
-              top="50%"
-              left={mode === "dark" ? "57px" : "10px"}
-              textTransform="uppercase"
-              fontSize="11px"
-              sx={{
-                transform: "translateY(-50%)",
-                transition: ".3s",
-                userSelect: "none",
-              }}
-            >
-              {mode === "dark" ? "dark mode" : "light mode"}
-            </Typography>
-          </Box>
-
-          <Box
             sx={{ cursor: "pointer", userSelect: "none" }}
             position="relative"
             onClick={() => setIsClickProfile(true)}
@@ -638,31 +568,6 @@ const Navbar = ({ isProfile }) => {
           >
             <Search />
           </Box>
-
-          <Box
-            sx={{
-              width: "41px",
-              height: "41px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor:
-                isProfile && returnNavColor && mode === "light"
-                  ? "#F0F0F0"
-                  : isProfile && returnNavColor && mode === "dark"
-                  ? "#33333391"
-                  : undefined,
-              borderRadius: "50%",
-            }}
-            onClick={() => dispatch(setMode())}
-          >
-            {theme.palette.mode === "light" ? (
-              <LightMode sx={{ fontSize: "25px" }} />
-            ) : (
-              <DarkMode sx={{ fontSize: "25px" }} />
-            )}
-          </Box>
         </Box>
       )}
 
@@ -740,7 +645,10 @@ const Navbar = ({ isProfile }) => {
             left="0"
             boxShadow="6px 2px 20px 0 #0000002d"
             borderTop="1px solid #0000001f"
-            sx={{background: "radial-gradient(circle at top left, #4a366a4a, #2d1e4661)"}}
+            sx={{
+              background:
+                "radial-gradient(circle at top left, #4a366a4a, #2d1e4661)",
+            }}
             className="mobileNav"
           >
             <Box display="flex" justifyContent="space-around">
