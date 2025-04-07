@@ -26,6 +26,7 @@ const LikePost = ({
       sx={{ userSelect: "none" }}
       color={palette.text.secondary}
       mt={!ele?.picturePath && "10px"}
+      p="0px 10px 6px"
     >
       <FlexBetween gap="8px">
         <FlexBetween position="relative">

@@ -14,7 +14,6 @@ const UserImage = ({
   isActive,
 }) => {
   const theme = useTheme();
-  const alt = theme.palette.background.alt;
 
   const user = useSelector((state) => state.user);
   const { userId } = useParams();
@@ -33,7 +32,7 @@ const UserImage = ({
           objectFit: "cover",
           userSelect: "none",
           border: isProfile
-            ? `6px solid ${alt}`
+            ? `6px solid ${theme.palette.primary.dark}`
             : isNav && !isActive
             ? `2px solid white`
             : isActive

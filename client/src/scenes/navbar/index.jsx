@@ -254,13 +254,12 @@ const Navbar = ({ isProfile }) => {
     if (isProfile && returnNavColor) {
       return undefined;
     } else {
-      return mode === "dark" ? "#1a1a1a87" : "#ffffff82";
+      return "radial-gradient(circle at top left, #4a366a4a, #2d1e4661)";
     }
   };
 
   return (
     <FlexBetween
-      bgcolor={navBgColor}
       p="8px 30px"
       position="fixed"
       top="-1px"
@@ -273,6 +272,7 @@ const Navbar = ({ isProfile }) => {
             ? undefined
             : "-1px 11px 11px 0px #00000008",
         transition: isProfile ? ".3s" : undefined,
+        background: navBgColor(),
       }}
       className={!returnNavColor ? "navbarHolder" : ""}
     >
@@ -315,9 +315,9 @@ const Navbar = ({ isProfile }) => {
 
         {isNonMobileScreens && (
           <FlexBetween
-            backgroundColor={neutrallLight}
+            border={`1px solid ${theme.palette.primary.dark}`}
+            borderRadius="50px"
             padding="2px 38px 2px 7px"
-            borderRadius="9px"
             gap="3px"
             position="relative"
             sx={{
@@ -355,6 +355,7 @@ const Navbar = ({ isProfile }) => {
                   }
                 }}
                 placeholder="Search for users, posts"
+                sx={{ pl: "5px" }}
               />
               <IconButton
                 type="submit"
@@ -735,11 +736,11 @@ const Navbar = ({ isProfile }) => {
             width="100%"
             padding="5px 10px 10px"
             zIndex="10"
-            backgroundColor={mode === "light" ? "#ebebebb8" : "#1a1a1ade"}
             bottom="-3px"
             left="0"
             boxShadow="6px 2px 20px 0 #0000002d"
             borderTop="1px solid #0000001f"
+            sx={{background: "radial-gradient(circle at top left, #4a366a4a, #2d1e4661)"}}
             className="mobileNav"
           >
             <Box display="flex" justifyContent="space-around">
@@ -755,7 +756,7 @@ const Navbar = ({ isProfile }) => {
                       <Home
                         sx={{
                           fontSize: "25px",
-                          color: "#0dc6f2",
+                          color: theme.palette.primary.main,
                         }}
                       />
                     ) : (
@@ -764,7 +765,7 @@ const Navbar = ({ isProfile }) => {
                           fontSize: "25px",
                           color:
                             location.pathname === "/"
-                              ? "#0dc6f2"
+                              ? theme.palette.primary.main
                               : mode === "dark"
                               ? "#c4c4c4"
                               : "",

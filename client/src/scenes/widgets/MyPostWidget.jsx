@@ -173,8 +173,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
               sx={{
                 fontWeight: textAddition.value === "bold" && "bold",
 
-                bgcolor:
-                  textAddition.value !== "quotation" && palette.neutral.light,
                 borderRadius:
                   !post && textAddition.value !== "quotation" && "50px",
                 p: "14px 10px 14px 18px",
@@ -224,11 +222,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
                 alignItems="center"
                 textAlign="center"
                 borderRadius="10px"
-                bgcolor={
-                  textAddition.value === "quotation"
-                    ? "white"
-                    : palette.neutral.light
-                }
+                bgcolor="#54545438"
                 color={textAddition.value === "quotation" && "black"}
                 sx={{
                   userSelect: "none",
@@ -262,11 +256,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
                 width="50px"
                 textAlign="center"
                 borderRadius="10px"
-                bgcolor={
-                  textAddition.value === "bold"
-                    ? "white"
-                    : palette.neutral.light
-                }
+                bgcolor="#54545438"
                 color={textAddition.value === "bold" && "black"}
                 fontWeight="bold"
                 sx={{
@@ -296,11 +286,7 @@ const MyPostWidget = ({ picturePath, socket }) => {
                 alignItems="center"
                 textAlign="center"
                 borderRadius="10px"
-                bgcolor={
-                  textAddition.value === "uppercase"
-                    ? "white"
-                    : palette.neutral.light
-                }
+                bgcolor="#54545438"
                 color={textAddition.value === "uppercase" && "black"}
                 sx={{
                   userSelect: "none",

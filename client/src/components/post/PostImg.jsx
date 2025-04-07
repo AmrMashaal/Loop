@@ -3,7 +3,6 @@ const PostImg = ({
   setIsPostClicked,
   setPostClickData,
   ele,
-  isRepost,
   setPostClickType,
 }) => {
   return (
@@ -14,7 +13,6 @@ const PostImg = ({
         maxHeight: "560px",
         objectFit: "cover",
         margin: "10px 0 10px 0",
-        borderRadius: isRepost ? "0.75rem 0.75rem 0 0" : "0.75rem",
         cursor: "pointer",
         backgroundColor: "gray",
         userSelect: "none",
