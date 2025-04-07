@@ -254,7 +254,7 @@ const Navbar = ({ isProfile }) => {
     if (isProfile && returnNavColor) {
       return undefined;
     } else {
-      return mode === "dark" ? "#1a1a1a87" : "#ffffff82";
+      return mode === "dark" ? "#1a1a1a87" : "#f3f9ff85";
     }
   };
 
