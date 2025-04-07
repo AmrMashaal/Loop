@@ -481,6 +481,31 @@ const Navbar = ({ isProfile }) => {
           </IconButton>
 
           <Box
+            sx={{
+              width: "41px",
+              height: "41px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor:
+                isProfile && returnNavColor && mode === "light"
+                  ? "#F0F0F0"
+                  : isProfile && returnNavColor && mode === "dark"
+                  ? "#33333391"
+                  : undefined,
+              borderRadius: "50%",
+            }}
+            onClick={() => dispatch(setMode())}
+          >
+            {theme.palette.mode === "light" ? (
+              <LightMode sx={{ fontSize: "25px" }} />
+            ) : (
+              <DarkMode sx={{ fontSize: "25px" }} />
+            )}
+          </Box>
+
+          <Box
             sx={{ cursor: "pointer", userSelect: "none" }}
             position="relative"
             onClick={() => setIsClickProfile(true)}
@@ -567,6 +592,31 @@ const Navbar = ({ isProfile }) => {
             }}
           >
             <Search />
+          </Box>
+
+          <Box
+            sx={{
+              width: "41px",
+              height: "41px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              bgcolor:
+                isProfile && returnNavColor && mode === "light"
+                  ? "#F0F0F0"
+                  : isProfile && returnNavColor && mode === "dark"
+                  ? "#33333391"
+                  : undefined,
+              borderRadius: "50%",
+            }}
+            onClick={() => dispatch(setMode())}
+          >
+            {theme.palette.mode === "light" ? (
+              <LightMode sx={{ fontSize: "25px" }} />
+            ) : (
+              <DarkMode sx={{ fontSize: "25px" }} />
+            )}
           </Box>
         </Box>
       )}

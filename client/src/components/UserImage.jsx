@@ -51,13 +51,14 @@ const UserImage = ({
       {isOnline && user?._id !== userId && (
         <Tooltip arrow placement="top" title="Online">
           <Box
-            bgcolor="#00D5FA"
-            width={isProfile ? "15px" : "10px"}
-            height={isProfile ? "15px" : "10px"}
+            bgcolor="lightgreen"
+            width={isProfile ? "20px" : "15px"}
+            height={isProfile ? "20px" : "15px"}
             borderRadius="50%"
             position="absolute"
-            bottom="0"
-            right={isProfile ? "5px" : "3px"}
+            bottom={isProfile ? "0px" : "5px"}
+            right={isProfile ? "14px" : "0px"}
+            border="2px solid white"
           ></Box>
         </Tooltip>
       )}

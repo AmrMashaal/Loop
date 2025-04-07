@@ -18,12 +18,10 @@ export const colorTokens = {
   primary: {
     50: "#E6FBFF",
     100: "#CCF7FE",
-    200: "#99EEFD",
+    200: "#692b8a",
     300: "#66E6FC",
     400: "#33DDFB",
-    500: "#00D5FA",
-    500: "#00D5FA",
-06B7D",:0353F",
+    500: "#a847dc",
     900: "#001519",
   },
 };
@@ -34,12 +32,6 @@ export const themeSettings = (mode) => {
       mode: mode,
       ...(mode === "dark"
         ? {
- {
- {
- {
- {
-  {
- {
             // palette values for dark mode
             primary: {
               dark: colorTokens.primary[200],
@@ -57,7 +49,9 @@ export const themeSettings = (mode) => {
               default: colorTokens.grey[900],
               alt: colorTokens.grey[800],
             },
-          }  // palette values for light mode
+          }
+        : {
+            // palette values for light mode
             primary: {
               dark: colorTokens.primary[700],
               main: colorTokens.primary[500],

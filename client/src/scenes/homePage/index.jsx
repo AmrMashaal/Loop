@@ -108,21 +108,9 @@ const HomePage = ({
             />
           </Box>
         )}
+
         {isNonMobileScreens && (
-          <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-            <UserWidget userId={_id} picturePath={picturePath} />
-          </Box>
-        )}
-        <Box flexBasis={isNonMobileScreens ? "42%" : undefined}>
-          <MyPostWidget picturePath={picturePath} socket={socket} />
-          <PostsWidget
-            socket={socket}
-            newPosts={newPosts}
-            setNewPosts={setNewPosts}
-          />
-        </Box>
-        {isNonMobileScreens && (
-          <Box flexBasis="26%">
+          <Box flexBasis="24%">
             <FriendsWidget
               handleUserFriend={handleUserFriend}
               loading={loading}
@@ -133,6 +121,20 @@ const HomePage = ({
               onlineFriends={onlineFriends}
               userId={user._id}
             />
+          </Box>
+        )}
+        <Box flexBasis={isNonMobileScreens ? "42%" : undefined}>
+          <MyPostWidget picturePath={picturePath} socket={socket} />
+          <PostsWidget
+            socket={socket}
+            newPosts={newPosts}
+            setNewPosts={setNewPosts}
+          />
+        </Box>
+
+        {isNonMobileScreens && (
+          <Box flexBasis={isNonMobileScreens ? "24%" : undefined}>
+            <UserWidget userId={_id} picturePath={picturePath} />
           </Box>
         )}
       </Box>

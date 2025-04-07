@@ -271,7 +271,9 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 2",
                   }}
+                  className="inputForm"
                 />
+
                 <TextField
                   label="Last Name"
                   onBlur={handleBlur}
@@ -283,6 +285,7 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 2",
                   }}
+                  className="inputForm"
                 />
 
                 <TextField
@@ -296,6 +299,7 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 4",
                   }}
+                  className="inputForm"
                 />
 
                 {dataExisted.username && (
@@ -316,6 +320,7 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 4",
                   }}
+                  className="inputForm"
                 />
 
                 <TextField
@@ -332,6 +337,7 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 4",
                   }}
+                  className="inputForm"
                 />
 
                 <Box
@@ -436,7 +442,7 @@ const Form = () => {
                 )}
 
                 <Box sx={{ gridColumn: "span 4" }}>
-                  <InputLabel>Gender</InputLabel>
+                  <InputLabel sx={{ color: "gray" }}>Gender</InputLabel>
 
                   <Box display="flex" alignItems="center" gap="10px" my="10px">
                     <Box
@@ -508,7 +514,9 @@ const Form = () => {
                   sx={{ gridColumn: "span 4", mt: "3px" }}
                 />
 
-                <InputLabel id="location-lable">Location</InputLabel>
+                <InputLabel id="location-lable" sx={{ color: "gray" }}>
+                  Location
+                </InputLabel>
 
                 <Select
                   name="location"
@@ -581,7 +589,7 @@ const Form = () => {
             {location.pathname === "/signup" && (
               <Typography
                 color={palette.neutral.medium}
-                fontSize="12px"
+                fontSize="11px"
                 mt=".75rem"
                 mb="-.45rem"
                 sx={{ userSelect: "none" }}

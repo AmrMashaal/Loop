@@ -7,6 +7,7 @@ import OnlineFriends from "../../components/friends/OnlineFriends";
 import UserFriends from "../../components/friends/UserFriends";
 import FlexBetween from "../../components/FlexBetween";
 import { Link } from "react-router-dom";
+import { Box } from "@mui/system";
 
 // eslint-disable-next-line react/prop-types
 const FriendsWidget = ({
@@ -78,7 +79,7 @@ const FriendsWidget = ({
   }, [userId]);
 
   return (
-    <WidgetWrapper position="sticky" top="80px">
+    <Box position="sticky" top="80px" height="100vh">
       <FlexBetween>
         <Typography
           fontSize={isNonMobileScreens ? "20px" : "16px"}
@@ -142,7 +143,7 @@ const FriendsWidget = ({
           isNonMobileScreens={isNonMobileScreens}
         />
       )}
-    </WidgetWrapper>
+    </Box>
   );
 };
 

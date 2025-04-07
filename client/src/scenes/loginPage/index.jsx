@@ -1,5 +1,6 @@
 import { Box, useTheme, useMediaQuery } from "@mui/material";
 import Form from "./Form";
+import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { setIsOverFlow } from "../../App";
 
@@ -7,6 +8,8 @@ const LoginPage = () => {
   const theme = useTheme();
 
   const isNonMobileScreen = useMediaQuery("(min-width: 1000px)");
+
+  const mode = useSelector((state) => state.mode);
 
   useEffect(() => {
     document.title = "Loop";
@@ -22,7 +25,7 @@ const LoginPage = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      bgcolor="#e9e9e9"
+      bgcolor={isNonMobileScreen && mode === "light" ? "#e9e9e9" : "#1d1d1d"}
     >
       <Box
         display="flex"
@@ -56,7 +59,9 @@ const LoginPage = () => {
               alignItems="center"
               sx={{
                 background:
-                  "linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)",
+                  mode === "light"
+                    ? "linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 100%)"
+                    : "linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgb(0 0 0 / 80%) 100%)",
                 borderRadius: "10px 0 0 10px",
                 pointerEvents: "none",
               }}
@@ -73,7 +78,7 @@ const LoginPage = () => {
           height="100%"
           sx={{
             "&::-webkit-scrollbar-thumb": {
-              background: "#a0a0a0",
+              background: mode === "light" ? "#a0a0a0" : "#3d3d3d",
               "&:hover": {
                 background: "#8c8c8c",
               },
@@ -98,7 +103,9 @@ const LoginPage = () => {
           <Box
             sx={{
               background:
-                "linear-gradient(180deg, rgb(55 55 55 / 24%) 0%, rgb(109 146 255 / 0%) 100%)",
+                mode === "light"
+                  ? "linear-gradient(180deg, rgb(55 55 55 / 24%) 0%, rgb(109 146 255 / 0%) 100%)"
+                  : "linear-gradient(180deg, rgb(47 47 47 / 24%) 0%, rgb(109 146 255 / 0%) 100%)",
               borderRadius: "0 10px 10px 0",
               pointerEvents: "none",
               position: "absolute",
