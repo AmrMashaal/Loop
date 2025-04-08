@@ -53,7 +53,7 @@ export const register = async (req, res) => {
     } = req.body;
 
     const isUsernameExisted = await User.findOne({ username });
-console.log(password)
+
     if (isUsernameExisted) {
       return res.status(400).json({ message: "This Username Already Exists" });
     }

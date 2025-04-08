@@ -24,7 +24,7 @@ import ChangePassword from "./ChangePassword";
 import { setIsOverFlow } from "../../App";
 import { formatLikesCount } from "../../frequentFunctions";
 
-const ProfileInfo = ({ userInfo, userId }) => {
+const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const [profileSettings, setProfileSettings] = useState(false);
   const [isImgOpen, setIsImagOpen] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
@@ -243,7 +243,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   return (
     <Box position="relative" sx={{ maxHeight: "395px" }}>
-      {userInfo?.background ? (
+      {userInfo?.background && !isLoading ? (
         <img
           onClick={() => {
             setIsImagOpen(true),
@@ -265,17 +265,10 @@ const ProfileInfo = ({ userInfo, userId }) => {
           }}
         />
       ) : (
-        <img
-        src="https://res.cloudinary.com/dc3ta1xrf/image/upload/v1744071510/posts/c1845c88-ad84-435c-b154-292402df1567-loop-login.png.jpg"
-        style={{
-          background: "#a89090",
-          height: "300px",
-          maxWidth: "100%",
-          objectFit: "cover",
-          cursor: "pointer",
-        }}
-        width="100%"
-        height="300px"
+        <Box
+          width="100%"
+          height="300px"
+          bgcolor={mode === "light" ? "#f0f0f0" : "#1e1e1e"}
         />
       )}
 
@@ -390,7 +383,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                     : userInfo?.username}
                 </Typography>
 
-                {userInfo?.occupation && (
+                {userInfo?.occupation && userInfo?.occupation !== "undefined" && (
                   <Box
                     display="flex"
                     gap={isNonMobileScreens ? "20px" : "4px"}

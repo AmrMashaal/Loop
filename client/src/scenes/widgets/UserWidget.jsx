@@ -15,6 +15,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+  const mode = useSelector((state) => state.mode);
 
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
@@ -72,9 +73,8 @@ const UserWidget = ({ userId, picturePath }) => {
                   }}
                 />
               ) : (
-                <img
-                  src="https://res.cloudinary.com/dc3ta1xrf/image/upload/v1744071510/posts/c1845c88-ad84-435c-b154-292402df1567-loop-login.png.jpg"
-                  alt=""
+                <Box
+                  bgcolor={mode === "light" ? "#f0f0f0" : "#1e1e1e"}
                   style={{
                     position: "absolute",
                     top: "0",
@@ -86,7 +86,7 @@ const UserWidget = ({ userId, picturePath }) => {
                     pointerEvents: "none",
                     userSelect: "none",
                   }}
-                />
+                ></Box>
               )}
 
               <Box

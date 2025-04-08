@@ -214,7 +214,11 @@ const ProfilePage = () => {
         <>
           <Navbar isProfile={true} />
 
-          <ProfileInfo userInfo={userInfo} userId={userId} />
+          <ProfileInfo
+            userInfo={userInfo}
+            userId={userId}
+            isLoading={isLoading}
+          />
 
           <Box
             display="flex"
