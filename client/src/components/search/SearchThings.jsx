@@ -64,7 +64,7 @@ const SearchThings = ({
               Search result:
             </Typography>
             <Typography
-              color="#00D5FA"
+              color={theme.palette.primary.main}
               fontSize="30px"
               textTransform="capitalize"
               fontWeight="600"
@@ -113,7 +113,7 @@ const SearchThings = ({
                   onClick={() => setType("user")}
                 >
                   <People
-                    sx={{ color: type === "user" ? "#00D5FA" : medium }}
+                    sx={{ color: type === "user" ? theme.palette.primary.main : medium }}
                   />
                   Users
                 </Box>
@@ -141,7 +141,7 @@ const SearchThings = ({
                   onClick={() => setType("post")}
                 >
                   <CommentSharp
-                    sx={{ color: type === "post" ? "#00D5FA" : medium }}
+                    sx={{ color: type === "post" ? theme.palette.primary.main : medium }}
                   />
                   Posts
                 </Box>

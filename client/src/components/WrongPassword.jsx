@@ -71,7 +71,7 @@ const WrongPassword = () => {
 
         <Button
           sx={{
-            bgcolor: "#00D5FA",
+            bgcolor: palette.primary.main,
             color: "black",
             width: "30%",
             mt: "10px",

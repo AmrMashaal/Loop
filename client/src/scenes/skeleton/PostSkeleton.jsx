@@ -3,7 +3,7 @@ import { Box } from "@mui/system";
 
 const PostSkeleton = () => {
   return (
-    <Box mt="-10px">
+    <Box mt="-21px">
       <Box position="relative">
         <Box
           position="absolute"
@@ -12,29 +12,21 @@ const PostSkeleton = () => {
           display="flex"
           alignItems="center"
           gap="7px"
-        >
+      >
           <Skeleton width="40px" height="63px" sx={{ borderRadius: "50%" }} />
           <Box>
             <Skeleton width="100px" height="10px" />
             <Skeleton width="50px" height="10px" />
           </Box>
         </Box>
-        <Skeleton
-          width="100%"
-          height="100px"
-          sx={{ borderRadius: ".75rem .75rem 0 0" }}
-        />
+        <Skeleton width="100%" height="100px" />
         <Skeleton
           sx={{ m: "-178px 0 0 0", borderRadius: "0" }}
           height="700px"
           width="100%"
         />
         <Box position="relative">
-          <Skeleton
-            sx={{ m: "-154px 0 0 0", borderRadius: "0 0 .75rem .75rem" }}
-            height="100px"
-            width="100%"
-          />
+          <Skeleton sx={{ m: "-154px 0 0 0" }} height="100px" width="100%" />
           <Skeleton
             width="30px"
             height="23px"
@@ -49,7 +41,7 @@ const PostSkeleton = () => {
         </Box>
       </Box>
       {/* ----------------------second post---------------------- */}
-      <Box position="relative">
+      <Box position="relative" mt="-30px">
         <Box
           position="absolute"
           top="19px"
@@ -64,22 +56,15 @@ const PostSkeleton = () => {
             <Skeleton width="50px" height="10px" />
           </Box>
         </Box>
-        <Skeleton
-          width="100%"
-          height="100px"
-          sx={{ borderRadius: ".75rem .75rem 0 0" }}
-        />
+        <Skeleton width="100%" height="100px" />
         <Skeleton
           sx={{ m: "-128px 0 0 0", borderRadius: "0" }}
           height="470px"
           width="100%"
         />
+
         <Box position="relative">
-          <Skeleton
-            sx={{ m: "-112px 0 0 0", borderRadius: "0 0 .75rem .75rem" }}
-            height="100px"
-            width="100%"
-          />
+          <Skeleton sx={{ m: "-112px 0 0 0" }} height="100px" width="100%" />
           <Skeleton
             width="30px"
             height="23px"

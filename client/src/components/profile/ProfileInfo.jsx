@@ -361,7 +361,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
                       <VerifiedOutlined
                         sx={{
                           fontSize: "32px",
-                          color: "#00D5FA",
+                          color: "#15a1ed",
                           position: "absolute",
                           right: isNonMobileScreens ? "-40px" : "-39px",
                           top: "50%",

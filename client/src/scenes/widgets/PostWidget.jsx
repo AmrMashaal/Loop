@@ -400,7 +400,7 @@ const PostWidget = ({
 
   // eslint-disable-next-line react/prop-types
   return (
-    <>
+    <Box>
       {posts && (
         <>
           {posts?.map((ele, index) => {
@@ -970,7 +970,7 @@ const PostWidget = ({
                                   sx={{
                                     backgroundColor: fol?.isFollowed
                                       ? palette.neutral.light
-                                      : "rgb(0 151 250)",
+                                      : palette.primary.dark,
                                     color: fol?.isFollowed
                                       ? palette.neutral.main
                                       : "white",
@@ -979,7 +979,7 @@ const PostWidget = ({
                                       opacity: "0.8",
                                       backgroundColor: fol?.isFollowed
                                         ? "white"
-                                        : "rgb(0 151 250)",
+                                        : palette.primary.dark,
                                     },
                                   }}
                                   onClick={(e) => {
@@ -1197,7 +1197,7 @@ const PostWidget = ({
             No posts available
           </Typography>
         )}
-    </>
+    </Box>
   );
 };
 

@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+:root {
+  --primary-color: #a847dc;
+}
+
 input,
 textarea,
 button,
@@ -17,7 +21,6 @@ body {
   font-family: "Rubik", sans-serif;
 }
 
- 
 .app {
   height: 100%;
   width: 100%;
@@ -92,7 +95,7 @@ li {
 
 .loopAnimation {
   color: transparent;
-  background: radial-gradient(circle, #00d5fa, #a40fe9a3);
+  background: radial-gradient(circle, var(--primary-color), #e0a6ff 50%);
   background-clip: text;
   -webkit-background-clip: text;
   -moz-background-clip: text;
@@ -224,7 +227,7 @@ li {
   left: 0;
   width: 0%;
   height: 2px;
-  background-color: #00d5fa;
+  background-color: var(--primary-color);
   transition: 0.2s;
   -webkit-transition: 0.2s;
   -moz-transition: 0.2s;

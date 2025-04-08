@@ -55,7 +55,6 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
 
       const data = await response.json();
 
-
       if (pageNumber === 1 && data?.suggestions) {
         setFollowSuggestions(data.suggestions);
       }

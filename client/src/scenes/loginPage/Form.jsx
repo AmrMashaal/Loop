@@ -128,15 +128,15 @@ const Form = () => {
 
       const savedUser = await savedUserResponse.json();
 
-
-      setDataExisted({ username: false });
-
       if (
         savedUser?.message &&
-        savedUser?.message?.includes("Username Is Already Existed")
+        savedUser?.message?.includes("This Username Already Exists")
       ) {
         setDataExisted({ username: true });
+      } else {
+        setDataExisted({ username: false });
       }
+
       if (savedUser && !savedUser?.message) {
         onSubmitProps.resetForm();
         navigate("/login");
@@ -262,7 +262,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.firstName}
-                  name="firstName" 
+                  name="firstName"
                   error={
                     Boolean(touched.firstName) && Boolean(errors.firstName)
                   }
@@ -278,7 +278,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.lastName}
-                  name="lastName" 
+                  name="lastName"
                   error={Boolean(touched.lastName) && Boolean(errors.lastName)}
                   helperText={touched.lastName && errors.lastName}
                   sx={{
@@ -292,7 +292,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
-                  name="username" 
+                  name="username"
                   error={Boolean(touched.username) && Boolean(errors.username)}
                   helperText={touched.username && errors.username}
                   sx={{
@@ -313,7 +313,7 @@ const Form = () => {
                   onChange={handleChange}
                   value={values.password}
                   type="password"
-                  name="password" 
+                  name="password"
                   error={Boolean(touched.password) && Boolean(errors.password)}
                   helperText={touched.password && errors.password}
                   sx={{
@@ -556,7 +556,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
-                  name="username" 
+                  name="username"
                   error={Boolean(touched.username) && Boolean(errors.username)}
                   helperText={touched.username && errors.username}
                   sx={{

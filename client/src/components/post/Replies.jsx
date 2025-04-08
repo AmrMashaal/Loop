@@ -199,7 +199,7 @@ const Replies = ({
                               <VerifiedOutlined
                                 sx={{
                                   fontSize: "20px",
-                                  color: "#00D5FA",
+                                  color: "#15a1ed",
                                 }}
                               />
                             )}
@@ -303,7 +303,7 @@ const Replies = ({
                         }
                       >
                         {reply?.isLiked ? (
-                          <FavoriteOutlined sx={{ color: "red" }} />
+                          <FavoriteOutlined sx={{ color: palette.primary.main }} />
                         ) : (
                           <FavoriteBorderOutlined />
                         )}

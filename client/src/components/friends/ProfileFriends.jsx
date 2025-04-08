@@ -124,7 +124,7 @@ const ProfileFriends = ({ userParam }) => {
                       <VerifiedOutlined
                         sx={{
                           fontSize: "20px",
-                          color: "#00D5FA",
+                          color: "#15a1ed",
                         }}
                       />
                     )
@@ -132,7 +132,7 @@ const ProfileFriends = ({ userParam }) => {
                       <VerifiedOutlined
                         sx={{
                           fontSize: "20px",
-                          color: "#00D5FA",
+                          color: "#15a1ed",
                         }}
                       />
                     )}

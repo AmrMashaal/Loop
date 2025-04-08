@@ -637,6 +637,7 @@ const ProfileSettings = ({
                     color: palette.primary.main,
                   },
                 }}
+                disabled={loading}
               >
                 {loading ? "loading..." : "Submit"}
               </Button>

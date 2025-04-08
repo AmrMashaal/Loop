@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Box } from "@mui/system";
+import { Box  } from "@mui/system";
 import FlexBetween from "./../components/FlexBetween";
 import UserImage from "./../components/UserImage";
 import { Button, Divider, Typography } from "@mui/material";
@@ -66,7 +66,7 @@ const WhoLiked = ({
                       <VerifiedOutlined
                         sx={{
                           fontSize: "20px",
-                          color: "#00D5FA",
+                          color: "#15a1ed",
                         }}
                       />
                     )}

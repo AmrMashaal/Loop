@@ -6,7 +6,7 @@ import OnlineFriends from "../../components/friends/OnlineFriends";
 import UserFriends from "../../components/friends/UserFriends";
 import FlexBetween from "../../components/FlexBetween";
 import { Link } from "react-router-dom";
-import { Box } from "@mui/system";
+import { Box, useTheme } from "@mui/system";
 
 // eslint-disable-next-line react/prop-types
 const FriendsWidget = ({
@@ -22,6 +22,8 @@ const FriendsWidget = ({
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+
+  const {palette} = useTheme()
 
   const handleUserFriend = async () => {
     if (type === "friends") {
@@ -102,7 +104,7 @@ const FriendsWidget = ({
                 textTransform: "capitalize",
                 fontWeight: "500",
                 fontSize: isNonMobileScreens ? "15px" : "14px",
-                color: "#00D5FA",
+                color: palette.primary.main,
               }}
               className="linkUnderline"
               to={`/profile/${userId}/friends`}

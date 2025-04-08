@@ -263,12 +263,12 @@ const ProfilePage = () => {
                   fontSize="18px"
                   color={
                     !location.pathname.split("/")[3]
-                      ? "#00D5FA"
+                      ? palette.primary.main
                       : palette.neutral.medium
                   }
                   p="3px"
                   borderBottom={
-                    !location.pathname.split("/")[3] && "3px solid #00D5FA"
+                    !location.pathname.split("/")[3] && `3px solid ${palette.primary.main}`
                   }
                   sx={{ cursor: "pointer", userSelect: "none" }}
                   className="opacityBox"
@@ -283,12 +283,12 @@ const ProfilePage = () => {
                   p="3px"
                   color={
                     location.pathname.split("/")[3] === "about"
-                      ? "#00D5FA"
+                      ? palette.primary.main
                       : palette.neutral.medium
                   }
                   borderBottom={
                     location.pathname.split("/")[3] === "about" &&
-                    "3px solid #00D5FA"
+                    `3px solid ${palette.primary.main}`
                   }
                   sx={{ cursor: "pointer", userSelect: "none" }}
                   className="opacityBox"
@@ -304,12 +304,12 @@ const ProfilePage = () => {
                   p="3px"
                   color={
                     location.pathname.split("/")[3] === "friends"
-                      ? "#00D5FA"
+                      ? palette.primary.main
                       : palette.neutral.medium
                   }
                   borderBottom={
                     location.pathname.split("/")[3] === "friends" &&
-                    "3px solid #00D5FA"
+                    `3px solid ${palette.primary.main}`
                   }
                   sx={{ cursor: "pointer", userSelect: "none" }}
                   className="opacityBox"
@@ -325,12 +325,12 @@ const ProfilePage = () => {
                   p="3px"
                   color={
                     location.pathname.split("/")[3] === "badges"
-                      ? "#00D5FA"
+                      ? palette.primary.main
                       : palette.neutral.medium
                   }
                   borderBottom={
                     location.pathname.split("/")[3] === "badges" &&
-                    "3px solid #00D5FA"
+                    `3px solid ${palette.primary.main}`
                   }
                   sx={{ cursor: "pointer", userSelect: "none" }}
                   className="opacityBox"

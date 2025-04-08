@@ -107,36 +107,35 @@ const App = () => {
 
   return (
     <div className="app">
-        <Box
+      <Box
         position="fixed"
-        width="800px"
-        height="800px"
+        width="700px"
+        height="700px"
         borderRadius="50%"
-        boxShadow="0 0 20px 20px rgb(27 102 176 / 19%)"
+        boxShadow="0 0 20px 20px #a847dc38"
         top="-200px"
         left="-172px"
         zIndex="10"
         sx={{
           opacity: mode === "light" ? "0.1" : "0.07",
-          background:
-            "radial-gradient(circle, rgb(30 144 255 / 65%), rgb(17 17 17 / 0%))",
+          background: `radial-gradient(circle, #a847dc69, rgb(17 17 17 / 0%))`,
           pointerEvents: "none",
         }}
       ></Box>
 
       <Box
         position="fixed"
-        width="800px"
-        height="800px"
+        width="600px"
+        height="600px"
         borderRadius="50%"
-        boxShadow="0 0 20px 20px rgb(255 31 198 / 13%)"
+        boxShadow="0 0 20px 20px rgb(255 255 255 / 16%)"
         bottom="-200px"
         right="-172px"
         zIndex="10"
         sx={{
           opacity: mode === "light" ? "0.1" : "0.1",
           background:
-            "radial-gradient(circle, rgb(255 31 223 / 63%), rgb(17 17 17 / 0%))",
+            "radial-gradient(circle, rgb(255 255 255 / 34%), rgb(17 17 17 / 0%))",
           pointerEvents: "none",
         }}
       ></Box>

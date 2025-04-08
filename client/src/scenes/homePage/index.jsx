@@ -84,11 +84,10 @@ const HomePage = ({
       position="relative"
       className="homeContainer"
       mb={!isNonMobileScreens ? "71px" : ""}
+      p={isNonMobileScreens ? "5rem 1rem 1rem" : "4.5rem 1rem 1rem"}
     >
-      <Navbar />
-
+      <Navbar/>
       <Box
-        p={isNonMobileScreens ? "5rem 1rem 1rem" : "4.2rem 1rem 1rem"}
         display="flex"
         gap="10px"
         justifyContent="space-between"
