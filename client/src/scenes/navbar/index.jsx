@@ -254,12 +254,13 @@ const Navbar = ({ isProfile }) => {
     if (isProfile && returnNavColor) {
       return undefined;
     } else {
-      return "radial-gradient(circle at top left, #4a366a4a, #2d1e4661)";
+      return mode === "dark" ? "#1a1a1a87" : "#f3f9ff85";
     }
   };
 
   return (
     <FlexBetween
+      bgcolor={navBgColor}
       p="8px 30px"
       position="fixed"
       top="-1px"
@@ -272,7 +273,6 @@ const Navbar = ({ isProfile }) => {
             ? undefined
             : "-1px 11px 11px 0px #00000008",
         transition: isProfile ? ".3s" : undefined,
-        background: navBgColor(),
       }}
       className={!returnNavColor ? "navbarHolder" : ""}
     >
@@ -315,9 +315,9 @@ const Navbar = ({ isProfile }) => {
 
         {isNonMobileScreens && (
           <FlexBetween
-            border={`1px solid ${theme.palette.primary.dark}`}
-            borderRadius="50px"
+            backgroundColor={neutrallLight}
             padding="2px 38px 2px 7px"
+            borderRadius="9px"
             gap="3px"
             position="relative"
             sx={{
@@ -355,7 +355,6 @@ const Navbar = ({ isProfile }) => {
                   }
                 }}
                 placeholder="Search for users, posts"
-                sx={{ pl: "5px" }}
               />
               <IconButton
                 type="submit"
@@ -481,28 +480,73 @@ const Navbar = ({ isProfile }) => {
           </IconButton>
 
           <Box
-            sx={{
-              width: "41px",
-              height: "41px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor:
-                isProfile && returnNavColor && mode === "light"
-                  ? "#F0F0F0"
-                  : isProfile && returnNavColor && mode === "dark"
-                  ? "#33333391"
-                  : undefined,
-              borderRadius: "50%",
-            }}
+            p="3px"
+            width="130px"
+            height="36px"
+            mr="10px"
+            bgcolor={
+              isProfile && returnNavColor && mode === "light"
+                ? "#f0f0f0b3"
+                : isProfile && returnNavColor && mode === "dark"
+                ? "#33333391"
+                : neutrallLight
+            }
+            borderRadius="50px"
+            position="relative"
+            boxShadow="inset -1px 2px 3px 2px #00000045"
+            outline={`${
+              isProfile && returnNavColor && mode === "light"
+                ? "#f0f0f0b3"
+                : isProfile && returnNavColor && mode === "dark"
+                ? "#33333391"
+                : neutrallLight
+            } solid 5px`}
+            sx={{ cursor: "pointer" }}
             onClick={() => dispatch(setMode())}
           >
-            {theme.palette.mode === "light" ? (
-              <LightMode sx={{ fontSize: "25px" }} />
-            ) : (
-              <DarkMode sx={{ fontSize: "25px" }} />
-            )}
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                transform: "translateY(-50%)",
+                backgroundColor: mode === "dark" ? "#3e3e3e" : neutrallLight,
+                transition: ".3s",
+                left: mode === "dark" ? "0" : "89px",
+                boxShadow: "0px 0px 10px 0px #00000054",
+                width: "41px",
+                height: "41px",
+                borderRadius: "50%",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: "11",
+                ":hover": {
+                  background: mode === "dark" ? neutrallLight : "#dedede",
+                },
+              }}
+            >
+              {theme.palette.mode === "light" ? (
+                <LightMode sx={{ fontSize: "25px" }} />
+              ) : (
+                <DarkMode sx={{ fontSize: "25px" }} />
+              )}
+            </Box>
+
+            <Typography
+              position="absolute"
+              top="50%"
+              left={mode === "dark" ? "57px" : "10px"}
+              textTransform="uppercase"
+              fontSize="11px"
+              sx={{
+                transform: "translateY(-50%)",
+                transition: ".3s",
+                userSelect: "none",
+              }}
+            >
+              {mode === "dark" ? "dark mode" : "light mode"}
+            </Typography>
           </Box>
 
           <Box
@@ -691,14 +735,11 @@ const Navbar = ({ isProfile }) => {
             width="100%"
             padding="5px 10px 10px"
             zIndex="10"
+            backgroundColor={mode === "light" ? "#ebebebb8" : "#1a1a1ade"}
             bottom="-3px"
             left="0"
             boxShadow="6px 2px 20px 0 #0000002d"
             borderTop="1px solid #0000001f"
-            sx={{
-              background:
-                "radial-gradient(circle at top left, #4a366a4a, #2d1e4661)",
-            }}
             className="mobileNav"
           >
             <Box display="flex" justifyContent="space-around">
@@ -724,8 +765,6 @@ const Navbar = ({ isProfile }) => {
                           color:
                             location.pathname === "/"
                               ? theme.palette.primary.main
-                              : mode === "dark"
-                              ? "#c4c4c4"
                               : "",
                         }}
                       />

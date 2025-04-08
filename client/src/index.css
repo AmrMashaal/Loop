@@ -17,16 +17,7 @@ body {
   font-family: "Rubik", sans-serif;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  background: linear-gradient(167deg, #282840 0%, #37233a 100%);
-}
-
+ 
 .app {
   height: 100%;
   width: 100%;
@@ -192,7 +183,7 @@ li {
   -moz-border-radius: 50%;
   -ms-border-radius: 50%;
   -o-border-radius: 50%;
-  border: #00d5fa 4px solid;
+  border: #a847dc 4px solid;
   border-right: transparent 4px solid;
 }
 

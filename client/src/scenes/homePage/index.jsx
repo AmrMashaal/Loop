@@ -94,21 +94,6 @@ const HomePage = ({
         justifyContent="space-between"
         flexDirection={!isNonMobileScreens ? "column" : ""}
       >
-        {!isNonMobileScreens && (
-          <Box flexBasis="26%">
-            <FriendsWidget
-              handleUserFriend={handleUserFriend}
-              loading={loading}
-              setLoading={setLoading}
-              description="online friends"
-              userId={user._id}
-              onlineFriends={onlineFriends}
-              type="onlineFriends"
-              setOnlineFriends={setOnlineFriends}
-            />
-          </Box>
-        )}
-
         {isNonMobileScreens && (
           <Box flexBasis="24%">
             <FriendsWidget

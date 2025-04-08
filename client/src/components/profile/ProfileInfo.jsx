@@ -265,12 +265,18 @@ const ProfileInfo = ({ userInfo, userId }) => {
           }}
         />
       ) : (
-        <Box
-          height="300px"
-          sx={{
-            background: userInfo?.background ? undefined : "#a89090",
-          }}
-        ></Box>
+        <img
+        src="https://res.cloudinary.com/dc3ta1xrf/image/upload/v1744071510/posts/c1845c88-ad84-435c-b154-292402df1567-loop-login.png.jpg"
+        style={{
+          background: "#a89090",
+          height: "300px",
+          maxWidth: "100%",
+          objectFit: "cover",
+          cursor: "pointer",
+        }}
+        width="100%"
+        height="300px"
+        />
       )}
 
       <Box

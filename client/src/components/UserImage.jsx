@@ -32,11 +32,11 @@ const UserImage = ({
           objectFit: "cover",
           userSelect: "none",
           border: isProfile
-            ? `6px solid ${theme.palette.primary.dark}`
+            ? `6px solid ${theme.palette.background.alt}`
             : isNav && !isActive
             ? `2px solid white`
             : isActive
-            ? `2px solid #00D5FA`
+            ? `2px solid ${theme.palette.primary.main}`
             : undefined,
           boxShadow: isProfile
             ? "rgba(0, 0, 0, 0.13) 3px 6px 7px 0px"

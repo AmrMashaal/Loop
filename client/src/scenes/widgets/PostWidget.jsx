@@ -663,7 +663,7 @@ const PostWidget = ({
                   )}
 
                   {typeof ele.userId === "object" && (
-                    <Box>
+                    <Box p="10px">
                       {ele?.postId?.picturePath && (
                         <PostImg
                           setIsPostClicked={setIsPostClicked}

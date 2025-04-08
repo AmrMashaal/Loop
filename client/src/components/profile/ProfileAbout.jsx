@@ -5,6 +5,7 @@ import WidgetWrapper from "../WidgetWrapper";
 import { Box, useMediaQuery } from "@mui/system";
 import ProfileFriendsSkeleton from "../../scenes/skeleton/ProfileFriendsSkeleton";
 import { Link } from "react-router-dom";
+import { countriesWithFlags } from "../../../infoArrays";
 
 const ProfileAbout = ({ userInfo }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 750px)");
@@ -158,7 +159,12 @@ const ProfileAbout = ({ userInfo }) => {
                 location :
               </Typography>
 
-              <Typography fontSize="17px">{userInfo?.location}</Typography>
+              <Typography fontSize="17px">
+                {userInfo?.location}{" "}
+                {countriesWithFlags.find((country) => {
+                  return country.country === userInfo?.location;
+                }).flag}
+              </Typography>
             </Box>
 
             {userInfo?.occupation && (

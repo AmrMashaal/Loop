@@ -1,24 +1,13 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unescaped-entities */
-import {
-  LocationOnOutlined,
-  WorkOutlineOutlined,
-  VerifiedOutlined,
-  PersonOutline,
-} from "@mui/icons-material";
-import {
-  Box,
-  Typography,
-  Divider,
-  useTheme,
-  Skeleton,
-  Button,
-} from "@mui/material";
+import { VerifiedOutlined } from "@mui/icons-material";
+import { Box, Typography, Divider, useTheme, Skeleton } from "@mui/material";
 import UserImage from "../../components/UserImage";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatLikesCount } from "../../frequentFunctions";
+import { countriesWithFlags } from "../../../infoArrays";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [theUser, setTheUser] = useState(null);
@@ -83,7 +72,9 @@ const UserWidget = ({ userId, picturePath }) => {
                   }}
                 />
               ) : (
-                <Box
+                <img
+                  src="https://res.cloudinary.com/dc3ta1xrf/image/upload/v1744071510/posts/c1845c88-ad84-435c-b154-292402df1567-loop-login.png.jpg"
+                  alt=""
                   style={{
                     position: "absolute",
                     top: "0",
@@ -94,9 +85,8 @@ const UserWidget = ({ userId, picturePath }) => {
                     zIndex: "2",
                     pointerEvents: "none",
                     userSelect: "none",
-                    background: "#a89090",
                   }}
-                ></Box>
+                />
               )}
 
               <Box
@@ -106,7 +96,11 @@ const UserWidget = ({ userId, picturePath }) => {
                 borderRadius="50%"
                 sx={{ transform: "translateX(-50%)", zIndex: "3" }}
               >
-                <UserImage image={picturePath} size="70" isOnline={true}></UserImage>
+                <UserImage
+                  image={picturePath}
+                  size="70"
+                  isOnline={true}
+                ></UserImage>
               </Box>
 
               <Box position="relative">
@@ -133,8 +127,15 @@ const UserWidget = ({ userId, picturePath }) => {
                     )}
                   </Box>
 
-                  <Typography fontSize="13px" mb="10px" color={medium}>
-                    @{theUser?.username}
+                  <Typography fontSize="13px">@{theUser?.username}</Typography>
+
+                  <Typography fontSize="13px" color={medium} mb="5px">
+                    {theUser?.location}{" "}
+                    {
+                      countriesWithFlags.find(
+                        (ct) => ct.country === theUser?.location
+                      ).flag
+                    }
                   </Typography>
                 </Box>
               </Box>
@@ -161,7 +162,7 @@ const UserWidget = ({ userId, picturePath }) => {
                   {formatLikesCount(theUser?.followersCount)}
                 </Typography>
 
-                <Typography fontSize="13px" fontWeight="bold">
+                <Typography fontSize="13px">
                   Follower
                   {theUser?.followersCount > 1 && "s"}
                 </Typography>
@@ -178,18 +179,30 @@ const UserWidget = ({ userId, picturePath }) => {
                   {formatLikesCount(theUser?.followingCount)}
                 </Typography>
 
-                <Typography fontSize="13px" fontWeight="bold">
+                <Typography fontSize="13px">
                   Following
                   {theUser?.followingCount > 1 && "s"}
                 </Typography>
               </Box>
             </Box>
 
-            <Link to={`/profile/${user._id}`}>
-              <Button sx={{ mt: "1rem", mx: "auto", width: "100%" }}>
-                My Profile
-              </Button>
-            </Link>
+            {theUser?.bio && (
+              <Box>
+                <Typography fontWeight="bold" sx={{ userSelect: "none" }}>
+                  Bio
+                </Typography>
+
+                <Typography
+                  fontSize="14px"
+                  mt="8px"
+                  fontWeight="200"
+                  mb="8px"
+                  lineHeight="1.5rem"
+                >
+                  {theUser?.bio}
+                </Typography>
+              </Box>
+            )}
           </>
         ) : (
           <Box>

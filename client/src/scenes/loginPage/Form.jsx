@@ -18,7 +18,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../../state";
 import Dropzone from "react-dropzone";
-import { countries } from "../../../infoArrays";
+import { countriesWithFlags } from "../../../infoArrays";
 import { DeleteOutlined } from "@mui/icons-material";
 
 const registerSchema = yup.object().shape({
@@ -43,7 +43,6 @@ const registerSchema = yup.object().shape({
     .oneOf([yup.ref("password"), null], "Password must match")
     .required("Confirm password is required"),
   location: yup.string().required("required"),
-  occupation: yup.string().required("required"),
   gender: yup.string().required("required"),
   birthdate: yup
     .string()
@@ -80,7 +79,6 @@ const initialValuesRegister = {
   password: "",
   confirmPassword: "",
   location: "",
-  occupation: "",
   picture: "",
   gender: "",
   birthdate: "",
@@ -129,6 +127,7 @@ const Form = () => {
       });
 
       const savedUser = await savedUserResponse.json();
+
 
       setDataExisted({ username: false });
 
@@ -263,7 +262,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.firstName}
-                  name="firstName" // name is related to initialValuesRegister
+                  name="firstName" 
                   error={
                     Boolean(touched.firstName) && Boolean(errors.firstName)
                   }
@@ -279,7 +278,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.lastName}
-                  name="lastName" // name is related to initialValuesRegister
+                  name="lastName" 
                   error={Boolean(touched.lastName) && Boolean(errors.lastName)}
                   helperText={touched.lastName && errors.lastName}
                   sx={{
@@ -293,7 +292,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
-                  name="username" // name is related to initialValuesRegister
+                  name="username" 
                   error={Boolean(touched.username) && Boolean(errors.username)}
                   helperText={touched.username && errors.username}
                   sx={{
@@ -314,7 +313,7 @@ const Form = () => {
                   onChange={handleChange}
                   value={values.password}
                   type="password"
-                  name="password" // name is related to initialValuesRegister
+                  name="password" 
                   error={Boolean(touched.password) && Boolean(errors.password)}
                   helperText={touched.password && errors.password}
                   sx={{
@@ -531,10 +530,10 @@ const Form = () => {
                   }}
                 >
                   <MenuItem value="">Select a location</MenuItem>
-                  {countries.map((country) => {
+                  {countriesWithFlags.map((country) => {
                     return (
-                      <MenuItem value={country} key={country}>
-                        {country}
+                      <MenuItem value={country.country} key={country.country}>
+                        {country.country} {country.flag}
                       </MenuItem>
                     );
                   })}
@@ -557,7 +556,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
-                  name="username" // name is related to initialValuesRegister
+                  name="username" 
                   error={Boolean(touched.username) && Boolean(errors.username)}
                   helperText={touched.username && errors.username}
                   sx={{

@@ -47,16 +47,19 @@ export const register = async (req, res) => {
       lastName,
       username,
       password,
-      friends,
       location,
       birthdate,
       gender,
     } = req.body;
 
     const isUsernameExisted = await User.findOne({ username });
-
+console.log(password)
     if (isUsernameExisted) {
       return res.status(400).json({ message: "This Username Already Exists" });
+    }
+
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -70,7 +73,6 @@ export const register = async (req, res) => {
       picturePath:
         picturePath ||
         "https://res.cloudinary.com/dc3ta1xrf/image/upload/v1741039254/posts/feb4142e-fff3-4a0f-a2bd-d89bd563543c-loading-user.png.jpg",
-      friends,
       location,
       birthdate,
       gender,

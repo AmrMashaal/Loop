@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import Dropzone from "react-dropzone";
 import EditOutLinedIcon from "@mui/icons-material/EditOutlined";
-import { countries } from "../../../infoArrays";
+import { countriesWithFlags } from "../../../infoArrays";
 import { Box, useTheme } from "@mui/system";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from "../../../state";
@@ -368,10 +368,10 @@ const ProfileSettings = ({
                 labelId="location-lable"
               >
                 <MenuItem value="">Select a location</MenuItem>
-                {countries.map((country) => {
+                {countriesWithFlags.map((country) => {
                   return (
-                    <MenuItem value={country} key={country}>
-                      {country}
+                    <MenuItem value={country.country} key={country.country}>
+                      {country.country} {country.flag}  
                     </MenuItem>
                   );
                 })}

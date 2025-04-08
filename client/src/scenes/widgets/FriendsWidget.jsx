@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 import { Typography } from "@mui/material";
-import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import OnlineFriends from "../../components/friends/OnlineFriends";
@@ -79,7 +78,12 @@ const FriendsWidget = ({
   }, [userId]);
 
   return (
-    <Box position="sticky" top="80px" height="100vh">
+    <Box
+      position="sticky"
+      top="80px"
+      height={isNonMobileScreens ? "100vh" : "unset"}
+      p="14px 25px"
+    >
       <FlexBetween>
         <Typography
           fontSize={isNonMobileScreens ? "20px" : "16px"}

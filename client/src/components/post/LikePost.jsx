@@ -35,7 +35,7 @@ const LikePost = ({
             disabled={loading.postId === ele._id}
           >
             {ele?.isLiked ? (
-              <FavoriteOutlined sx={{ color: "red" }} />
+              <FavoriteOutlined sx={{ color: palette.primary.main }} />
             ) : (
               <FavoriteBorderOutlined sx={{ color: palette.text.secondary }} />
             )}
