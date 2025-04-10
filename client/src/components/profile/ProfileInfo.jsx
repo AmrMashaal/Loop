@@ -24,7 +24,7 @@ import ChangePassword from "./ChangePassword";
 import { setIsOverFlow } from "../../App";
 import { formatLikesCount } from "../../frequentFunctions";
 
-const ProfileInfo = ({ userInfo, userId }) => {
+const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const [profileSettings, setProfileSettings] = useState(false);
   const [isImgOpen, setIsImagOpen] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
@@ -243,7 +243,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
 
   return (
     <Box position="relative" sx={{ maxHeight: "395px" }}>
-      {userInfo?.background ? (
+      {userInfo?.background && !isLoading ? (
         <img
           onClick={() => {
             setIsImagOpen(true),
@@ -266,11 +266,10 @@ const ProfileInfo = ({ userInfo, userId }) => {
         />
       ) : (
         <Box
+          width="100%"
           height="300px"
-          sx={{
-            background: userInfo?.background ? undefined : "#a89090",
-          }}
-        ></Box>
+          bgcolor={mode === "light" ? "#f0f0f0" : "#1e1e1e"}
+        />
       )}
 
       <Box
@@ -362,7 +361,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                       <VerifiedOutlined
                         sx={{
                           fontSize: "32px",
-                          color: "#00D5FA",
+                          color: "#15a1ed",
                           position: "absolute",
                           right: isNonMobileScreens ? "-40px" : "-39px",
                           top: "50%",
@@ -384,7 +383,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                     : userInfo?.username}
                 </Typography>
 
-                {userInfo?.occupation && (
+                {userInfo?.occupation && userInfo?.occupation !== "undefined" && (
                   <Box
                     display="flex"
                     gap={isNonMobileScreens ? "20px" : "4px"}
@@ -399,7 +398,7 @@ const ProfileInfo = ({ userInfo, userId }) => {
                       justifyContent={isNonMobileScreens ? undefined : "center"}
                     >
                       <WorkOutlineOutlined />
-                      <Typography fontSize="17px">
+                      <Typography fontSize="17px" sx={{wordBreak: "break-word"}}>
                         {userInfo?._id === user._id
                           ? user.occupation
                           : userInfo?.occupation}

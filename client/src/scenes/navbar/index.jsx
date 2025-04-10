@@ -755,7 +755,7 @@ const Navbar = ({ isProfile }) => {
                       <Home
                         sx={{
                           fontSize: "25px",
-                          color: "#0dc6f2",
+                          color: theme.palette.primary.main,
                         }}
                       />
                     ) : (
@@ -764,9 +764,7 @@ const Navbar = ({ isProfile }) => {
                           fontSize: "25px",
                           color:
                             location.pathname === "/"
-                              ? "#0dc6f2"
-                              : mode === "dark"
-                              ? "#c4c4c4"
+                              ? theme.palette.primary.main
                               : "",
                         }}
                       />

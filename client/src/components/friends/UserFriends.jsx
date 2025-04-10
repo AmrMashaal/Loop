@@ -108,12 +108,12 @@ const UserFriends = ({
                         {friend?.sender?._id === userId
                           ? friend?.receiver?.verified && (
                               <VerifiedOutlined
-                                sx={{ fontSize: "18px", color: "#00D5FA" }}
+                                sx={{ fontSize: "18px", color: "#15a1ed" }}
                               />
                             )
                           : friend?.sender?.verified && (
                               <VerifiedOutlined
-                                sx={{ fontSize: "18px", color: "#00D5FA" }}
+                                sx={{ fontSize: "18px", color: "#15a1ed" }}
                               />
                             )}
                       </Box>

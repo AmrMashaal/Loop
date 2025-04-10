@@ -3,7 +3,9 @@ import Friend from "../models/Friend.js";
 export const getFriends = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page, app } = req.query;
+    const { page, app, isNavFriends, isProfile } = req.query;
+
+    let friends;
 
     if (app) {
       const friends = await Friend.find({
@@ -13,19 +15,33 @@ export const getFriends = async (req, res) => {
 
       res.status(200).json(friends);
     } else {
-      const friends = await Friend.find({
-        $or: [{ sender: userId }, { receiver: userId }],
-        status: "accepted",
-      })
-        .populate(
-          "sender receiver",
-          "firstName lastName username occupation _id picturePath verified"
-        )
-        .skip((page - 1) * 6)
-        .limit(6)
-        .sort({ createdAt: -1 });
+      if (isNavFriends === "true") {
+        friends = await Friend.find({
+          $or: [{ sender: userId }, { receiver: userId }],
+          status: "accepted",
+        })
+          .populate(
+            "sender receiver",
+            "firstName lastName username occupation _id picturePath verified"
+          )
+          .skip((page - 1) * 15)
+          .limit(15)
+          .sort({ createdAt: -1 });
+      } else {
+        friends = await Friend.find({
+          $or: [{ sender: userId }, { receiver: userId }],
+          status: "accepted",
+        })
+          .populate(
+            "sender receiver",
+            "firstName lastName username occupation _id picturePath verified"
+          )
+          .skip((page - 1) * 6)
+          .limit(6)
+          .sort({ verified: -1, createdAt: -1 });
+      }
 
-      if (req.query.isProfile) {
+      if (isProfile) {
         const friendsCount = await Friend.countDocuments({
           $or: [{ sender: userId }, { receiver: userId }],
           status: "accepted",

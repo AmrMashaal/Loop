@@ -285,7 +285,10 @@ export const deleteComment = async (req, res) => {
 
     const replyCount = await Reply.countDocuments({ comment: commentId });
 
-    const post = await Post.findById(comments.postId);
+    const post = await Post.findById(comments.postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
     if (post) {
       await Post.findByIdAndUpdate(comments.postId, {

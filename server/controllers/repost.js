@@ -22,11 +22,16 @@ export const createRepost = async (req, res) => {
     );
 
     const populatedRepost = await Repost.findById(repost._id)
-      .populate(
-        "postId",
-        "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-      )
-      .populate("userId", "firstName lastName picturePath verified _id");
+      .populate("userId", "firstName lastName picturePath verified _id")
+      .populate({
+        path: "postId",
+        select:
+          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt",
+        populate: {
+          path: "userId",
+          select: "_id firstName lastName picturePath verified",
+        },
+      });
 
     res.status(201).json(populatedRepost);
   } catch (error) {

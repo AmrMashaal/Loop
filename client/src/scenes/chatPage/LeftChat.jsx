@@ -224,7 +224,7 @@ const LeftChat = ({
                                 <VerifiedOutlined
                                   sx={{
                                     fontSize: "20px",
-                                    color: "#00D5FA",
+                                    color: "#15a1ed",
                                   }}
                                 />
                               ) : undefined
@@ -232,7 +232,7 @@ const LeftChat = ({
                               <VerifiedOutlined
                                 sx={{
                                   fontSize: "20px",
-                                  color: "#00D5FA",
+                                  color: "#15a1ed",
                                 }}
                               />
                             ) : undefined
@@ -240,7 +240,7 @@ const LeftChat = ({
                             <VerifiedOutlined
                               sx={{
                                 fontSize: "20px",
-                                color: "#00D5FA",
+                                color: "#15a1ed",
                               }}
                             />
                           ) : undefined}

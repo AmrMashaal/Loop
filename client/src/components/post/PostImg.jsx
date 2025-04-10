@@ -3,7 +3,6 @@ const PostImg = ({
   setIsPostClicked,
   setPostClickData,
   ele,
-  isRepost,
   setPostClickType,
 }) => {
   return (
@@ -14,7 +13,6 @@ const PostImg = ({
         maxHeight: "560px",
         objectFit: "cover",
         margin: "10px 0 10px 0",
-        borderRadius: isRepost ? "0.75rem 0.75rem 0 0" : "0.75rem",
         cursor: "pointer",
         backgroundColor: "gray",
         userSelect: "none",
@@ -26,14 +24,14 @@ const PostImg = ({
         setIsPostClicked(true),
           setPostClickType("post"),
           setPostClickData({
-            firstName: ele.firstName,
-            lastName: ele.lastName,
-            picturePath: ele.picturePath,
-            userPicturePath: ele.userPicturePath,
+            firstName: ele?.userId?.firstName,
+            lastName: ele?.userId?.lastName,
+            picturePath: ele?.picturePath,
+            userPicturePath: ele?.userId?.picturePath,
             description: ele.description,
-            _id: ele._id,
-            userId: ele.userId,
-            verified: ele.verified,
+            _id: ele?._id,
+            userId: ele?.userId?._id,
+            verified: ele?.userId?.verified,
           });
       }}
     />

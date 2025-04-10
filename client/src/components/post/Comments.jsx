@@ -479,7 +479,7 @@ const Comments = ({
 
   const handleSubmitReply = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
 
     if ((commentInfo.trim().length !== 0 || image) && !loading) {
       const formData = new FormData();
@@ -673,7 +673,7 @@ const Comments = ({
 
                               {com?.user?.verified && (
                                 <VerifiedOutlined
-                                  sx={{ fontSize: "20px", color: "#00D5FA" }}
+                                  sx={{ fontSize: "20px", color: "#15a1ed" }}
                                 />
                               )}
                             </Box>
@@ -811,7 +811,9 @@ const Comments = ({
                           }
                         >
                           {com?.isLiked ? (
-                            <FavoriteOutlined sx={{ color: "red" }} />
+                            <FavoriteOutlined
+                              sx={{ color: palette.primary.main }}
+                            />
                           ) : (
                             <FavoriteBorderOutlined />
                           )}
@@ -1109,7 +1111,9 @@ const Comments = ({
           >
             <Box display="flex" alignItems="center" gap="5px">
               {countCheck?.isLiked ? (
-                <FavoriteOutlined style={{ fontSize: "23px", color: "red" }} />
+                <FavoriteOutlined
+                  style={{ fontSize: "23px", color: palette.primary.main }}
+                />
               ) : (
                 <FavoriteBorderOutlined style={{ fontSize: "23px" }} />
               )}
@@ -1127,7 +1131,6 @@ const Comments = ({
             else if (inputType === "reply") handleSubmitReply(e);
           }}
           style={{ position: "relative" }}
-          
         >
           <InputBase
             type="text"

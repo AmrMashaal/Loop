@@ -40,6 +40,7 @@ const PostWidget = ({
   setPostClickType,
   followSuggestions,
   setFollowSuggestions,
+  pageNumber,
 }) => {
   const [showLikes, setShowLikes] = useState(false);
   const [likesLoading, setLikesLoading] = useState(false);
@@ -126,6 +127,8 @@ const PostWidget = ({
 
         const data = await response.json();
 
+        console.log("data", data);
+
         if (initial) {
           setLikeList(data);
         } else {
@@ -166,7 +169,7 @@ const PostWidget = ({
     try {
       const response1 = await fetch(
         `/api/likes/${postId}/${user._id}/${
-          typeof ele.userId !== "object" ? "like" : "likeRepost"
+          typeof ele.postId !== "object" ? "like" : "likeRepost"
         }`,
         {
           method: "PATCH",
@@ -193,12 +196,12 @@ const PostWidget = ({
       }
 
       if (
-        ele.userId !== user._id &&
-        ele.userId._id !== user._id &&
+        ele?.userId !== user._id &&
+        ele?.userId?._id !== user._id &&
         updatedPost.isLiked
       ) {
         const response2 = await fetch(
-          `/api/notifications/${user._id}/${ele.userId}`,
+          `/api/notifications/${user._id}/${ele?.userId}`,
           {
             method: "POST",
             headers: {
@@ -209,7 +212,7 @@ const PostWidget = ({
               type: "like",
               description: `${user.firstName} liked your post`,
               linkId: postId,
-              receiverId: ele.userId,
+              receiverId: ele?.userId,
               senderId: user._id,
             }),
           }
@@ -219,7 +222,7 @@ const PostWidget = ({
 
         if (import.meta.env.VITE_NODE_ENV !== "production") {
           socket.emit("notifications", {
-            receiverId: ele.userId,
+            receiverId: ele?.userId,
             notification: notification,
           });
         }
@@ -400,7 +403,7 @@ const PostWidget = ({
 
   // eslint-disable-next-line react/prop-types
   return (
-    <>
+    <Box>
       {posts && (
         <>
           {posts?.map((ele, index) => {
@@ -410,237 +413,222 @@ const PostWidget = ({
 
             return (
               <Box key={index}>
-                <WidgetWrapper mb="10px">
-                  <FlexBetween>
-                    <Link
-                      to={`/profile/${
-                        typeof ele.userId === "object"
-                          ? ele.userId._id
-                          : ele.userId
-                      }`}
-                    >
-                      <FlexBetween gap="10px">
-                        <Box sx={{ cursor: "pointer" }}>
-                          <UserImage
-                            image={
-                              typeof ele.userId === "object"
-                                ? ele.userId.picturePath
-                                : ele.userPicturePath
-                            }
-                            size="40px"
-                          />
-                        </Box>
-
-                        <Box>
-                          <Box
-                            sx={{ cursor: "pointer" }}
-                            display="flex"
-                            alignItems="center"
-                            gap="4px"
-                          >
-                            <Typography fontSize="14px" className="opacityBox">
-                              {typeof ele.userId === "object"
-                                ? ele.userId.firstName
-                                : ele.firstName}{" "}
-                              {typeof ele.userId === "object"
-                                ? ele.userId.lastName
-                                : ele.lastName}
-                            </Typography>
-
-                            {typeof ele.userId === "object" &&
-                            ele.userId.verified ? (
-                              <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                            ) : ele.verified ? (
-                              <VerifiedOutlined sx={{ color: "#15a1ed" }} />
-                            ) : undefined}
+                <WidgetWrapper mb="10px" isPost={true}>
+                  <Box p="14px 14px 2px">
+                    <FlexBetween>
+                      <Link to={`/profile/${ele?.userId?._id}`}>
+                        <FlexBetween gap="10px">
+                          <Box sx={{ cursor: "pointer" }}>
+                            <UserImage
+                              image={ele?.userId?.picturePath}
+                              size="40px"
+                            />
                           </Box>
 
-                          <Typography
-                            fontSize="11px"
-                            color={medium}
-                            display="flex"
-                            alignItems="center"
-                            gap="3px"
-                            sx={{ userSelect: "none" }}
-                          >
-                            {timeAgo(ele?.createdAt)}{" "}
-                            {ele?.privacy === "public" ? (
-                              <Public sx={{ fontSize: "15px" }} />
-                            ) : ele?.privacy === "friends" ? (
-                              <People sx={{ fontSize: "15px" }} />
-                            ) : (
-                              <Lock sx={{ fontSize: "15px" }} />
-                            )}
-                            {ele?.edited && (
-                              <Typography fontWeight="500" fontSize="11px">
-                                | Edited
+                          <Box>
+                            <Box
+                              sx={{ cursor: "pointer" }}
+                              display="flex"
+                              alignItems="center"
+                              gap="4px"
+                            >
+                              <Typography
+                                fontSize="14px"
+                                className="opacityBox"
+                              >
+                                {ele?.userId?.firstName} {ele?.userId?.lastName}
                               </Typography>
-                            )}
-                            {ele?.pinned &&
-                              location.pathname.split("/")[1] === "profile" && (
-                                <Box
-                                  display="flex"
-                                  alignItems="center"
-                                  gap="2px"
-                                  fontWeight="500"
-                                  fontSize="11px"
-                                >
-                                  | Pinned
-                                  <PushPinOutlined sx={{ fontSize: "14px" }} />
-                                </Box>
+
+                              {ele?.userId?.verified && (
+                                <VerifiedOutlined sx={{ color: "#15a1ed" }} />
                               )}
-                          </Typography>
-                        </Box>
-                      </FlexBetween>
-                    </Link>
+                            </Box>
 
-                    {typeof ele.userId === "object" &&
-                    ele.userId._id === user._id ? (
-                      <IconButton
-                        onClick={() => {
-                          setIsDots(true),
-                            setPostInfo({
-                              postId: ele._id,
-                              userId: ele.userId,
-                            });
-                        }}
-                      >
-                        <MoreHoriz />
-                      </IconButton>
-                    ) : ele.userId === user._id ? (
-                      <IconButton
-                        onClick={() => {
-                          setIsDots(true),
-                            setPostInfo({
-                              postId: ele._id,
-                              userId: ele.userId,
-                            });
-                        }}
-                      >
-                        <MoreHoriz />
-                      </IconButton>
-                    ) : undefined}
-                  </FlexBetween>
+                            <Typography
+                              fontSize="11px"
+                              color={medium}
+                              display="flex"
+                              alignItems="center"
+                              gap="3px"
+                              sx={{ userSelect: "none" }}
+                            >
+                              {timeAgo(ele?.createdAt)}{" "}
+                              {ele?.privacy === "public" ? (
+                                <Public sx={{ fontSize: "15px" }} />
+                              ) : ele?.privacy === "friends" ? (
+                                <People sx={{ fontSize: "15px" }} />
+                              ) : (
+                                <Lock sx={{ fontSize: "15px" }} />
+                              )}
+                              {ele?.edited && (
+                                <Typography fontWeight="500" fontSize="11px">
+                                  | Edited
+                                </Typography>
+                              )}
+                              {ele?.pinned &&
+                                location.pathname.split("/")[1] ===
+                                  "profile" && (
+                                  <Box
+                                    display="flex"
+                                    alignItems="center"
+                                    gap="2px"
+                                    fontWeight="500"
+                                    fontSize="11px"
+                                  >
+                                    | Pinned
+                                    <PushPinOutlined
+                                      sx={{ fontSize: "14px" }}
+                                    />
+                                  </Box>
+                                )}
+                            </Typography>
+                          </Box>
+                        </FlexBetween>
+                      </Link>
 
-                  <Box
-                    border={textAddition?.value === "quotation" && "2px solid "}
-                    p={textAddition?.value === "quotation" && "15px"}
-                    m={
-                      textAddition?.value === "quotation"
-                        ? "15px 0 8px"
-                        : ele?.picturePath && ele?.description
-                        ? "10px 0 0"
-                        : ele?.description && !ele?.picturePath
-                        ? "14px 00 0"
-                        : undefined
-                    }
-                    textAlign={
-                      (textAddition?.value === "quotation" ||
-                        textAddition.type === "color") &&
-                      "center"
-                    }
-                    sx={{
-                      p: textAddition.type === "color" && "160px 25px",
-                      background:
-                        textAddition.type === "color" && textAddition.value,
-                      cursor: textAddition.type === "color" && "pointer",
-                      color:
-                        textAddition.type === "color" &&
-                        textAddition.value !==
-                          "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
-                        "white",
-                    }}
-                    onClick={() => {
-                      if (textAddition?.type === "color") {
-                        setIsPostClicked(true),
-                          setPostClickType("post"),
-                          setPostClickData({
-                            firstName: ele?.firstName,
-                            lastName: ele?.lastName,
-                            picturePath: ele?.picturePath,
-                            userPicturePath: ele?.userPicturePath,
-                            description: ele?.description,
-                            _id: ele?._id,
-                            userId: ele?.userId,
-                            verified: ele?.verified,
-                          });
-                      }
-                    }}
-                  >
-                    <Typography
-                      position="relative"
-                      fontWeight={textAddition?.value === "bold" && "bold"}
-                      fontSize={
-                        typeof ele.userId === "object"
-                          ? "14px"
-                          : howIsText(
-                              ele?.description,
-                              ele?.picturePath,
-                              textAddition
-                            )
-                      }
-                      color={
-                        textAddition?.value ===
-                          "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
-                        mode === "light" &&
-                        "black"
-                      }
-                      textTransform={
+                      {typeof ele.postId === "object" &&
+                      ele?.userId?._id === user._id ? (
+                        <IconButton
+                          onClick={() => {
+                            setIsDots(true),
+                              setPostInfo({
+                                postId: ele._id,
+                                userId: ele?.userId?._id,
+                              });
+                          }}
+                        >
+                          <MoreHoriz />
+                        </IconButton>
+                      ) : ele?.userId?._id === user._id ? (
+                        <IconButton
+                          onClick={() => {
+                            setIsDots(true),
+                              setPostInfo({
+                                postId: ele._id,
+                                userId: ele?.userId?._id,
+                              });
+                          }}
+                        >
+                          <MoreHoriz />
+                        </IconButton>
+                      ) : undefined}
+                    </FlexBetween>
+
+                    <Box
+                      p={textAddition?.value === "quotation" && "15px"}
+                      m={
                         textAddition?.value === "quotation"
-                          ? "capitalize"
-                          : textAddition?.value === "uppercase"
-                          ? "uppercase"
+                          ? "15px 0 8px"
+                          : ele?.picturePath && ele?.description
+                          ? "10px 0 0"
+                          : ele?.description && !ele?.picturePath
+                          ? "14px 00 0"
                           : undefined
                       }
+                      textAlign={textAddition.type === "color" && "center"}
                       sx={{
-                        wordBreak: "break-word",
-                        lineHeight: "1.7",
-                        direction: testArabic(ele?.description) && "rtl",
-                        textAlign: textAddition.type === "color",
-                        p: textAddition?.value === "quotation" && "25px",
+                        p: textAddition.type === "color" && "160px 25px",
+                        background:
+                          textAddition.type === "color" && textAddition.value,
+                        cursor: textAddition.type === "color" && "pointer",
+                        color:
+                          textAddition.type === "color" &&
+                          textAddition.value !==
+                            "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
+                          "white",
                       }}
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(
-                          convertTextLink(
-                            ele?.description?.length > 180
-                              ? ele?.description?.slice(0, 179)
-                              : ele?.description
-                          ),
-                          {
-                            ADD_ATTR: ["target", "rel"],
-                          }
-                        ),
-                      }}
-                      className={
-                        textAddition?.value === "quotation" && "postText"
-                      }
-                    />
-
-                    {ele?.description?.length > 180 && (
-                      <span
-                        style={{
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          userSelect: "none",
-                        }}
-                        onClick={() => {
+                      onClick={() => {
+                        if (textAddition?.type === "color") {
                           setIsPostClicked(true),
                             setPostClickType("post"),
                             setPostClickData({
-                              firstName: ele?.firstName,
-                              lastName: ele?.lastName,
+                              firstName: ele?.userId?.firstName,
+                              lastName: ele?.userId?.lastName,
                               picturePath: ele?.picturePath,
-                              userPicturePath: ele?.userPicturePath,
+                              userPicturePath: ele?.userId?.picturePath,
                               description: ele?.description,
                               _id: ele?._id,
-                              userId: ele?.userId,
-                              verified: ele?.verified,
+                              userId: ele?.userId?._id,
+                              verified: ele?.userId?.verified,
                             });
+                        }
+                      }}
+                    >
+                      <Typography
+                        position="relative"
+                        fontWeight={textAddition?.value === "bold" && "bold"}
+                        fontSize={
+                          typeof ele.postId === "object"
+                            ? "14px"
+                            : howIsText(
+                                ele?.description,
+                                ele?.picturePath,
+                                textAddition
+                              )
+                        }
+                        color={
+                          textAddition?.value ===
+                            "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
+                          mode === "light" &&
+                          "black"
+                        }
+                        textTransform={
+                          textAddition?.value === "quotation"
+                            ? "capitalize"
+                            : textAddition?.value === "uppercase"
+                            ? "uppercase"
+                            : undefined
+                        }
+                        sx={{
+                          wordBreak: "break-word",
+                          lineHeight: "1.7",
+                          direction: testArabic(ele?.description) && "rtl",
+                          textAlign: textAddition.type === "color",
+                          p: textAddition?.value === "quotation" && "10px",
                         }}
-                      >
-                        ...more
-                      </span>
-                    )}
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(
+                            convertTextLink(
+                              ele?.description?.length > 180
+                                ? ele?.description?.slice(0, 179)
+                                : ele?.description
+                            ),
+                            {
+                              ADD_ATTR: ["target", "rel"],
+                            }
+                          ),
+                        }}
+                        className={
+                          textAddition?.value === "quotation" && "postText"
+                        }
+                      />
+
+                      {ele?.description?.length > 180 && (
+                        <span
+                          style={{
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            userSelect: "none",
+                          }}
+                          onClick={() => {
+                            setIsPostClicked(true),
+                              setPostClickType("post"),
+                              setPostClickData({
+                                firstName: ele?.userId?.firstName,
+                                lastName: ele?.userId?.lastName,
+                                picturePath: ele?.picturePath,
+                                userPicturePath: ele?.userId?.picturePath,
+                                description: ele?.description,
+                                _id: ele?._id,
+                                userId: ele?.userId?._id,
+                                verified: ele?.userId?.verified,
+                              });
+                          }}
+                        >
+                          ...more
+                        </span>
+                      )}
+                    </Box>
                   </Box>
 
                   {ele.picturePath && (
@@ -652,8 +640,8 @@ const PostWidget = ({
                     />
                   )}
 
-                  {typeof ele.userId === "object" && (
-                    <Box borderRadius="0.75rem">
+                  {typeof ele.postId === "object" && (
+                    <Box p="10px">
                       {ele?.postId?.picturePath && (
                         <PostImg
                           setIsPostClicked={setIsPostClicked}
@@ -666,23 +654,18 @@ const PostWidget = ({
 
                       <Box
                         mt={ele?.postId?.picturePath ? "-17px" : "13px"}
-                        border="1px solid"
-                        borderColor={palette.neutral.light}
+                        border="1px solid #4a366a"
                         p="10px"
                       >
                         {ele?.postId !== null ? (
                           <Link
-                            to={`/profile/${ele?.postId?.userId}`}
+                            to={`/profile/${ele?.postId?.userId?._id}`}
                             style={{ width: "fit-content", display: "block" }}
                           >
                             <Box gap="10px" display="flex" alignItems="center">
                               <Box sx={{ cursor: "pointer" }}>
                                 <UserImage
-                                  image={
-                                    typeof ele?.userId === "object"
-                                      ? ele?.postId?.userPicturePath
-                                      : ele?.userPicturePath
-                                  }
+                                  image={ele?.postId?.userId?.picturePath}
                                   size="40px"
                                 />
                               </Box>
@@ -698,15 +681,11 @@ const PostWidget = ({
                                     fontSize="14px"
                                     className="opacityBox"
                                   >
-                                    {typeof ele?.userId === "object"
-                                      ? ele?.postId?.firstName
-                                      : ele?.firstName}{" "}
-                                    {typeof ele?.userId === "object"
-                                      ? ele?.postId?.lastName
-                                      : ele?.lastName}
+                                    {ele?.postId?.userId?.firstName}{" "}
+                                    {ele?.postId?.userId?.lastName}
                                   </Typography>
 
-                                  {ele.postId?.verified && (
+                                  {ele?.postId?.userId?.verified && (
                                     <VerifiedOutlined
                                       sx={{ color: "#15a1ed" }}
                                     />
@@ -796,15 +775,15 @@ const PostWidget = ({
                                   setIsPostClicked(true),
                                     setPostClickType("post"),
                                     setPostClickData({
-                                      firstName: ele?.postId?.firstName,
-                                      lastName: ele?.postId?.lastName,
+                                      firstName: ele?.postId?.userId?.firstName,
+                                      lastName: ele?.postId?.userId?.lastName,
                                       picturePath: ele?.postId?.picturePath,
                                       userPicturePath:
-                                        ele?.postId?.userPicturePath,
+                                        ele?.postId?.userId?.picturePath,
                                       description: ele?.postId?.description,
                                       _id: ele?.postId?._id,
-                                      userId: ele?.postId?.userId,
-                                      verified: ele?.postId?.verified,
+                                      userId: ele?.postId?.userId?._id,
+                                      verified: ele?.postId?.userId?.verified,
                                     });
                                 }}
                               >
@@ -835,7 +814,8 @@ const PostWidget = ({
                 {(posts.length > 4
                   ? index === 3 || index === 30 || index === 80
                   : index === 0) &&
-                  location.pathname === "/" && (
+                  location.pathname === "/" &&
+                  followSuggestions?.length !== 0 && (
                     <Box
                       key={index + 123}
                       my="20px"
@@ -961,7 +941,7 @@ const PostWidget = ({
                                   sx={{
                                     backgroundColor: fol?.isFollowed
                                       ? palette.neutral.light
-                                      : "rgb(0 151 250)",
+                                      : palette.primary.dark,
                                     color: fol?.isFollowed
                                       ? palette.neutral.main
                                       : "white",
@@ -970,7 +950,7 @@ const PostWidget = ({
                                       opacity: "0.8",
                                       backgroundColor: fol?.isFollowed
                                         ? "white"
-                                        : "rgb(0 151 250)",
+                                        : palette.primary.dark,
                                     },
                                   }}
                                   onClick={(e) => {
@@ -1147,7 +1127,16 @@ const PostWidget = ({
         />
       )}
 
-      {postLoading && <PostSkeleton />}
+      {postLoading && pageNumber === 1 && <PostSkeleton />}
+
+      {postLoading && pageNumber !== 1 && (
+        <Box
+          className="loadingAnimation"
+          width="20px"
+          height="20px"
+          margin="auto"
+        />
+      )}
 
       {!postLoading &&
         posts?.length === 0 &&
@@ -1188,7 +1177,7 @@ const PostWidget = ({
             No posts available
           </Typography>
         )}
-    </>
+    </Box>
   );
 };
 

@@ -18,6 +18,7 @@ import ChatPage from "./scenes/chatPage/ChatPage";
 import PostClick from "./components/post/PostClick";
 import { setFriends } from "../state";
 import socket from "./components/socket";
+import { Box } from "@mui/system";
 
 export let isOverflow;
 export let setIsOverFlow;
@@ -106,6 +107,39 @@ const App = () => {
 
   return (
     <div className="app">
+      <Box
+        position="fixed"
+        width="700px"
+        height="700px"
+        borderRadius="50%"
+        boxShadow="0 0 20px 20px #a847dc38"
+        top="-200px"
+        left="-172px"
+        zIndex="10"
+        sx={{
+          opacity: mode === "light" ? "0.1" : "0.07",
+          background: `radial-gradient(circle, #a847dc69, rgb(17 17 17 / 0%))`,
+          pointerEvents: "none",
+        }}
+      ></Box>
+
+      <Box
+        position="fixed"
+        width="600px"
+        height="600px"
+        borderRadius="50%"
+        boxShadow="0 0 20px 20px rgb(255 255 255 / 16%)"
+        bottom="-200px"
+        right="-172px"
+        zIndex="10"
+        sx={{
+          opacity: mode === "light" ? "0.1" : "0.1",
+          background:
+            "radial-gradient(circle, rgb(255 255 255 / 34%), rgb(17 17 17 / 0%))",
+          pointerEvents: "none",
+        }}
+      ></Box>
+
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline />
