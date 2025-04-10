@@ -154,34 +154,9 @@ export const editUser = async (req, res) => {
       user.picturePath = picturePath;
     }
 
-    if (picturePath) {
-      await Post.updateMany(
-        {
-          userId: id,
-        },
-        {
-          $set: {
-            userPicturePath: picturePath,
-          },
-        }
-      );
-    }
-
-    await Post.updateMany(
-      {
-        userId: id,
-      },
-      {
-        $set: {
-          firstName: firstName,
-          lastName: lastName,
-        },
-      }
-    );
-
     const updatedUser = await user.save();
 
-    const { password, ...UserData } = updatedUser.toObject(); 
+    const { password, ...UserData } = updatedUser.toObject();
 
     res.status(200).json(UserData);
   } catch (err) {
