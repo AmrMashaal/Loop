@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  --primary-color: #a847dc;
+  --secondary-color: #4a366a;
+}
+
 input,
 textarea,
 button,
@@ -36,16 +41,15 @@ li {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(120, 120, 120);
-  border-radius: 50px;
-  -webkit-border-radius: 50px;
-  -moz-border-radius: 50px;
-  -ms-border-radius: 50px;
-  -o-border-radius: 50px;
+  background: linear-gradient(to bottom, var(--primary-color), transparent);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(93, 93, 93);
+  background: linear-gradient(
+    to bottom,
+    var(--primary-color),
+    var(--secondary-color)
+  );
 }
 
 ::-webkit-scrollbar-track {
@@ -91,7 +95,7 @@ li {
 
 .loopAnimation {
   color: transparent;
-  background: radial-gradient(circle, #00d5fa, #a40fe9a3);
+  background: radial-gradient(circle, var(--primary-color), #e0a6ff 50%);
   background-clip: text;
   -webkit-background-clip: text;
   -moz-background-clip: text;
@@ -159,14 +163,16 @@ li {
 
 .postText::before {
   content: "❝";
-  margin-right: 5px;
+  margin-right: 8px;
   font-size: 27px;
+  color: #858585;
 }
 
 .postText::after {
   content: "❞";
-  margin-left: 5px;
+  margin-left: 8px;
   font-size: 27px;
+  color: #858585;
 }
 
 .myInputWidgetUppercase .css-1y6has7-MuiInputBase-input,
@@ -182,7 +188,7 @@ li {
   -moz-border-radius: 50%;
   -ms-border-radius: 50%;
   -o-border-radius: 50%;
-  border: #00d5fa 4px solid;
+  border: #a847dc 4px solid;
   border-right: transparent 4px solid;
 }
 
@@ -223,7 +229,7 @@ li {
   left: 0;
   width: 0%;
   height: 2px;
-  background-color: #00d5fa;
+  background-color: var(--primary-color);
   transition: 0.2s;
   -webkit-transition: 0.2s;
   -moz-transition: 0.2s;
@@ -300,4 +306,25 @@ li {
 
 .authInputes > div > input {
   padding-left: 30px;
+}
+
+.gradientBorderRight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 60vh;
+  width: 1px;
+  background: linear-gradient(180deg, #4a366a, transparent);
+}
+
+.gradientBorderLeft::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 60vh;
+  width: 1px;
+  background: linear-gradient(180deg, #4a366a, transparent);
+  z-index: 11;
 }

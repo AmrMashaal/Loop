@@ -331,7 +331,7 @@ const PostClick = ({
                   </Typography>
                   {postDetails.verified && (
                     <VerifiedOutlined
-                      sx={{ fontSize: "22px", color: "#00D5FA" }}
+                      sx={{ fontSize: "22px", color: "#15a1ed" }}
                     />
                   )}
                 </Box>

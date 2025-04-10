@@ -1,85 +1,78 @@
 /* eslint-disable react/prop-types */
 import { Typography } from "@mui/material";
-import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import OnlineFriends from "../../components/friends/OnlineFriends";
 import UserFriends from "../../components/friends/UserFriends";
-import FlexBetween from "../../components/FlexBetween";
 import { Link } from "react-router-dom";
+import { Box, useTheme } from "@mui/system";
 
 // eslint-disable-next-line react/prop-types
-const FriendsWidget = ({
-  userId,
-  description,
-  onlineFriends,
-  type,
-  setOnlineFriends,
-  isNonMobileScreens,
-}) => {
+const FriendsWidget = ({ userId, description, type, isNonMobileScreens }) => {
   const [loading, setLoading] = useState(true);
   const [userFriends, setUserFriends] = useState([]);
+  const [page, setPage] = useState(1);
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
 
-  const handleUserFriend = async () => {
-    if (type === "friends") {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          ` /api/friends/${userId}/friends?isProfile=true`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+  const { palette } = useTheme();
 
-        const friends = await response.json();
+  const handleUserFriend = async (initial = false) => {
+    if (page === 1) setLoading(true);
 
-        setUserFriends(friends);
-      } catch (error) {
-        if (import.meta.env.VITE_NODE_ENV === "development") {
-          console.error("Error:", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const handleOnlineFriends = async () => {
-    if (type === "onlineFriends") {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/users/${userId}/onlineFriends`, {
+    try {
+      const response = await fetch(
+        ` /api/friends/${userId}/friends?isProfile=true&&page=${page}&&isNavFriends=${
+          type === "navFriends" ? "true" : "false"
+        }`,
+        {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const onlineFriends = await response.json();
-        setOnlineFriends(onlineFriends);
-      } catch (error) {
-        if (import.meta.env.VITE_NODE_ENV === "development") {
-          console.error("Error:", error);
         }
-      } finally {
-        setLoading(false);
+      );
+
+      const friends = await response.json();
+
+      if (response.ok) {
+        if (initial) {
+          setUserFriends(friends);
+        } else {
+          setUserFriends((prev) => ({
+            friends: [...prev.friends, ...friends.friends],
+            count: friends.count,
+          }));
+        }
       }
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (type === "friends") {
+    if (page === 1) handleUserFriend(true);
+    else {
       handleUserFriend();
-    } else if (type === "onlineFriends") {
-      handleOnlineFriends();
     }
-  }, [userId]);
+  }, [userId, page]);
 
   return (
-    <WidgetWrapper position="sticky" top="80px">
-      <FlexBetween>
+    <Box
+      position="sticky"
+      top="80px"
+      height={isNonMobileScreens ? "100vh" : "unset"}
+      className="gradientBorderRight"
+      padding={type === "navFriends" ? undefined : "14px 25px"}
+    >
+      <Box
+        display={type === "navFriends" ? undefined : "flex"}
+        justifyContent={type === "navFriends" ? undefined : "space-between"}
+        alignContent={type === "navFriends" ? undefined : "center"}
+      >
         <Typography
           fontSize={isNonMobileScreens ? "20px" : "16px"}
           fontWeight="500"
@@ -88,52 +81,51 @@ const FriendsWidget = ({
           {description}
         </Typography>
 
-        {!loading &&
-          userFriends?.count !== 0 &&
-          description !== "online friends" && (
-            <Link
-              style={{
-                userSelect: "none",
-                textTransform: "capitalize",
-                fontWeight: "500",
-                fontSize: isNonMobileScreens ? "15px" : "14px",
-                color: "#00D5FA",
-              }}
-              className="linkUnderline"
-              to={`/profile/${userId}/friends`}
-            >
-              see all friends
-            </Link>
-          )}
-      </FlexBetween>
+        {!loading && userFriends?.count !== 0 && type !== "navFriends" && (
+          <Link
+            style={{
+              userSelect: "none",
+              textTransform: "capitalize",
+              fontWeight: "500",
+              fontSize: isNonMobileScreens ? "15px" : "14px",
+              color: palette.primary.main,
+            }}
+            className="linkUnderline"
+            to={`/profile/${userId}/friends`}
+          >
+            see all friends
+          </Link>
+        )}
+      </Box>
 
-      <Typography
-        mt="1px"
-        fontSize={isNonMobileScreens ? "14px" : "12px"}
-        color="#a9a4a4"
-        fontWeight="500"
-        sx={{ userSelect: "none" }}
-      >
-        {!loading &&
-          userFriends?.count !== 0 &&
-          description !== "online friends" &&
-          userFriends?.count}{" "}
-        {!loading &&
-          userFriends?.count !== 0 &&
-          description !== "online friends" &&
-          (userFriends?.count > 1 ? "friends" : "friend")}
-      </Typography>
+      {type !== "navFriends" && (
+        <Typography
+          mt="1px"
+          fontSize={isNonMobileScreens ? "14px" : "12px"}
+          color="#a9a4a4"
+          fontWeight="500"
+          sx={{ userSelect: "none" }}
+        >
+          {!loading &&
+            userFriends?.count !== 0 &&
+            description !== "friends" &&
+            userFriends?.count}{" "}
+          {!loading &&
+            userFriends?.count !== 0 &&
+            description !== "friends" &&
+            (userFriends?.count > 1 ? "friends" : "friend")}
+        </Typography>
+      )}
 
-      {type === "onlineFriends" && (
+      {type === "navFriends" && (
         <OnlineFriends
-          onlineFriends={onlineFriends}
+          navFriends={userFriends}
           loading={loading}
-          user={user}
-          userId={user._id}
+          setPage={setPage}
         />
       )}
 
-      {type === "friends" && (
+      {type !== "navFriends" && (
         <UserFriends
           userFriends={userFriends}
           loading={loading}
@@ -142,7 +134,7 @@ const FriendsWidget = ({
           isNonMobileScreens={isNonMobileScreens}
         />
       )}
-    </WidgetWrapper>
+    </Box>
   );
 };
 

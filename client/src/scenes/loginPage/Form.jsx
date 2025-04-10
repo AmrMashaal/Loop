@@ -18,7 +18,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../../state";
 import Dropzone from "react-dropzone";
-import { countries } from "../../../infoArrays";
+import { countriesWithFlags } from "../../../infoArrays";
 import { DeleteOutlined } from "@mui/icons-material";
 
 const registerSchema = yup.object().shape({
@@ -43,7 +43,6 @@ const registerSchema = yup.object().shape({
     .oneOf([yup.ref("password"), null], "Password must match")
     .required("Confirm password is required"),
   location: yup.string().required("required"),
-  occupation: yup.string().required("required"),
   gender: yup.string().required("required"),
   birthdate: yup
     .string()
@@ -80,7 +79,6 @@ const initialValuesRegister = {
   password: "",
   confirmPassword: "",
   location: "",
-  occupation: "",
   picture: "",
   gender: "",
   birthdate: "",
@@ -130,14 +128,15 @@ const Form = () => {
 
       const savedUser = await savedUserResponse.json();
 
-      setDataExisted({ username: false });
-
       if (
         savedUser?.message &&
-        savedUser?.message?.includes("Username Is Already Existed")
+        savedUser?.message?.includes("This Username Already Exists")
       ) {
         setDataExisted({ username: true });
+      } else {
+        setDataExisted({ username: false });
       }
+
       if (savedUser && !savedUser?.message) {
         onSubmitProps.resetForm();
         navigate("/login");
@@ -152,8 +151,9 @@ const Form = () => {
   };
 
   const login = async (values, onSubmitProps) => {
-    setLoading(true);
+    if (loading) return;
 
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -263,7 +263,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.firstName}
-                  name="firstName" // name is related to initialValuesRegister
+                  name="firstName"
                   error={
                     Boolean(touched.firstName) && Boolean(errors.firstName)
                   }
@@ -271,18 +271,21 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 2",
                   }}
+                  className="inputForm"
                 />
+
                 <TextField
                   label="Last Name"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.lastName}
-                  name="lastName" // name is related to initialValuesRegister
+                  name="lastName"
                   error={Boolean(touched.lastName) && Boolean(errors.lastName)}
                   helperText={touched.lastName && errors.lastName}
                   sx={{
                     gridColumn: "span 2",
                   }}
+                  className="inputForm"
                 />
 
                 <TextField
@@ -290,12 +293,13 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
-                  name="username" // name is related to initialValuesRegister
+                  name="username"
                   error={Boolean(touched.username) && Boolean(errors.username)}
                   helperText={touched.username && errors.username}
                   sx={{
                     gridColumn: "span 4",
                   }}
+                  className="inputForm"
                 />
 
                 {dataExisted.username && (
@@ -310,12 +314,13 @@ const Form = () => {
                   onChange={handleChange}
                   value={values.password}
                   type="password"
-                  name="password" // name is related to initialValuesRegister
+                  name="password"
                   error={Boolean(touched.password) && Boolean(errors.password)}
                   helperText={touched.password && errors.password}
                   sx={{
                     gridColumn: "span 4",
                   }}
+                  className="inputForm"
                 />
 
                 <TextField
@@ -332,6 +337,7 @@ const Form = () => {
                   sx={{
                     gridColumn: "span 4",
                   }}
+                  className="inputForm"
                 />
 
                 <Box
@@ -436,7 +442,7 @@ const Form = () => {
                 )}
 
                 <Box sx={{ gridColumn: "span 4" }}>
-                  <InputLabel>Gender</InputLabel>
+                  <InputLabel sx={{ color: "gray" }}>Gender</InputLabel>
 
                   <Box display="flex" alignItems="center" gap="10px" my="10px">
                     <Box
@@ -508,7 +514,9 @@ const Form = () => {
                   sx={{ gridColumn: "span 4", mt: "3px" }}
                 />
 
-                <InputLabel id="location-lable">Location</InputLabel>
+                <InputLabel id="location-lable" sx={{ color: "gray" }}>
+                  Location
+                </InputLabel>
 
                 <Select
                   name="location"
@@ -523,10 +531,10 @@ const Form = () => {
                   }}
                 >
                   <MenuItem value="">Select a location</MenuItem>
-                  {countries.map((country) => {
+                  {countriesWithFlags.map((country) => {
                     return (
-                      <MenuItem value={country} key={country}>
-                        {country}
+                      <MenuItem value={country.country} key={country.country}>
+                        {country.country} {country.flag}
                       </MenuItem>
                     );
                   })}
@@ -549,7 +557,7 @@ const Form = () => {
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.username}
-                  name="username" // name is related to initialValuesRegister
+                  name="username"
                   error={Boolean(touched.username) && Boolean(errors.username)}
                   helperText={touched.username && errors.username}
                   sx={{
@@ -581,7 +589,7 @@ const Form = () => {
             {location.pathname === "/signup" && (
               <Typography
                 color={palette.neutral.medium}
-                fontSize="12px"
+                fontSize="11px"
                 mt=".75rem"
                 mb="-.45rem"
                 sx={{ userSelect: "none" }}
@@ -606,6 +614,7 @@ const Form = () => {
                   },
                 }}
                 onClick={handleFormSubmit}
+                disabled={loading}
               >
                 {loading
                   ? "Loading.."

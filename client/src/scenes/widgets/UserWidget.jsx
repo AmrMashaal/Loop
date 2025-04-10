@@ -1,25 +1,13 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unescaped-entities */
-import {
-  LocationOnOutlined,
-  WorkOutlineOutlined,
-  VerifiedOutlined,
-  PersonOutline,
-} from "@mui/icons-material";
-import {
-  Box,
-  Typography,
-  Divider,
-  useTheme,
-  Skeleton,
-  Button,
-} from "@mui/material";
+import { VerifiedOutlined } from "@mui/icons-material";
+import { Box, Typography, Divider, useTheme, Skeleton } from "@mui/material";
 import UserImage from "../../components/UserImage";
-import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatLikesCount } from "../../frequentFunctions";
+import { countriesWithFlags } from "../../../infoArrays";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [theUser, setTheUser] = useState(null);
@@ -27,6 +15,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
+  const mode = useSelector((state) => state.mode);
 
   const { palette } = useTheme();
   const medium = palette.neutral.medium;
@@ -57,7 +46,14 @@ const UserWidget = ({ userId, picturePath }) => {
 
   return (
     <>
-      <WidgetWrapper position="sticky" top="80px" overflow="hidden">
+      <Box
+        p="14px 25px"
+        position="sticky"
+        top="80px"
+        overflow="hidden"
+        height="100vh"
+        className="gradientBorderLeft"
+      >
         {!userLoading ? (
           <>
             <Link to={`/profile/${userId}`}>
@@ -79,6 +75,7 @@ const UserWidget = ({ userId, picturePath }) => {
                 />
               ) : (
                 <Box
+                  bgcolor={mode === "light" ? "#f0f0f0" : "#1e1e1e"}
                   style={{
                     position: "absolute",
                     top: "0",
@@ -89,7 +86,6 @@ const UserWidget = ({ userId, picturePath }) => {
                     zIndex: "2",
                     pointerEvents: "none",
                     userSelect: "none",
-                    background: "#a89090",
                   }}
                 ></Box>
               )}
@@ -101,7 +97,11 @@ const UserWidget = ({ userId, picturePath }) => {
                 borderRadius="50%"
                 sx={{ transform: "translateX(-50%)", zIndex: "3" }}
               >
-                <UserImage image={picturePath} size="70"></UserImage>
+                <UserImage
+                  image={picturePath}
+                  size="70"
+                  isOnline={true}
+                ></UserImage>
               </Box>
 
               <Box position="relative">
@@ -128,73 +128,82 @@ const UserWidget = ({ userId, picturePath }) => {
                     )}
                   </Box>
 
-                  <Typography fontSize="13px" mb="10px" color={medium}>
-                    @{theUser?.username}
+                  <Typography fontSize="13px">@{theUser?.username}</Typography>
+
+                  <Typography fontSize="13px" color={medium} mb="5px">
+                    {theUser?.location}{" "}
+                    {
+                      countriesWithFlags?.find(
+                        (ct) => ct.country === theUser?.location
+                      )?.flag
+                    }
                   </Typography>
                 </Box>
               </Box>
             </Link>
 
-            <Divider />
+            <Box
+              p="1rem 0"
+              zIndex="2"
+              position="relative"
+              alignItems="center"
+              justifyContent="center"
+              display="flex"
+              sx={{ userSelect: "none" }}
+            >
+              <Box
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                p={"0 1rem"}
+                borderRight={`1px solid ${medium}`}
+              >
+                <Typography fontSize="20px" fontWeight="bold">
+                  {formatLikesCount(theUser?.followersCount)}
+                </Typography>
 
-            <Box p="1rem 0" zIndex="2" position="relative">
-              <Box display="flex" alignItems="center" gap="10px">
-                <PersonOutline style={{ fontSize: "26px" }} />
-
-                <Box
-                  color={medium}
-                  display="flex"
-                  gap="5px"
-                  alignItems="center"
-                >
-                  <Typography fontSize="14px">
-                    {formatLikesCount(theUser?.followersCount)}
-                  </Typography>
-
-                  <Typography fontSize="14px">
-                    Follower
-                    {theUser?.followersCount > 1 && "s"}
-                  </Typography>
-                </Box>
+                <Typography fontSize="13px">
+                  Follower
+                  {theUser?.followersCount > 1 && "s"}
+                </Typography>
               </Box>
 
               <Box
                 display="flex"
+                flexDirection="column"
+                justifyContent="center"
                 alignItems="center"
-                gap="10px"
-                marginBlock="1rem"
+                p={"0 1rem"}
               >
-                <LocationOnOutlined style={{ fontSize: "26px" }} />
-                <Typography
-                  color={medium}
-                  textTransform="capitalize"
-                  fontSize="14px"
-                >
-                  {theUser?.location}
+                <Typography fontSize="20px" fontWeight="bold">
+                  {formatLikesCount(theUser?.followingCount)}
+                </Typography>
+
+                <Typography fontSize="13px">
+                  Following
+                  {theUser?.followingCount > 1 && "s"}
                 </Typography>
               </Box>
-
-              {theUser?.occupation && (
-                <Box display="flex" alignItems="center" gap="10px">
-                  <WorkOutlineOutlined style={{ fontSize: "26px" }} />
-                  <Typography
-                    color={medium}
-                    textTransform="capitalize"
-                    fontSize="14px"
-                  >
-                    {theUser?.occupation}
-                  </Typography>
-                </Box>
-              )}
             </Box>
 
-            <Divider />
+            {theUser?.bio && (
+              <Box>
+                <Typography fontWeight="bold" sx={{ userSelect: "none" }}>
+                  Bio
+                </Typography>
 
-            <Link to={`/profile/${user._id}`}>
-              <Button sx={{ mt: "1rem", mx: "auto", width: "100%" }}>
-                My Profile
-              </Button>
-            </Link>
+                <Typography
+                  fontSize="14px"
+                  mt="8px"
+                  fontWeight="200"
+                  mb="8px"
+                  lineHeight="1.5rem"
+                >
+                  {theUser?.bio}
+                </Typography>
+              </Box>
+            )}
           </>
         ) : (
           <Box>
@@ -215,7 +224,7 @@ const UserWidget = ({ userId, picturePath }) => {
             <Skeleton width="230px" />
           </Box>
         )}
-      </WidgetWrapper>
+      </Box>
     </>
   );
 };
