@@ -80,23 +80,34 @@ export const followUser = async (req, res) => {
 };
 
 export const getFollowers = async (req, res) => {
-  const { id } = req.params;
-  const myId = req.user.id;
+  const { userId } = req.params;
 
-  const page = req.query.page || 1;
-  const limit = req.query.limit || 10;
-
-  if (id !== myId) {
-    return res.status(403).json({ message: "You are not authorized" });
-  }
+  const { page = 1, limit = 10 } = req.query;
 
   try {
-    const followers = await Follow.find({ following: id })
-      .populate("follower", "firstName lastName picturePath")
+    const followers = await Follow.find({ following: userId })
+      .populate("follower", "firstName lastName picturePath verified _id")
       .limit(limit)
       .skip((page - 1) * limit);
 
     res.status(200).json(followers);
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+};
+
+export const getFollowing = async (req, res) => {
+  const { userId } = req.params;
+
+  const { page = 1, limit = 10 } = req.query;
+
+  try {
+    const following = await Follow.find({ follower: userId })
+      .populate("following", "firstName lastName picturePath verified _id")
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    res.status(200).json(following);
   } catch (error) {
     res.status(500).json({ message: error });
   }

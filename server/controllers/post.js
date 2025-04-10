@@ -549,7 +549,7 @@ export const getPost = async (req, res) => {
       const postWithIsLiked = {
         ...post._doc,
         isLiked: Boolean(isLiked),
-        reposted: typeof post.userId === "object" ? true : false,
+        reposted: typeof post.postId === "object" ? true : false,
       };
 
       res.status(200).json(postWithIsLiked);

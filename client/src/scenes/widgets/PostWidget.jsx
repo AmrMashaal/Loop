@@ -127,8 +127,6 @@ const PostWidget = ({
 
         const data = await response.json();
 
-        console.log("data", data);
-
         if (initial) {
           setLikeList(data);
         } else {
@@ -656,6 +654,23 @@ const PostWidget = ({
                         mt={ele?.postId?.picturePath ? "-17px" : "13px"}
                         border="1px solid #4a366a"
                         p="10px"
+                        sx={{
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          setIsPostClicked(true),
+                            setPostClickType("post"),
+                            setPostClickData({
+                              firstName: ele?.postId?.userId?.firstName,
+                              lastName: ele?.postId?.userId?.lastName,
+                              picturePath: ele?.postId?.picturePath,
+                              userPicturePath: ele?.postId?.userId?.picturePath,
+                              description: ele?.postId?.description,
+                              _id: ele?.postId?._id,
+                              userId: ele?.postId?.userId?._id,
+                              verified: ele?.postId?.userId?.verified,
+                            });
+                        }}
                       >
                         {ele?.postId !== null ? (
                           <Link

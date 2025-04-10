@@ -84,32 +84,23 @@ const PostClick = ({
 
         const data = await response.json();
 
-        if (response.ok) {
-          if (data.reposted) {
-            setPostDetails({
-              picturePath: data.postId.picturePath,
-              firstName: data.userId.firstName,
-              lastName: data.userId.lastName,
-              userPicturePath: data.userId.picturePath,
-              description: data.description,
-              _id: data._id,
-              userId: data.userId._id,
-              verified: data.userId.verified,
-            });
+        console.log(data);
 
+        if (response.ok) {
+          setPostDetails({
+            picturePath: data.picturePath,
+            firstName: data.userId.firstName,
+            lastName: data.userId.lastName,
+            userPicturePath: data.userId.picturePath,
+            description: data.description,
+            _id: data._id,
+            userId: data.userId._id,
+            verified: data.userId.verified,
+          });
+
+          if (data.reposted) {
             setIsReposted(true);
           } else {
-            setPostDetails({
-              picturePath: data.picturePath,
-              firstName: data.firstName,
-              lastName: data.lastName,
-              userPicturePath: data.userPicturePath,
-              description: data.description,
-              _id: data._id,
-              userId: data.userId,
-              verified: data.verified,
-            });
-
             setIsReposted(false);
           }
 

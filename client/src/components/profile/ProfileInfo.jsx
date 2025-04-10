@@ -23,6 +23,7 @@ import { setFriends } from "../../../state";
 import ChangePassword from "./ChangePassword";
 import { setIsOverFlow } from "../../App";
 import { formatLikesCount } from "../../frequentFunctions";
+import ShowFollow from "./ShowFollow";
 
 const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const [profileSettings, setProfileSettings] = useState(false);
@@ -33,9 +34,14 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const [isFriendSettings, setIsFriendSettings] = useState(false);
   const [isFollower, setIsFollower] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [openFollow, setOpenFollow] = useState(false);
+  const [getFollowLoading, setGetFollowLoading] = useState(false);
   const [friendship, setFriendship] = useState({});
+  const [follows, setFollows] = useState([]);
   const [friendSettings, setFriendSettings] = useState("");
   const [img, setImg] = useState("");
+  const [followType, setFollowType] = useState("");
+  const [followPage, setFollowPage] = useState(1);
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -241,6 +247,76 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
     }
   };
 
+  const handleGetFollowers = async () => {
+    if (followPage === 1) {
+      setFollows([]);
+      setGetFollowLoading(true);
+    }
+    setOpenFollow(true);
+
+    try {
+      const response = await fetch(
+        `/api/follow/${userId}/followers?page=${followPage}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (followPage === 1) {
+        setFollows(data);
+      } else {
+        setFollows((prev) => [...prev, ...data]);
+      }
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
+    } finally {
+      setGetFollowLoading(false);
+    }
+  };
+
+  const handleGetFollowing = async () => {
+    if (followPage === 1) {
+      setFollows([]);
+      setGetFollowLoading(true);
+    }
+    setOpenFollow(true);
+
+    try {
+      const response = await fetch(
+        `/api/follow/${userId}/following?page=${followPage}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+if (followPage === 1) {
+        setFollows(data);
+      } else {
+        setFollows((prev) => [...prev, ...data]);
+      }
+    } catch (error) {
+      if (import.meta.env.VITE_NODE_ENV === "development") {
+        console.error("Error:", error);
+      }
+    } finally {
+      setGetFollowLoading(false);
+    }
+  };
+
   return (
     <Box position="relative" sx={{ maxHeight: "395px" }}>
       {userInfo?.background && !isLoading ? (
@@ -383,29 +459,35 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
                     : userInfo?.username}
                 </Typography>
 
-                {userInfo?.occupation && userInfo?.occupation !== "undefined" && (
-                  <Box
-                    display="flex"
-                    gap={isNonMobileScreens ? "20px" : "4px"}
-                    mt="9px"
-                    flexDirection={isNonMobileScreens ? "row" : "column"}
-                  >
+                {userInfo?.occupation &&
+                  userInfo?.occupation !== "undefined" && (
                     <Box
                       display="flex"
-                      alignItems="center"
-                      gap="6px"
-                      color={medium}
-                      justifyContent={isNonMobileScreens ? undefined : "center"}
+                      gap={isNonMobileScreens ? "20px" : "4px"}
+                      mt="9px"
+                      flexDirection={isNonMobileScreens ? "row" : "column"}
                     >
-                      <WorkOutlineOutlined />
-                      <Typography fontSize="17px" sx={{wordBreak: "break-word"}}>
-                        {userInfo?._id === user._id
-                          ? user.occupation
-                          : userInfo?.occupation}
-                      </Typography>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        gap="6px"
+                        color={medium}
+                        justifyContent={
+                          isNonMobileScreens ? undefined : "center"
+                        }
+                      >
+                        <WorkOutlineOutlined />
+                        <Typography
+                          fontSize="17px"
+                          sx={{ wordBreak: "break-word" }}
+                        >
+                          {userInfo?._id === user._id
+                            ? user.occupation
+                            : userInfo?.occupation}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                )}
+                  )}
                 <Box
                   display="flex"
                   alignItems="center"
@@ -416,16 +498,46 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
                   color={medium}
                   sx={{ userSelect: "none" }}
                 >
-                  <Typography fontSize="17px">
-                    <span style={{ fontWeight: "500", marginRight: "3px" }}>
+                  <Typography
+                    fontSize="17px"
+                    sx={{
+                      cursor: "pointer",
+                      ":hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                    display="flex"
+                    gap="3px"
+                    alignItems="center"
+                    onClick={() => {
+                      setOpenFollow(true);
+                      setFollowType("followers");
+                    }}
+                  >
+                    <span style={{ fontWeight: "500" }}>
                       {formatLikesCount(userInfo?.followersCount)}
                     </span>
                     follower
                     {formatLikesCount(userInfo?.followersCount) > 1 ? "s" : ""}
                   </Typography>
                   -
-                  <Typography fontSize="17px">
-                    <span style={{ fontWeight: "500", marginRight: "3px" }}>
+                  <Typography
+                    fontSize="17px"
+                    display="flex"
+                    gap="3px"
+                    alignItems="center"
+                    sx={{
+                      cursor: "pointer",
+                      ":hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                    onClick={() => {
+                      setOpenFollow(true);
+                      setFollowType("following");
+                    }}
+                  >
+                    <span style={{ fontWeight: "500" }}>
                       {formatLikesCount(userInfo?.followingCount)}
                     </span>
                     following
@@ -680,6 +792,22 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
           setIsDelete={setIsDelete}
           type="removeFriend"
           handleRemoveFriend={handleRemoveFriend}
+        />
+      )}
+
+      {openFollow && (
+        <ShowFollow
+          openFollow={openFollow}
+          setOpenFollow={setOpenFollow}
+          page={followPage}
+          setPage={setFollowPage}
+          followType={followType}
+          follows={follows}
+          handleGetFollowers={handleGetFollowers}
+          handleGetFollowing={handleGetFollowing}
+          getFollowLoading={getFollowLoading}
+          palette={theme.palette}
+          setFollows={setFollows}
         />
       )}
     </Box>

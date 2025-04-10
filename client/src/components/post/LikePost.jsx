@@ -99,10 +99,11 @@ const LikePost = ({
             onClick={() => {
               setIsShare(true);
               setPostInfo(
-                typeof ele.userId === "object"
-                  ? { postId: ele?.postId?._id, userId: ele?.postId?.userId }
-                  : { postId: ele?._id, userId: ele?.userId }
+                typeof ele.postId === "object"
+                  ? { postId: ele?.postId?._id, userId: ele?.postId?.userId?._id }
+                  : { postId: ele?._id, userId: ele?.userId?._id }
               );
+
             }}
           >
             <Reply

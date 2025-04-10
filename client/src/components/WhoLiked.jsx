@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Box  } from "@mui/system";
+import { Box } from "@mui/system";
 import FlexBetween from "./../components/FlexBetween";
 import UserImage from "./../components/UserImage";
 import { Button, Divider, Typography } from "@mui/material";
@@ -50,6 +50,7 @@ const WhoLiked = ({
           <Typography fontSize="25px">There are no likes yet</Typography>
         </Box>
       )}
+
       {likeList?.likes?.map((user, index) => {
         return (
           <>
