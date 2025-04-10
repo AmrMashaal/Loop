@@ -45,8 +45,9 @@ const LikePost = ({
             sx={{ cursor: "pointer" }}
             onClick={() => {
               setShowLikes(true);
+
               setPostInfo(
-                typeof ele.userId === "object"
+                typeof ele.postId === "object"
                   ? { postId: ele, userId: null }
                   : { postId: ele._id, userId: null }
               );
@@ -60,31 +61,19 @@ const LikePost = ({
           onClick={() => {
             setIsPostClicked(true),
               setPostClickType(
-                typeof ele?.userId === "object" ? "repost" : "post"
+                typeof ele?.postId === "object" ? "repost" : "post"
               );
-            setPostClickData(
-              typeof ele?.userId === "object"
-                ? {
-                    picturePath: ele?.postId?.picturePath,
-                    firstName: ele?.userId?.firstName,
-                    lastName: ele?.userId?.lastName,
-                    userPicturePath: ele?.userId?.picturePath,
-                    description: ele?.description,
-                    _id: ele?._id,
-                    userId: ele?.userId?._id,
-                    verified: ele?.userId?.verified,
-                  }
-                : {
-                    picturePath: ele?.picturePath,
-                    firstName: ele?.firstName,
-                    lastName: ele?.lastName,
-                    userPicturePath: ele?.userPicturePath,
-                    description: ele?.description,
-                    _id: ele?._id,
-                    userId: ele?.userId,
-                    verified: ele?.verified,
-                  }
-            );
+              
+              setPostClickData({
+                firstName: ele?.userId?.firstName,
+                lastName: ele?.userId?.lastName,
+                picturePath: ele?.picturePath || ele?.postId?.picturePath,
+                userPicturePath: ele?.userId?.picturePath,
+                description: ele.description,
+                _id: ele?._id,
+                userId: ele?.userId?._id,
+                verified: ele?.userId?.verified,
+              });
           }}
         >
           <IconButton>

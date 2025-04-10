@@ -151,8 +151,9 @@ const Form = () => {
   };
 
   const login = async (values, onSubmitProps) => {
-    setLoading(true);
+    if (loading) return;
 
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -613,6 +614,7 @@ const Form = () => {
                   },
                 }}
                 onClick={handleFormSubmit}
+                disabled={loading}
               >
                 {loading
                   ? "Loading.."

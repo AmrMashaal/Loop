@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { VerifiedOutlined } from "@mui/icons-material";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import ProfileFriendsSkeleton from "../../scenes/skeleton/ProfileFriendsSkeleton";
 
@@ -11,7 +11,6 @@ const UserFriends = ({
   userId,
   isNonMobileScreens,
 }) => {
-  const { palette } = useTheme();
   return (
     <Box
       mt="10px"

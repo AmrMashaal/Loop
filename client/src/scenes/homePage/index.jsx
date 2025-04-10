@@ -10,13 +10,7 @@ import { useEffect, useState } from "react";
 import { setFriends } from "../../../state";
 import WrongPassword from "../../components/WrongPassword";
 
-const HomePage = ({
-  socket,
-  newPosts,
-  setNewPosts,
-  onlineFriends,
-  setOnlineFriends,
-}) => {
+const HomePage = ({ socket, newPosts, setNewPosts }) => {
   const [loading, setLoading] = useState(true);
   const [wrongPassword, setWrongPassword] = useState(false);
 
@@ -86,7 +80,7 @@ const HomePage = ({
       mb={!isNonMobileScreens ? "71px" : ""}
       p={isNonMobileScreens ? "5rem 1rem 1rem" : "4.5rem 1rem 1rem"}
     >
-      <Navbar/>
+      <Navbar />
       <Box
         display="flex"
         gap="10px"
@@ -99,14 +93,13 @@ const HomePage = ({
               handleUserFriend={handleUserFriend}
               loading={loading}
               setLoading={setLoading}
-              description="online friends"
-              type="onlineFriends"
-              setOnlineFriends={setOnlineFriends}
-              onlineFriends={onlineFriends}
+              description="Friends"
+              type="navFriends"
               userId={user._id}
             />
           </Box>
         )}
+
         <Box flexBasis={isNonMobileScreens ? "42%" : undefined}>
           <MyPostWidget picturePath={picturePath} socket={socket} />
           <PostsWidget

@@ -10,6 +10,7 @@ import Repost from "../models/Repost.js";
 import Badge from "../models/Badge.js";
 import Notification from "../models/notification.js";
 import Follow from "../models/Follow.js";
+import mongoose from "mongoose";
 
 const compressImage = async (buffer) => {
   return await sharp(buffer)
@@ -61,17 +62,10 @@ export const createPost = async (req, res) => {
       return res.status(403).json({ message: "Forbidden!" });
     }
 
-    const user = await User.findById(userId);
-
     const newPost = new Post({
       userId,
       description,
       picturePath,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      userPicturePath: user.picturePath,
-      location: user.location,
-      verified: user.verified,
       textAddition: textAddition,
       privacy,
       comments: [],
@@ -79,6 +73,11 @@ export const createPost = async (req, res) => {
     });
 
     await newPost.save();
+
+    await newPost.populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
     const postsCount = await Post.countDocuments({
       userId,
@@ -224,14 +223,16 @@ export const getFeedPosts = async (req, res) => {
     });
 
     const friendsIds = friendsPromise.map((fr) => {
-      return fr.sender.toString() === id
-        ? fr.receiver.toString()
-        : fr.sender.toString();
+      return new mongoose.Types.ObjectId(fr.sender.toString()) === id
+        ? new mongoose.Types.ObjectId(fr.receiver.toString())
+        : new mongoose.Types.ObjectId(fr.sender.toString());
     });
 
     const following = await Follow.find({ follower: id }).select("following");
 
-    const followingIds = following.map((f) => f.following.toString());
+    const followingIds = following.map(
+      (f) => new mongoose.Types.ObjectId(f.following.toString())
+    );
 
     if (followingIds.length > 0 || friendsIds.length > 0) {
       posts = await Post.find({
@@ -245,11 +246,14 @@ export const getFeedPosts = async (req, res) => {
       })
         .sort({ createdAt: -1 })
         .skip((page - 1) * limit)
-        .limit(limit);
+        .limit(limit)
+        .populate("userId", "_id firstName lastName picturePath verified");
     } else {
       posts = await Post.find({
         _id: "67c0e95cc6489e642bf59fee",
-      }).sort({ createdAt: -1 });
+      })
+        .sort({ createdAt: -1 })
+        .populate("userId", "_id firstName lastName picturePath verified");
     }
 
     const postsWithIsLiked = await Promise.all(
@@ -275,11 +279,16 @@ export const getFeedPosts = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * 4)
       .limit(4)
-      .populate(
-        "postId",
-        "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-      )
-      .populate("userId", "firstName lastName picturePath verified _id");
+      .populate("userId", "firstName lastName picturePath verified _id")
+      .populate({
+        path: "postId",
+        select:
+          "_id userId description picturePath textAddition privacy createdAt",
+        populate: {
+          path: "userId",
+          select: "_id firstName lastName picturePath verified",
+        },
+      });
 
     const repostsWithIsLiked = await Promise.all(
       reposts.map(async (rep) => {
@@ -357,7 +366,8 @@ export const getUserPosts = async (req, res) => {
       userPosts = await Post.find({ userId })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ pinned: -1, createdAt: -1 });
+        .sort({ pinned: -1, createdAt: -1 })
+        .populate("userId", "_id firstName lastName picturePath verified");
 
       let reposts = await Repost.find({
         userId,
@@ -370,11 +380,16 @@ export const getUserPosts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
         .limit(4)
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
 
       userPosts = [...userPosts, ...reposts].sort((a, b) => {
         if (a.pinned && !b.pinned) return -1;
@@ -389,7 +404,8 @@ export const getUserPosts = async (req, res) => {
       })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ pinned: -1, createdAt: -1 });
+        .sort({ pinned: -1, createdAt: -1 })
+        .populate("userId", "_id firstName lastName picturePath verified");
 
       let reposts = await Repost.find({
         userId,
@@ -398,11 +414,16 @@ export const getUserPosts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
         .limit(4)
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
 
       userPosts = [...userPosts, ...reposts].sort((a, b) => {
         if (a.pinned && !b.pinned) return -1;
@@ -414,7 +435,8 @@ export const getUserPosts = async (req, res) => {
       userPosts = await Post.find({ userId, privacy: "public" })
         .skip((page - 1) * limit)
         .limit(limit)
-        .sort({ pinned: -1, createdAt: -1 });
+        .sort({ pinned: -1, createdAt: -1 })
+        .populate("userId", "_id firstName lastName picturePath verified");
 
       let reposts = await Repost.find({
         userId,
@@ -423,11 +445,16 @@ export const getUserPosts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
         .limit(4)
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
 
       userPosts = [...userPosts, ...reposts].sort((a, b) => {
         if (a.pinned && !b.pinned) return -1;
@@ -440,7 +467,7 @@ export const getUserPosts = async (req, res) => {
     const postsWithIsLiked = await Promise.all(
       userPosts.map(async (post) => {
         const isLiked = await Like.findOne(
-          typeof post.userId === "object"
+          typeof post.postId === "object"
             ? {
                 userId: req.user.id,
                 repostId: post._id,
@@ -481,15 +508,23 @@ export const getPost = async (req, res) => {
   let post;
 
   try {
-    post = await Post.findById(postId);
+    post = await Post.findById(postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
     if (!post) {
       post = await Repost.findById(postId)
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
     }
 
     if (post.userId.toString() !== req.user.id && post.privacy === "private") {
@@ -567,9 +602,12 @@ export const editPost = async (req, res) => {
   let post;
 
   try {
-    post = await Post.findById(postId);
+    post = await Post.findById(postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
-    if (post && post.userId.toString() !== req.user.id) {
+    if (post && post.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: "Forbidden!" });
     }
 
@@ -600,11 +638,16 @@ export const editPost = async (req, res) => {
       const result = await post.save();
 
       const populatedResult = await Repost.findById(result._id)
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
 
       const isLiked = await Like.findOne({
         userId: req.user.id,
@@ -628,9 +671,12 @@ export const pinPost = async (req, res) => {
 
   let post;
   try {
-    post = await Post.findById(postId);
+    post = await Post.findById(postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
-    if (post && post.userId.toString() !== req.user.id) {
+    if (post && post.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: "Forbidden!" });
     }
 
@@ -648,13 +694,18 @@ export const pinPost = async (req, res) => {
       res.status(200).json(postWithIsLiked);
     } else {
       post = await Repost.findById(postId)
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
 
-      if (post && post.userId.toString() !== req.user.id) {
+      if (post && post.userId._id.toString() !== req.user.id) {
         return res.status(403).json({ message: "Forbidden!" });
       }
 
@@ -680,9 +731,9 @@ export const getPostClickInfo = async (req, res) => {
   let isLiked;
 
   try {
-    const post = await Post.findById(postId).select(
-      "likesCount commentCount userId"
-    );
+    const post = await Post.findById(postId)
+      .select("likesCount commentCount userId")
+      .populate("userId", "_id firstName lastName picturePath verified");
 
     const repost = await Repost.findById(postId);
 
@@ -714,9 +765,12 @@ export const changePrivacy = async (req, res) => {
   let post;
 
   try {
-    post = await Post.findById(postId);
+    post = await Post.findById(postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
-    if (post && post.userId.toString() !== req.user.id) {
+    if (post && post.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: "Forbidden!" });
     }
 
@@ -739,17 +793,18 @@ export const changePrivacy = async (req, res) => {
         },
         { new: true }
       )
-        .populate(
-          "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
-        )
-        .populate("userId", "firstName lastName picturePath verified _id");
+        .populate("userId", "firstName lastName picturePath verified _id")
+        .populate({
+          path: "postId",
+          select:
+            "_id userId description picturePath textAddition privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        });
 
-      if (
-        post &&
-        (post.userId.toString() !== req.user.id ||
-          post.userId._id !== req.user.id)
-      ) {
+      if (post && post.userId._id.toString() !== req.user.id) {
         return res.status(403).json({ message: "Forbidden!" });
       }
 

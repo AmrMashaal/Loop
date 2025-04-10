@@ -398,7 +398,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
                       justifyContent={isNonMobileScreens ? undefined : "center"}
                     >
                       <WorkOutlineOutlined />
-                      <Typography fontSize="17px">
+                      <Typography fontSize="17px" sx={{wordBreak: "break-word"}}>
                         {userInfo?._id === user._id
                           ? user.occupation
                           : userInfo?.occupation}

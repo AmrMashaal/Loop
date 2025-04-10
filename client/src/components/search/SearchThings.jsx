@@ -218,7 +218,7 @@ const SearchThings = ({
                             overflow="hidden"
                             textOverflow="ellipsis"
                           >
-                            {user.occupation}
+                            {user.username}
                           </Typography>
                         </Box>
                       </Box>

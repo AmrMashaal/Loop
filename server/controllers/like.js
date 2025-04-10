@@ -23,7 +23,7 @@ export const likePost = async (req, res) => {
         id,
         { $inc: { likesCount: -1 } },
         { new: true }
-      );
+      ).populate("userId", "_id firstName lastName picturePath verified");
 
       newPost = { ...post._doc, isLiked: false };
     } else {
@@ -33,7 +33,7 @@ export const likePost = async (req, res) => {
         id,
         { $inc: { likesCount: 1 } },
         { new: true }
-      );
+      ).populate("userId", "_id firstName lastName picturePath verified");
 
       newPost = { ...post._doc, isLiked: true };
     }

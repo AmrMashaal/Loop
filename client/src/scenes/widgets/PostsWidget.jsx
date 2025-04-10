@@ -44,6 +44,8 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
   }
 
   async function getPosts(reset = false) {
+    setPostLoading(true);
+
     try {
       const response = await fetch(
         `/api/posts/feed?page=${pageNumber}&limit=${10 + newPostsData.length}`,
@@ -54,6 +56,8 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
       );
 
       const data = await response.json();
+
+      console.log(data)
 
       if (pageNumber === 1 && data?.suggestions) {
         setFollowSuggestions(data.suggestions);
@@ -91,7 +95,7 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
     const handleScroll = debounce(() => {
       if (
         window.scrollY + window.innerHeight >=
-        document.body.offsetHeight - 3
+        document.body.offsetHeight - 2000
       ) {
         getMorePosts();
       }
@@ -129,6 +133,7 @@ const PostsWidget = ({ socket, newPosts: newPostsData = {} }) => {
         setPostClickType={setPostClickType}
         followSuggestions={followSuggestions}
         setFollowSuggestions={setFollowSuggestions}
+        pageNumber={pageNumber}
       />
     </Box>
   );

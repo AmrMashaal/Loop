@@ -52,6 +52,7 @@ const UserWidget = ({ userId, picturePath }) => {
         top="80px"
         overflow="hidden"
         height="100vh"
+        className="gradientBorderLeft"
       >
         {!userLoading ? (
           <>
@@ -132,9 +133,9 @@ const UserWidget = ({ userId, picturePath }) => {
                   <Typography fontSize="13px" color={medium} mb="5px">
                     {theUser?.location}{" "}
                     {
-                      countriesWithFlags.find(
+                      countriesWithFlags?.find(
                         (ct) => ct.country === theUser?.location
-                      ).flag
+                      )?.flag
                     }
                   </Typography>
                 </Box>

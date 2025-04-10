@@ -91,7 +91,10 @@ export const postReply = async (req, res) => {
       "firstName lastName verified picturePath _id"
     );
 
-    const post = await Post.findById(req.body.postId);
+    const post = await Post.findById(req.body.postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
     if (post) {
       await Post.findByIdAndUpdate(req.body.postId, {
@@ -132,7 +135,10 @@ export const deleteReply = async (req, res) => {
 
     await Reply.findByIdAndDelete(replyId);
 
-    const post = await Post.findById(reply.comment.postId);
+    const post = await Post.findById(reply.comment.postId).populate(
+      "userId",
+      "_id firstName lastName picturePath verified"
+    );
 
     if (post) {
       await Post.findByIdAndUpdate(reply.comment.postId, {

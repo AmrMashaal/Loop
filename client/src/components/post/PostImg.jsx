@@ -24,14 +24,14 @@ const PostImg = ({
         setIsPostClicked(true),
           setPostClickType("post"),
           setPostClickData({
-            firstName: ele.firstName,
-            lastName: ele.lastName,
-            picturePath: ele.picturePath,
-            userPicturePath: ele.userPicturePath,
+            firstName: ele?.userId?.firstName,
+            lastName: ele?.userId?.lastName,
+            picturePath: ele?.picturePath,
+            userPicturePath: ele?.userId?.picturePath,
             description: ele.description,
-            _id: ele._id,
-            userId: ele.userId,
-            verified: ele.verified,
+            _id: ele?._id,
+            userId: ele?.userId?._id,
+            verified: ele?.userId?.verified,
           });
       }}
     />

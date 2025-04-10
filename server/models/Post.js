@@ -2,9 +2,11 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
-    firstName: { type: String, required: true },
-    verified: { type: Boolean, default: false },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
     edited: { type: Boolean, default: false },
     pinned: { type: Boolean, default: false },
     likesCount: { type: Number, default: 0 },
@@ -12,9 +14,7 @@ const postSchema = new mongoose.Schema(
     shareCount: { type: Number, default: 0 },
     description: { type: String, maxlength: 2000 },
     privacy: { type: String, default: "public" },
-    lastName: String,
     location: String,
-    userPicturePath: String,
     picturePath: String,
     textAddition: Object,
   },

@@ -45,7 +45,8 @@ export const searchInfo = async (req, res) => {
       })
         .limit(5)
         .skip((page - 1) * 5)
-        .sort({ description: 1 });
+        .sort({ description: 1 })
+        .populate("userId", "_id firstName lastName picturePath verified");
 
       const count = await Post.countDocuments({
         description: { $regex: info, $options: "i" },

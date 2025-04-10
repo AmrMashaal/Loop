@@ -177,7 +177,6 @@ const MyPostWidget = ({ picturePath, socket }) => {
                   !post && textAddition.value !== "quotation" && "50px",
                 p: "14px 10px 14px 18px",
                 transition: ".3s",
-                border: textAddition.value === "quotation" && "2px solid ",
                 direction: testArabic(post) && "rtl",
                 "::before": {
                   content: textAddition.value === "quotation" && "'❝'",
