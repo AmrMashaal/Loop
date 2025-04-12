@@ -272,8 +272,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
       } else {
         setFollows((prev) => [...prev, ...data]);
       }
-      console.log(data);
-
+ 
       return data;
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -310,8 +309,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
         setFollows((prev) => [...prev, ...data]);
       }
 
-      console.log(data);
-
+ 
       return data;
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
