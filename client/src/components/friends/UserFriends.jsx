@@ -131,9 +131,10 @@ const UserFriends = ({
                           overflow: "hidden",
                         }}
                       >
+                        @
                         {friend?.sender?._id === userId
-                          ? friend?.receiver?.occupation
-                          : friend?.sender?.occupation}
+                          ? friend?.receiver?.username
+                          : friend?.sender?.username}
                       </Typography>
                     </Box>
                   </Box>

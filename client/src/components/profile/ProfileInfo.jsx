@@ -35,7 +35,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const [isFollower, setIsFollower] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [openFollow, setOpenFollow] = useState(false);
-  const [getFollowLoading, setGetFollowLoading] = useState(false);
+  const [getFollowLoading, setGetFollowLoading] = useState(true);
   const [friendship, setFriendship] = useState({});
   const [follows, setFollows] = useState([]);
   const [friendSettings, setFriendSettings] = useState("");
@@ -252,7 +252,6 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
       setFollows([]);
       setGetFollowLoading(true);
     }
-    setOpenFollow(true);
 
     try {
       const response = await fetch(
@@ -273,6 +272,9 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
       } else {
         setFollows((prev) => [...prev, ...data]);
       }
+      console.log(data);
+
+      return data;
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
@@ -287,7 +289,6 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
       setFollows([]);
       setGetFollowLoading(true);
     }
-    setOpenFollow(true);
 
     try {
       const response = await fetch(
@@ -303,11 +304,15 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
 
       const data = await response.json();
 
-if (followPage === 1) {
+      if (followPage === 1) {
         setFollows(data);
       } else {
         setFollows((prev) => [...prev, ...data]);
       }
+
+      console.log(data);
+
+      return data;
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
         console.error("Error:", error);
@@ -512,6 +517,9 @@ if (followPage === 1) {
                     onClick={() => {
                       setOpenFollow(true);
                       setFollowType("followers");
+                      setFollowPage(1);
+                      setFollows([]);
+                      setGetFollowLoading(true);
                     }}
                   >
                     <span style={{ fontWeight: "500" }}>
@@ -535,6 +543,9 @@ if (followPage === 1) {
                     onClick={() => {
                       setOpenFollow(true);
                       setFollowType("following");
+                      setFollowPage(1);
+                      setFollows([]);
+                      setGetFollowLoading(true);
                     }}
                   >
                     <span style={{ fontWeight: "500" }}>

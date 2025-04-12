@@ -86,7 +86,7 @@ export const getFollowers = async (req, res) => {
 
   try {
     const followers = await Follow.find({ following: userId })
-      .populate("follower", "firstName lastName picturePath verified _id")
+      .populate("follower", "firstName lastName username picturePath verified _id")
       .limit(limit)
       .skip((page - 1) * limit);
 
@@ -103,7 +103,7 @@ export const getFollowing = async (req, res) => {
 
   try {
     const following = await Follow.find({ follower: userId })
-      .populate("following", "firstName lastName picturePath verified _id")
+      .populate("following", "firstName lastName username picturePath verified _id")
       .limit(limit)
       .skip((page - 1) * limit);
 

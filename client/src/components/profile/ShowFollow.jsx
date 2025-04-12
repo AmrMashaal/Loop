@@ -6,7 +6,9 @@ import { Box } from "@mui/system";
 import UserImage from "../UserImage";
 import { Divider, Typography } from "@mui/material";
 import { VerifiedOutlined } from "@mui/icons-material";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { FixedSizeList as List } from "react-window";
+import { debounce } from "lodash";
 
 const ShowFollow = ({
   openFollow,
@@ -21,31 +23,100 @@ const ShowFollow = ({
   palette,
   setFollows,
 }) => {
-  const parentRef = useRef(null);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    const div = parentRef.current;
+    const handleFetching = async () => {
+      if (!hasMore) return;
 
-    const handleScroll = () => {
-      if (div.scrollTop + div.clientHeight >= div.scrollHeight - 10) {
-        setPage((prev) => prev + 1);
+      let data;
+
+      if (followType === "followers") {
+        data = await handleGetFollowers();
+      } else if (followType === "following") {
+        data = await handleGetFollowing();
+      }
+
+      if (data?.length === 0) {
+        setHasMore(false);
       }
     };
 
-    div.addEventListener("scroll", handleScroll);
+    const debounceFetch = debounce(() => {
+      handleFetching();
+    }, 300)
 
-    return () => {
-      div.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+    debounceFetch();
+  }, [page, hasMore]);
 
-  useEffect(() => {
-    if (followType === "followers" && openFollow) {
-      handleGetFollowers();
-    } else if (followType === "following" && openFollow) {
-      handleGetFollowing();
+  const Row = ({ index, style }) => {
+    const fol = follows[index];
+
+    const user = followType === "followers" ? fol?.follower : fol?.following;
+
+    if (!user.username) return null;
+
+    return (
+      <Box
+        key={index}
+        display="flex"
+        flexDirection="column"
+        gap="15px"
+        style={style}
+      >
+        <Link
+          to={`/profile/${user?._id}`}
+          className="opacityBox"
+          onClick={() => {
+            setOpenFollow(false);
+            setFollows([]);
+            setPage(1);
+          }}
+        >
+          <FlexBetween sx={{ cursor: "pointer" }}>
+            <Box display="flex" alignItems="center" gap="10px">
+              <UserImage image={user?.picturePath} />
+              <Box>
+                <Box display="flex" alignItems="center" gap="4px">
+                  <Typography>
+                    {user?.firstName} {user?.lastName}
+                  </Typography>
+
+                  {user?.verified && (
+                    <VerifiedOutlined
+                      sx={{
+                        fontSize: "20px",
+                        color: "#15a1ed",
+                      }}
+                    />
+                  )}
+                </Box>
+
+                <Typography
+                  fontSize="12px"
+                  color={palette.neutral.main}
+                  sx={{ userSelect: "none" }}
+                >
+                  @{user?.username}
+                </Typography>
+              </Box>
+            </Box>
+          </FlexBetween>
+        </Link>
+        {follows?.indexOf(fol) !== follows?.length - 1 && <Divider />}
+      </Box>
+    );
+  };
+
+  const handleItemsRendered = ({ visibleStopIndex }) => {
+    if (
+      visibleStopIndex >= follows?.length - 1 &&
+      hasMore &&
+      !getFollowLoading
+    ) {
+      setPage((prevPage) => prevPage + 1);
     }
-  }, [page]);
+  };
 
   return (
     <TasksComponent
@@ -53,75 +124,38 @@ const ShowFollow = ({
       open={openFollow}
       setOpen={setOpenFollow}
       setPage={setPage}
+      overflowAuto={false}
     >
-      <Box
-        display="flex"
-        flexDirection="column"
-        gap="10px"
-        height="100%"
-        overflow="auto"
-        ref={parentRef}
-      >
-        {getFollowLoading && (
+      <Box display="flex" flexDirection="column" gap="10px">
+        {getFollowLoading ? (
           <Box
             className="loadingAnimation"
             width="20px"
             height="20px"
             ml="8px"
           />
-        )}
-
-        {follows?.length > 0 &&  !getFollowLoading && 
-          follows?.map((fol, index) => {
-            const user =
-              followType === "followers" ? fol?.follower : fol?.following;
-
-            return (
-              <>
-                <Link
-                  to={`/profile/${user?._id}`}
-                  className="opacityBox"
-                  onClick={() => {
-                    setOpenFollow(false);
-                    setFollows([]);
-                    setPage(1);
-
-                  }}
-                >
-                  <FlexBetween key={index} sx={{ cursor: "pointer" }}>
-                    <Box display="flex" alignItems="center" gap="10px">
-                      <UserImage image={user?.picturePath} />
-                      <Box display="flex" alignItems="center" gap="4px">
-                        <Typography>
-                          {user?.firstName} {user?.lastName}
-                        </Typography>
-
-                        {user?.verified && (
-                          <VerifiedOutlined
-                            sx={{
-                              fontSize: "20px",
-                              color: "#15a1ed",
-                            }}
-                          />
-                        )}
-                      </Box>
-                    </Box>
-                  </FlexBetween>
-                </Link>
-                {follows?.indexOf(fol) !== follows?.length - 1 && <Divider />}
-              </>
-            );
-          })}
-
-        {!getFollowLoading && follows?.length === 0  && (
-          <Typography
-            textAlign="center"
-            fontSize="26px"
-            color={palette.neutral.medium}
-            mb="20px"
+        ) : !getFollowLoading && follows?.length > 0 ? (
+          <List
+            height={530}
+            itemCount={follows?.length}
+            itemSize={90}
+            width="100%"
+            onItemsRendered={handleItemsRendered}
           >
-            User has no {followType} yet
-          </Typography>
+            {Row}
+          </List>
+        ) : (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100%"
+            width="100%"
+          >
+            <Typography color={palette.neutral.main}>
+              No {followType} yet
+            </Typography>
+          </Box>
         )}
       </Box>
     </TasksComponent>

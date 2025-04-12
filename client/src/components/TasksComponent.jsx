@@ -13,6 +13,7 @@ const TasksComponent = ({
   id = "",
   setPage,
   minHeight = "660px",
+  overflowAuto = true,
 }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const theme = useTheme();
@@ -66,7 +67,7 @@ const TasksComponent = ({
           maxWidth: "100%",
           zIndex: "1",
           maxHeight: isNonMobileScreens ? "700px" : "312px",
-          overflow: "auto",
+          overflow: overflowAuto ? "auto" : "unset",
         }}
         id={id}
       >

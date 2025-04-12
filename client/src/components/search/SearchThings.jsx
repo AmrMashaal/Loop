@@ -198,7 +198,7 @@ const SearchThings = ({
                           >
                             <Typography
                               fontSize="17px"
-                              width="90px"
+                              maxWidth="90px"
                               whiteSpace="nowrap"
                               overflow="hidden"
                               textOverflow="ellipsis"
@@ -218,7 +218,7 @@ const SearchThings = ({
                             overflow="hidden"
                             textOverflow="ellipsis"
                           >
-                            {user.username}
+                            @{user.username}
                           </Typography>
                         </Box>
                       </Box>
