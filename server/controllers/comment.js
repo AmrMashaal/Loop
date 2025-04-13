@@ -16,6 +16,7 @@ export const getComments = async (req, res) => {
 
   let data;
 
+
   try {
     const comments = await Comment.find({ postId: postId })
       .sort({
@@ -25,6 +26,8 @@ export const getComments = async (req, res) => {
       .populate("user", "_id verified firstName lastName picturePath")
       .limit(limit)
       .skip((page - 1) * limit);
+
+      console.log(comments)
 
     if (!comments) {
       return res.status(404).json({ message: "comments is not found" });
@@ -81,6 +84,7 @@ export const getComments = async (req, res) => {
     } else {
       data = commentsWithIsLiked;
     }
+
 
     res.status(200).json(data);
   } catch (err) {
@@ -271,13 +275,19 @@ export const deleteComment = async (req, res) => {
   const { commentId } = req.params;
 
   try {
-    const comments = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId).populate(
+      "postId",
+      "userId"
+    );
 
-    if (!comments) {
-      return res.status(404).json({ message: "comments is not found" });
+    if (!comment) {
+      return res.status(404).json({ message: "comment is not found" });
     }
 
-    if (req.user.id !== comments.user.toString()) {
+    if (
+      req.user.id !== comment.user.toString() &&
+      req.user.id !== comment.postId.userId.toString()
+    ) {
       return res.status(403).json({ message: "Forbidden!" });
     }
 
@@ -285,19 +295,19 @@ export const deleteComment = async (req, res) => {
 
     const replyCount = await Reply.countDocuments({ comment: commentId });
 
-    const post = await Post.findById(comments.postId).populate(
+    const post = await Post.findById(comment.postId).populate(
       "userId",
       "_id firstName lastName picturePath verified"
     );
 
     if (post) {
-      await Post.findByIdAndUpdate(comments.postId, {
+      await Post.findByIdAndUpdate(comment.postId, {
         $inc: {
           commentCount: -(replyCount + 1),
         },
       });
     } else {
-      await Repost.findByIdAndUpdate(comments.repostId, {
+      await Repost.findByIdAndUpdate(comment.repostId, {
         $inc: {
           commentCount: -(replyCount + 1),
         },
@@ -308,7 +318,7 @@ export const deleteComment = async (req, res) => {
 
     await Reply.deleteMany({ comment: commentId });
 
-    res.status(200).json(comments);
+    res.status(200).json(comment);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
@@ -348,9 +358,12 @@ export const pinComment = async (req, res) => {
   const { commentId } = req.params;
 
   try {
-    const comment = await Comment.findById(commentId);
+    const comment = await Comment.findById(commentId).populate("postId", "userId");
 
-    if (req.user.id !== comment.user.toString()) {
+    if (
+      req.user.id !== comment.user.toString() &&
+      req.user.id !== comment.postId.userId.toString()
+    ) {
       return res.status(403).json({ message: "Forbidden!" });
     }
 

@@ -123,6 +123,27 @@ export const editUser = async (req, res) => {
       youtube,
     } = req.body;
 
+    const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]*$/;
+    const firstAndLastNameRegex = /^[a-zA-Z\u0600-\u06FF\s'-]+$/;
+
+    if (!username || !usernameRegex.test(username)) {
+      return res.status(400).json({
+        message: "Invalid username format",
+      });
+    }
+
+    if (!firstAndLastNameRegex.test(firstName)) {
+      return res.status(400).json({
+        message: "Invalid first name",
+      });
+    }
+
+    if (lastName && !firstAndLastNameRegex.test(lastName)) {
+      return res.status(400).json({
+        message: "Invalid last name",
+      });
+    }
+
     const user = await User.findById(id);
     const isUserName = await User.findOne({ username });
 

@@ -68,17 +68,19 @@ const ProfileSettings = ({
       .string()
       .min(2)
       .max(20)
-      .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters")
+      .matches(/^[a-zA-Z\u0600-\u06FF\s'-]+$/, "Invalid name")
       .required("required"),
     lastName: yup
       .string()
       .min(2)
       .max(20)
-      .matches(
-        /^\p{L}+(\s\p{L}+)*$/u,
-        "You can just add alphabetic characters"
-      ),
-    username: yup.string().min(2).max(20).required("required"),
+      .matches(/^[a-zA-Z\u0600-\u06FF\s'-]+$/, "Invalid name"),
+    username: yup
+      .string()
+      .required("Username is required")
+      .min(3, "Username must be at least 3 characters")
+      .max(20, "Username must be at most 20 characters")
+      .matches(/^[a-zA-Z][a-zA-Z0-9._]*$/, "Invalid username"),
     gender: yup.string().min(2).max(20).required("required"),
     birthdate: yup
       .string()
@@ -222,7 +224,12 @@ const ProfileSettings = ({
               <TextField
                 label="First Name"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const trimmed = e.target.value
+                    .trimStart()
+                    .replace(/\s+/g, " ");
+                  setFieldValue("firstName", trimmed);
+                }}
                 value={values.firstName}
                 name="firstName"
                 error={Boolean(touched.firstName) && Boolean(errors.firstName)}
@@ -231,10 +238,16 @@ const ProfileSettings = ({
                   gridColumn: "span 2",
                 }}
               />
+
               <TextField
                 label="Last Name"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const trimmed = e.target.value
+                    .trimStart()
+                    .replace(/\s+/g, " ");
+                  setFieldValue("lastName", trimmed);
+                }}
                 value={values.lastName}
                 name="lastName"
                 error={Boolean(touched.lastName) && Boolean(errors.lastName)}
@@ -246,7 +259,10 @@ const ProfileSettings = ({
               <TextField
                 label="Username"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const trimmed = e.target.value.trim();
+                  setFieldValue("username", trimmed);
+                }}
                 value={values.username}
                 name="username"
                 error={Boolean(touched.username) && Boolean(errors.username)}
@@ -371,7 +387,7 @@ const ProfileSettings = ({
                 {countriesWithFlags.map((country) => {
                   return (
                     <MenuItem value={country.country} key={country.country}>
-                      {country.country} {country.flag}  
+                      {country.country} {country.flag}
                     </MenuItem>
                   );
                 })}

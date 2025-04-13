@@ -26,14 +26,19 @@ const registerSchema = yup.object().shape({
     .string()
     .min(2)
     .max(20)
-    .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters")
+    .matches(/^[a-zA-Z\u0600-\u06FF\s'-]+$/, "Invalid name")
     .required("required"),
   lastName: yup
     .string()
     .min(2)
     .max(20)
-    .matches(/^\p{L}+(\s\p{L}+)*$/u, "You can just add alphabetic characters"),
-  username: yup.string().max(20).required("required"),
+    .matches(/^[a-zA-Z\u0600-\u06FF\s'-]+$/, "Invalid name"),
+  username: yup
+    .string()
+    .required("Username is required")
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be at most 20 characters")
+    .matches(/^[a-zA-Z][a-zA-Z0-9._]*$/, "Invalid username"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -85,7 +90,7 @@ const initialValuesRegister = {
 };
 
 const initialValuesLogin = {
-  username: "",
+  username: "".trim(),
   password: "",
 };
 
@@ -168,6 +173,7 @@ const Form = () => {
       });
 
       const loggedIn = await loggedInResponse.json();
+
 
       if (loggedIn && !loggedIn.message) {
         dispatch(
@@ -261,7 +267,12 @@ const Form = () => {
                 <TextField
                   label="First Name"
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const trimmed = e.target.value
+                      .trimStart()
+                      .replace(/\s+/g, " ");
+                    setFieldValue("firstName", trimmed);
+                  }}
                   value={values.firstName}
                   name="firstName"
                   error={
@@ -277,7 +288,12 @@ const Form = () => {
                 <TextField
                   label="Last Name"
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const trimmed = e.target.value
+                      .trimStart()
+                      .replace(/\s+/g, " ");
+                    setFieldValue("lastName", trimmed);
+                  }}
                   value={values.lastName}
                   name="lastName"
                   error={Boolean(touched.lastName) && Boolean(errors.lastName)}
@@ -291,7 +307,10 @@ const Form = () => {
                 <TextField
                   label="Username"
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const trimmed = e.target.value.trim();
+                    setFieldValue("username", trimmed);
+                  }}
                   value={values.username}
                   name="username"
                   error={Boolean(touched.username) && Boolean(errors.username)}
@@ -555,7 +574,10 @@ const Form = () => {
                 <TextField
                   label="Username"
                   onBlur={handleBlur}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const trimmed = e.target.value.trim();
+                    setFieldValue("username", trimmed);
+                  }}
                   value={values.username}
                   name="username"
                   error={Boolean(touched.username) && Boolean(errors.username)}
@@ -613,7 +635,6 @@ const Form = () => {
                     color: palette.primary.main,
                   },
                 }}
-                onClick={handleFormSubmit}
                 disabled={loading}
               >
                 {loading

@@ -178,6 +178,8 @@ const Comments = ({
 
       const comments = await response.json();
 
+console.log(comments);
+
       if (response.ok) {
         if (first) {
           setCommentsState(comments);

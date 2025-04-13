@@ -52,6 +52,29 @@ export const register = async (req, res) => {
       gender,
     } = req.body;
 
+    const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]*$/;
+    const firstAndLastNameRegex = /^[a-zA-Z\u0600-\u06FF\s'-]+$/;
+
+    console.log(username, password);
+
+    if (!username || !usernameRegex.test(username)) {
+      return res.status(400).json({
+        message: "Invalid username format",
+      });
+    }
+
+    if (!firstAndLastNameRegex.test(firstName)) {
+      return res.status(400).json({
+        message: "Invalid first name",
+      });
+    }
+
+    if (lastName && !firstAndLastNameRegex.test(lastName)) {
+      return res.status(400).json({
+        message: "Invalid last name",
+      });
+    }
+
     const isUsernameExisted = await User.findOne({ username });
 
     if (isUsernameExisted) {
@@ -67,7 +90,7 @@ export const register = async (req, res) => {
 
     const user = new User({
       firstName: firstName.replace(/\s+/g, " ").trim(),
-      lastName: lastName.replace(/\s+/g, " ").trim(),
+      lastName: lastName?.replace(/\s+/g, " ").trim(),
       username,
       password: passwordHash,
       picturePath:

@@ -62,7 +62,6 @@ const TasksComponent = ({
         gap="14px"
         minHeight={minHeight}
         position="relative"
-        borderRadius={isNonMobileScreens ? "0.75rem" : "0"}
         sx={{
           maxWidth: "100%",
           zIndex: "1",

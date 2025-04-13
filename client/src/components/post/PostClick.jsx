@@ -280,10 +280,7 @@ const PostClick = ({
             minHeight: isNonMobileScreens ? "550px" : undefined,
             overflow: "auto",
             flex: isNonMobileScreens ? undefined : "1",
-            boxShadow:
-              location.pathname.split("/")[1] === "post"
-                ? "-17px 18px 15px 0px #0000001c"
-                : undefined,
+  
           }}
           id="commentsParent"
         >
