@@ -26,8 +26,6 @@ export const getComments = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit);
 
-    console.log(comments);
-
     if (!comments) {
       return res.status(404).json({ message: "comments is not found" });
     }
@@ -126,6 +124,10 @@ export const postCommentOriginal = async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: error });
     }
+  }
+
+  if (!postId) {
+    return res.status(400).json({ message: "postId is required" });
   }
 
   try {
@@ -415,9 +417,9 @@ export const repostComment = async (req, res) => {
       res.status(500).json({ message: error });
     }
   }
-  
-  if (!req.body.postId && !req.body.repostId) {
-    return res.status(400).json({ message: "postId or repostId is required" });
+
+  if (!repostId) {
+    return res.status(400).json({ message: "repostId is required" });
   }
 
   try {
@@ -429,19 +431,17 @@ export const repostComment = async (req, res) => {
       repost: true,
     });
 
-    await comment.save();
+     await comment.save();
 
     if (!comment) {
       return res.status(404).json({ message: "comment is not found" });
     }
 
-    // await Repost.findByIdAndUpdate(repostId, {
-    //   $inc: {
-    //     commentCount: 1,
-    //   },
-    // });
-
-    console.log("comment", comment);
+    await Repost.findByIdAndUpdate(repostId, {
+      $inc: {
+        commentCount: 1,
+      },
+    });
 
     await comment.populate(
       "user",
