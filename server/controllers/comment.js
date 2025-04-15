@@ -16,7 +16,6 @@ export const getComments = async (req, res) => {
 
   let data;
 
-
   try {
     const comments = await Comment.find({ postId: postId })
       .sort({
@@ -27,7 +26,7 @@ export const getComments = async (req, res) => {
       .limit(limit)
       .skip((page - 1) * limit);
 
-      console.log(comments)
+    console.log(comments);
 
     if (!comments) {
       return res.status(404).json({ message: "comments is not found" });
@@ -84,7 +83,6 @@ export const getComments = async (req, res) => {
     } else {
       data = commentsWithIsLiked;
     }
-
 
     res.status(200).json(data);
   } catch (err) {
@@ -358,7 +356,10 @@ export const pinComment = async (req, res) => {
   const { commentId } = req.params;
 
   try {
-    const comment = await Comment.findById(commentId).populate("postId", "userId");
+    const comment = await Comment.findById(commentId).populate(
+      "postId",
+      "userId"
+    );
 
     if (
       req.user.id !== comment.user.toString() &&
@@ -414,6 +415,10 @@ export const repostComment = async (req, res) => {
       res.status(500).json({ message: error });
     }
   }
+  
+  if (!req.body.postId && !req.body.repostId) {
+    return res.status(400).json({ message: "postId or repostId is required" });
+  }
 
   try {
     const comment = new Comment({
@@ -424,13 +429,19 @@ export const repostComment = async (req, res) => {
       repost: true,
     });
 
-    await Repost.findByIdAndUpdate(repostId, {
-      $inc: {
-        commentCount: 1,
-      },
-    });
-
     await comment.save();
+
+    if (!comment) {
+      return res.status(404).json({ message: "comment is not found" });
+    }
+
+    // await Repost.findByIdAndUpdate(repostId, {
+    //   $inc: {
+    //     commentCount: 1,
+    //   },
+    // });
+
+    console.log("comment", comment);
 
     await comment.populate(
       "user",
