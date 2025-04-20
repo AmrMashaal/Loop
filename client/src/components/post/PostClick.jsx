@@ -238,7 +238,7 @@ const PostClick = ({
         maxHeight="100%"
         height={isNonMobileScreens ? undefined : "100%"}
       >
-        {postDetails.picturePath && (
+        {postDetails.picturePath.length !== 0 && (
           <Box
             bgcolor="black"
             sx={{
