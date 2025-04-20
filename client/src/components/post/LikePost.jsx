@@ -21,11 +21,11 @@ const LikePost = ({
   setIsShare,
   setPostClickType,
 }) => {
-  return (
+   return (
     <FlexBetween
       sx={{ userSelect: "none" }}
       color={palette.text.secondary}
-      mt={!ele?.picturePath && "10px"}
+      mt="10px"
       p="0px 10px 6px"
     >
       <FlexBetween gap="8px">
@@ -63,17 +63,17 @@ const LikePost = ({
               setPostClickType(
                 typeof ele?.postId === "object" ? "repost" : "post"
               );
-              
-              setPostClickData({
-                firstName: ele?.userId?.firstName,
-                lastName: ele?.userId?.lastName,
-                picturePath: ele?.picturePath || ele?.postId?.picturePath,
-                userPicturePath: ele?.userId?.picturePath,
-                description: ele.description,
-                _id: ele?._id,
-                userId: ele?.userId?._id,
-                verified: ele?.userId?.verified,
-              });
+
+            setPostClickData({
+              firstName: ele?.userId?.firstName,
+              lastName: ele?.userId?.lastName,
+              picturePath: ele?.picturePath|| ele?.postId?.picturePath,
+              userPicturePath: ele?.userId?.picturePath,
+              description: ele.description,
+              _id: ele?._id,
+              userId: ele?.userId?._id,
+              verified: ele?.userId?.verified,
+            });
           }}
         >
           <IconButton>
@@ -100,10 +100,12 @@ const LikePost = ({
               setIsShare(true);
               setPostInfo(
                 typeof ele.postId === "object"
-                  ? { postId: ele?.postId?._id, userId: ele?.postId?.userId?._id }
+                  ? {
+                      postId: ele?.postId?._id,
+                      userId: ele?.postId?.userId?._id,
+                    }
                   : { postId: ele?._id, userId: ele?.userId?._id }
               );
-
             }}
           >
             <Reply

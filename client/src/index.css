@@ -276,6 +276,7 @@ li {
 .truncated-text {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -329,3 +330,25 @@ li {
   z-index: 11;
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.highlighted {
+  background: linear-gradient(
+    to right,
+    var(--primary-color) 0%,
+    var(--primary-color) 100%
+  );
+  color: white;
+  padding: 2px;
+}
+
+.strikethrough {
+  text-decoration: line-through;
+  text-decoration-color: var(--primary-color);
+  -moz-text-decoration-color: var(--primary-color);
+  text-decoration-thickness: 2px;
+  text-decoration-style: solid;
+  -moz-text-decoration-style: solid;
+}

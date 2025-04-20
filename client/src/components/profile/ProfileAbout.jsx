@@ -163,7 +163,7 @@ const ProfileAbout = ({ userInfo }) => {
                 {userInfo?.location}{" "}
                 {countriesWithFlags.find((country) => {
                   return country.country === userInfo?.location;
-                }).flag}
+                })?.flag}
               </Typography>
             </Box>
 

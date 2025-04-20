@@ -30,7 +30,8 @@ import DOMPurify from "dompurify";
 import { posts, setIsOverFlow, setPosts } from "../../App";
 import ChangePrivacy from "../../components/post/ChangePrivacy";
 import ShareComponent from "../../components/post/ShareComponent";
-import { convertTextLink } from "../../frequentFunctions";
+import { formatTextForDisplay } from "../../frequentFunctions";
+import PostText from "../../components/post/PostText";
 
 const PostWidget = ({
   setPostClickData,
@@ -254,7 +255,8 @@ const PostWidget = ({
 
   const handleEditPost = async (e, editText, description) => {
     e.preventDefault();
-    if (editText !== description) {
+
+    if (editText !== description && editText.trim().length > 0) {
       try {
         const response = await fetch(`/api/posts/${postInfo.postId}/edit`, {
           method: "PATCH",
@@ -329,7 +331,13 @@ const PostWidget = ({
 
       const data = await response.json();
 
-      setPosts([data, ...posts.filter((ele) => ele._id !== data._id)]);
+      if (response.ok) {
+        setPosts((prev) => {
+          return prev.map((ele) =>
+            ele._id === data.postId ? { ...ele, privacy: data.privacy } : ele
+          );
+        });
+      }
     } catch (error) {
       if (import.meta.env.MODE === "development") {
         console.error(error);
@@ -398,7 +406,6 @@ const PostWidget = ({
       setFollowLoadingId(null);
     }
   };
-
   // eslint-disable-next-line react/prop-types
   return (
     <Box>
@@ -534,6 +541,10 @@ const PostWidget = ({
                           textAddition.value !==
                             "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
                           "white",
+                        textDecoration:
+                          textAddition?.value === "strikethrough" &&
+                          "line-through",
+                        fontStyle: textAddition?.value === "italic" && "italic",
                       }}
                       onClick={() => {
                         if (textAddition?.type === "color") {
@@ -552,84 +563,18 @@ const PostWidget = ({
                         }
                       }}
                     >
-                      <Typography
-                        position="relative"
-                        fontWeight={textAddition?.value === "bold" && "bold"}
-                        fontSize={
-                          typeof ele.postId === "object"
-                            ? "14px"
-                            : howIsText(
-                                ele?.description,
-                                ele?.picturePath,
-                                textAddition
-                              )
-                        }
-                        color={
-                          textAddition?.value ===
-                            "linear-gradient(to right, #89003054, #007a3342, #00000000)" &&
-                          mode === "light" &&
-                          "black"
-                        }
-                        textTransform={
-                          textAddition?.value === "quotation"
-                            ? "capitalize"
-                            : textAddition?.value === "uppercase"
-                            ? "uppercase"
-                            : undefined
-                        }
-                        sx={{
-                          wordBreak: "break-word",
-                          lineHeight: "1.7",
-                          direction: testArabic(ele?.description) && "rtl",
-                          textAlign: textAddition.type === "color",
-                          p: textAddition?.value === "quotation" && "10px",
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(
-                            convertTextLink(
-                              ele?.description?.length > 180
-                                ? ele?.description?.slice(0, 179)
-                                : ele?.description
-                            ),
-                            {
-                              ADD_ATTR: ["target", "rel"],
-                            }
-                          ),
-                        }}
-                        className={
-                          textAddition?.value === "quotation" && "postText"
-                        }
+                      <PostText
+                        key={ele?._id}
+                        ele={ele}
+                        textAddition={textAddition}
+                        howIsText={howIsText}
+                        mode={mode}
+                        testArabic={testArabic}
                       />
-
-                      {ele?.description?.length > 180 && (
-                        <span
-                          style={{
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            userSelect: "none",
-                          }}
-                          onClick={() => {
-                            setIsPostClicked(true),
-                              setPostClickType("post"),
-                              setPostClickData({
-                                firstName: ele?.userId?.firstName,
-                                lastName: ele?.userId?.lastName,
-                                picturePath: ele?.picturePath,
-                                userPicturePath: ele?.userId?.picturePath,
-                                description: ele?.description,
-                                _id: ele?._id,
-                                userId: ele?.userId?._id,
-                                verified: ele?.userId?.verified,
-                              });
-                          }}
-                        >
-                          ...more
-                        </span>
-                      )}
                     </Box>
                   </Box>
 
-                  {ele.picturePath && (
+                  {ele?.picturePath?.length > 0 && (
                     <PostImg
                       setIsPostClicked={setIsPostClicked}
                       setPostClickData={setPostClickData}
@@ -640,7 +585,7 @@ const PostWidget = ({
 
                   {typeof ele.postId === "object" && (
                     <Box p="10px">
-                      {ele?.postId?.picturePath && (
+                      {ele?.postId?.picturePath?.length > 0 && (
                         <PostImg
                           setIsPostClicked={setIsPostClicked}
                           setPostClickType={setPostClickType}
@@ -651,7 +596,7 @@ const PostWidget = ({
                       )}
 
                       <Box
-                        mt={ele?.postId?.picturePath ? "-17px" : "13px"}
+                        mt={ele?.postId?.picturePath ? "0" : "13px"}
                         border="1px solid #4a366a"
                         p="10px"
                         sx={{
@@ -767,9 +712,13 @@ const PostWidget = ({
                               fontSize="15px"
                               dangerouslySetInnerHTML={{
                                 __html: DOMPurify.sanitize(
-                                  convertTextLink(
-                                    ele?.postId?.description?.length > 180
-                                      ? ele?.postId?.description.slice(0, 179)
+                                  formatTextForDisplay(
+                                    ele?.postId?.description?.length > 400 &&
+                                      !ele?.postId?.picturePath
+                                      ? ele?.postId?.description?.slice(0, 400)
+                                      : ele?.postId?.description?.length >
+                                          400 && ele?.picturePath
+                                      ? ele?.postId?.description?.slice(0, 179)
                                       : ele?.postId?.description
                                   ),
                                   {
@@ -778,33 +727,6 @@ const PostWidget = ({
                                 ),
                               }}
                             />
-
-                            {ele?.postId?.description?.length > 180 && (
-                              <span
-                                style={{
-                                  fontWeight: "600",
-                                  cursor: "pointer",
-                                  userSelect: "none",
-                                }}
-                                onClick={() => {
-                                  setIsPostClicked(true),
-                                    setPostClickType("post"),
-                                    setPostClickData({
-                                      firstName: ele?.postId?.userId?.firstName,
-                                      lastName: ele?.postId?.userId?.lastName,
-                                      picturePath: ele?.postId?.picturePath,
-                                      userPicturePath:
-                                        ele?.postId?.userId?.picturePath,
-                                      description: ele?.postId?.description,
-                                      _id: ele?.postId?._id,
-                                      userId: ele?.postId?.userId?._id,
-                                      verified: ele?.postId?.userId?.verified,
-                                    });
-                                }}
-                              >
-                                ...more
-                              </span>
-                            )}
                           </>
                         )}
                       </Box>
@@ -1127,6 +1049,7 @@ const PostWidget = ({
               neutralColor={palette.neutral.light}
               handleSubmit={handleRepost}
               repostLoading={repostLoading}
+              palette={palette}
             />
           )}
         </>

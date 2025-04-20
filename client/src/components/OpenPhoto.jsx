@@ -3,9 +3,8 @@ import { Box, useMediaQuery } from "@mui/system";
 import { Close } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 
-const OpenPhoto = ({ photo, setIsImagOpen }) => {
+const OpenPhoto = ({ photo, setIsImagOpen, from = "" }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 550px)");
-
   return (
     <Box
       position="fixed"
@@ -57,9 +56,20 @@ const OpenPhoto = ({ photo, setIsImagOpen }) => {
           style={{
             zIndex: "1",
             position: "relative",
-            maxWidth: "100%",
-            maxHeight: "100%",
+            width:
+              from === "userImage" && isNonMobileScreens
+                ? "425px"
+                : from === "userImage" && !isNonMobileScreens
+                ? "325px"
+                : undefined,
+            height:
+              from === "userImage" && isNonMobileScreens
+                ? "425px"
+                : from === "userImage" && !isNonMobileScreens
+                ? "325px"
+                : undefined,
             objectFit: "cover",
+            borderRadius: from === "userImage" ? "50%" : "0",
           }}
         />
       </Box>

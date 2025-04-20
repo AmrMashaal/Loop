@@ -22,13 +22,12 @@ const compressImage = async (buffer) => {
 };
 
 export const createPost = async (req, res) => {
-  let picturePath = null;
+  let imagesUrl = [];
+  if (req.files && req.files.length > 0 && req.files.length <= 4) {
+    for (const file of req.files) {
+      const uniqueImageName = `${uuidv4()}-${file.originalname}`;
 
-  if (req.file) {
-    try {
-      const uniqueImageName = `${uuidv4()}-${req.file.originalname}`;
-
-      const compressedBuffer = await compressImage(req.file.buffer);
+      const compressedBuffer = await compressImage(file.buffer);
 
       const result = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -45,18 +44,12 @@ export const createPost = async (req, res) => {
         uploadStream.end(compressedBuffer);
       });
 
-      picturePath = result.secure_url;
-    } catch (error) {
-      if (picturePath) {
-        await cloudinary.uploader.destroy(uniqueImageName);
-      }
-
-      return res.status(500).json({ message: error.message });
+      imagesUrl.push(result.secure_url);
     }
   }
 
   try {
-    const { userId, description, textAddition, privacy } = req.body;
+    const { userId, description, privacy } = req.body;
 
     if (userId !== req.user.id) {
       return res.status(403).json({ message: "Forbidden!" });
@@ -65,11 +58,8 @@ export const createPost = async (req, res) => {
     const newPost = new Post({
       userId,
       description,
-      picturePath,
-      textAddition: textAddition,
+      picturePath: imagesUrl,
       privacy,
-      comments: [],
-      likes: [],
     });
 
     await newPost.save();
@@ -223,9 +213,9 @@ export const getFeedPosts = async (req, res) => {
     });
 
     const friendsIds = friendsPromise.map((fr) => {
-      return new mongoose.Types.ObjectId(fr.sender.toString()) === id
-        ? new mongoose.Types.ObjectId(fr.receiver.toString())
-        : new mongoose.Types.ObjectId(fr.sender.toString());
+      return new mongoose.Types.ObjectId(fr.sender).toString() === id
+        ? new mongoose.Types.ObjectId(fr.receiver)
+        : new mongoose.Types.ObjectId(fr.sender);
     });
 
     const following = await Follow.find({ follower: id }).select("following");
@@ -282,8 +272,7 @@ export const getFeedPosts = async (req, res) => {
       .populate("userId", "firstName lastName picturePath verified _id")
       .populate({
         path: "postId",
-        select:
-          "_id userId description picturePath textAddition privacy createdAt",
+        select: "_id userId description picturePath privacy createdAt",
         populate: {
           path: "userId",
           select: "_id firstName lastName picturePath verified",
@@ -298,9 +287,11 @@ export const getFeedPosts = async (req, res) => {
         });
 
         const postId =
-          rep?.postId?.privacy === "friends" &&
-          !friendsIds.includes(rep.postId.userId.toString()) &&
-          rep.postId.userId.toString() !== id
+          (rep?.postId?.privacy === "private" &&
+            rep.postId.userId._id.toString() !== id) ||
+          (rep?.postId?.privacy === "friends" &&
+            !friendsIds.includes(rep.postId.userId._id.toString()) &&
+            rep.postId.userId._id.toString() !== id)
             ? null
             : rep.postId;
 
@@ -344,16 +335,10 @@ export const getUserPosts = async (req, res) => {
   try {
     const userFriends = await Friend.find({
       $or: [
-        { sender: req.user.id, status: "accepted" },
-        { receiver: req.user.id, status: "accepted" },
+        { sender: userId, status: "accepted" },
+        { receiver: userId, status: "accepted" },
       ],
     });
-
-    const friendsIds = userFriends.map((fr) =>
-      fr.sender.toString() === req.user.id
-        ? fr.receiver.toString()
-        : fr.sender.toString()
-    );
 
     const isFriend = userFriends.some((friend) => {
       return (
@@ -383,8 +368,7 @@ export const getUserPosts = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",
@@ -417,8 +401,7 @@ export const getUserPosts = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",
@@ -448,8 +431,7 @@ export const getUserPosts = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",
@@ -479,15 +461,15 @@ export const getUserPosts = async (req, res) => {
         );
 
         const postId =
-          post?.postId?.privacy === "friends" &&
-          !friendsIds.includes(post.postId.userId.toString()) &&
-          post.postId.userId.toString() !== req.user.id
+          (post?.postId?.privacy === "private" &&
+            post.postId.userId._id.toString() !== req.user.id) ||
+          (post?.postId?.privacy === "friends" &&
+            !isFriend &&
+            post.postId.userId._id.toString() !== req.user.id)
             ? null
             : post.postId;
 
-        return typeof post.userId === "object"
-          ? { ...post._doc, isLiked: Boolean(isLiked), postId }
-          : { ...post._doc, isLiked: Boolean(isLiked) };
+        return { ...post._doc, isLiked: Boolean(isLiked), postId };
       })
     );
 
@@ -518,8 +500,7 @@ export const getPost = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",
@@ -527,7 +508,7 @@ export const getPost = async (req, res) => {
         });
     }
 
-    if (post.userId.toString() !== req.user.id && post.privacy === "private") {
+    if (post.userId._id.toString() !== req.user.id && post.privacy === "private") {
       res.status(403).json({ message: "Forbidden!" });
     } else {
       if (!post) {
@@ -641,8 +622,7 @@ export const editPost = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",
@@ -697,8 +677,7 @@ export const pinPost = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",
@@ -796,8 +775,7 @@ export const changePrivacy = async (req, res) => {
         .populate("userId", "firstName lastName picturePath verified _id")
         .populate({
           path: "postId",
-          select:
-            "_id userId description picturePath textAddition privacy createdAt",
+          select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
             select: "_id firstName lastName picturePath verified",

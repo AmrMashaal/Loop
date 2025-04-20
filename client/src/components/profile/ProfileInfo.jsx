@@ -27,7 +27,7 @@ import ShowFollow from "./ShowFollow";
 
 const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const [profileSettings, setProfileSettings] = useState(false);
-  const [isImgOpen, setIsImagOpen] = useState(false);
+  const [isImageOpen, setIsImageOpen] = useState({ show: false, from: "" });
   const [isDelete, setIsDelete] = useState(false);
   const [changePassword, setChangePassword] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
@@ -56,12 +56,12 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (isImgOpen) {
+    if (isImageOpen) {
       setIsOverFlow(true);
     } else {
       setIsOverFlow(false);
     }
-  }, [isImgOpen]);
+  }, [isImageOpen]);
 
   // useEffect(() => {
   //   setWaitingFriendRequest(userInfo?.friendsRequest);
@@ -272,7 +272,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
       } else {
         setFollows((prev) => [...prev, ...data]);
       }
- 
+
       return data;
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -309,7 +309,6 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
         setFollows((prev) => [...prev, ...data]);
       }
 
- 
       return data;
     } catch (error) {
       if (import.meta.env.VITE_NODE_ENV === "development") {
@@ -325,7 +324,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
       {userInfo?.background && !isLoading ? (
         <img
           onClick={() => {
-            setIsImagOpen(true),
+            setIsImageOpen({ show: true, from: "background" }),
               setImg(
                 userInfo?._id === user._id
                   ? user.background
@@ -375,7 +374,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
               margin="auto"
               sx={{ cursor: "pointer" }}
               onClick={() => {
-                setIsImagOpen(true),
+                setIsImageOpen({ show: true, from: "userImage" }),
                   setImg(
                     userInfo?._id === user._id
                       ? user.picturePath
@@ -794,7 +793,13 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
         />
       )}
 
-      {isImgOpen && <OpenPhoto photo={img} setIsImagOpen={setIsImagOpen} />}
+      {isImageOpen.show && (
+        <OpenPhoto
+          photo={img}
+          setIsImagOpen={setIsImageOpen}
+          from={isImageOpen.from}
+        />
+      )}
 
       {isDelete && (
         <DeleteComponent

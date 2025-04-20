@@ -14,7 +14,10 @@ import Comments from "./Comments";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../../scenes/navbar";
-import { convertTextLink, formatLikesCount } from "../../frequentFunctions";
+import {
+  formatTextForDisplay,
+  formatLikesCount,
+} from "../../frequentFunctions";
 import WhoLiked from "../WhoLiked";
 import DOMPurify from "dompurify";
 
@@ -84,7 +87,6 @@ const PostClick = ({
 
         const data = await response.json();
 
- 
         if (response.ok) {
           setPostDetails({
             picturePath: data.picturePath,
@@ -251,8 +253,16 @@ const PostClick = ({
             }}
           >
             <img
-              src={postDetails.picturePath}
-              title={postDetails.picturePath}
+              src={
+                typeof postDetails.picturePath === "string"
+                  ? postDetails.picturePath
+                  : postDetails.picturePath[0]
+              }
+              title={
+                typeof postDetails.picturePath === "string"
+                  ? postDetails.picturePath
+                  : postDetails.picturePath[0]
+              }
               style={{
                 objectFit: "contain",
                 height: "100%",
@@ -280,7 +290,6 @@ const PostClick = ({
             minHeight: isNonMobileScreens ? "550px" : undefined,
             overflow: "auto",
             flex: isNonMobileScreens ? undefined : "1",
-  
           }}
           id="commentsParent"
         >
@@ -348,7 +357,7 @@ const PostClick = ({
             }}
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(
-                convertTextLink(postDetails?.description),
+                formatTextForDisplay(postDetails?.description),
                 {
                   ADD_ATTR: ["target", "rel"],
                 }

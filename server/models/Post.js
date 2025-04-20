@@ -12,11 +12,18 @@ const postSchema = new mongoose.Schema(
     likesCount: { type: Number, default: 0 },
     commentCount: { type: Number, default: 0 },
     shareCount: { type: Number, default: 0 },
-    description: { type: String, maxlength: 2000 },
+    description: {
+      type: String,
+      maxlength: [3500, "Post cannot exceed 3500 characters"],
+    },
     privacy: { type: String, default: "public" },
     location: String,
-    picturePath: String,
-    textAddition: Object,
+    picturePath: {
+      type: [String],
+      default: [],
+       
+    },
+    textBackground: String,
   },
   { timestamps: true }
 );

@@ -62,9 +62,10 @@ const PostEdited = ({ setIsEdit, image, description, handleEditPost }) => {
             placeholder="What do you want to change?"
             value={editText}
             onChange={(e) => {
-              if (e.target.value.length <= 1000) setEditText(e.target.value);
-              else if (e.target.value.length > 1000)
-                setEditText(e.target.value.slice(0, 1000));
+              const newText = e.target.value;
+              if (newText.length <= 3000) {
+                setEditText(newText);
+              }
             }}
             sx={{
               p: "10px 0",
@@ -72,7 +73,8 @@ const PostEdited = ({ setIsEdit, image, description, handleEditPost }) => {
               direction: testArabic ? "rtl" : "ltr",
             }}
           />
-          <IconButton type="submit">
+
+          <IconButton type="submit" disabled={!editText.trim() || editText.length > 3000}>
             <SendOutlined />
           </IconButton>
         </form>

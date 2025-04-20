@@ -30,7 +30,7 @@ import { debounce } from "lodash";
 import socket from "../../components/socket";
 import Replies from "./Replies";
 import WhoLiked from "./../WhoLiked";
-import { convertTextLink, formatLikesCount } from "../../frequentFunctions";
+import { formatTextForDisplay, formatLikesCount } from "../../frequentFunctions";
 
 const Comments = ({
   _id,
@@ -177,8 +177,6 @@ const Comments = ({
       );
 
       const comments = await response.json();
-
-console.log(comments);
 
       if (response.ok) {
         if (first) {
@@ -764,7 +762,7 @@ console.log(comments);
                         }}
                         dangerouslySetInnerHTML={{
                           __html: DOMPurify.sanitize(
-                            convertTextLink(com?.text),
+                            formatTextForDisplay(com?.text),
                             {
                               ADD_ATTR: ["target", "rel"],
                             }

@@ -26,7 +26,7 @@ export const createRepost = async (req, res) => {
       .populate({
         path: "postId",
         select:
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt",
+          "_id userId description picturePath firstName lastName userPicturePath location verified privacy createdAt",
         populate: {
           path: "userId",
           select: "_id firstName lastName picturePath verified",

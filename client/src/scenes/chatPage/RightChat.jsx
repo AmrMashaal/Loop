@@ -15,7 +15,7 @@ import {
   Send,
 } from "@mui/icons-material";
 import Dropzone from "react-dropzone";
-import { convertTextLink } from "../../frequentFunctions";
+import { formatTextForDisplay } from "../../frequentFunctions";
 import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
 
@@ -288,7 +288,7 @@ const RightChat = ({
                     p="10px 10px 3px"
                     sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(convertTextLink(msg.text), {
+                      __html: DOMPurify.sanitize(formatTextForDisplay(msg.text), {
                         ADD_ATTR: ["target", "rel"],
                       }),
                     }}

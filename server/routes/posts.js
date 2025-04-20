@@ -28,7 +28,7 @@ router.patch("/:postId/changePrivacy", verifyToken, changePrivacy);
 router.post(
   "/",
   verifyToken,
-  upload.single("picture"),
+  upload.array("picture", 4),
   postLimiter,
   createPost
 );

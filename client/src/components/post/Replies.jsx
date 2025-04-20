@@ -16,7 +16,7 @@ import { useState } from "react";
 import DeleteComponent from "./DeleteComponent";
 import EditThing from "./EditThing";
 import socket from "../socket";
-import { convertTextLink, formatLikesCount } from "../../frequentFunctions";
+import { formatTextForDisplay, formatLikesCount } from "../../frequentFunctions";
 
 const Replies = ({
   data,
@@ -254,7 +254,7 @@ const Replies = ({
                       }}
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(
-                          convertTextLink(reply.reply),
+                          formatTextForDisplay(reply.reply),
                           {
                             ADD_ATTR: ["target", "rel"],
                           }

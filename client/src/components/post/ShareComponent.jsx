@@ -9,12 +9,11 @@ import { Lock, People, Public } from "@mui/icons-material";
 const ShareComponent = ({
   isShare,
   setIsShare,
-  postInfo,
-  setPostInfo,
-  user,
+   user,
   neutralColor,
   handleSubmit,
   repostLoading,
+  palette
 }) => {
   const [description, setDescription] = useState("");
   const [privacy, setPrivacy] = useState("public");
@@ -150,7 +149,7 @@ const ShareComponent = ({
         <Button
           sx={{
             color: "white",
-            background: "#0866ff",
+            background: palette.primary.main,
             width: "117px",
             alignSelf: "end",
           }}

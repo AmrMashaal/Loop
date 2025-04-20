@@ -202,7 +202,7 @@ export const likeRepost = async (req, res) => {
       )
         .populate(
           "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
+          "_id userId description picturePath firstName lastName userPicturePath location verified privacy createdAt"
         )
         .populate("userId", "firstName lastName picturePath verified _id");
 
@@ -224,7 +224,7 @@ export const likeRepost = async (req, res) => {
       )
         .populate(
           "postId",
-          "_id userId description picturePath firstName lastName userPicturePath location verified textAddition privacy createdAt"
+          "_id userId description picturePath firstName lastName userPicturePath location verified privacy createdAt"
         )
         .populate("userId", "firstName lastName picturePath verified _id");
 
