@@ -256,12 +256,12 @@ const PostClick = ({
               src={
                 typeof postDetails.picturePath === "string"
                   ? postDetails.picturePath
-                  : (postDetails?.picturePath?.[0] && postDetails?.picturePath[0])
+                  : (postDetails?.picturePath?.[0] && postDetails?.picturePath?.[0])
               }
               title={
                 typeof postDetails.picturePath === "string"
                   ? postDetails.picturePath
-                  : (postDetails?.picturePath?.[0] && postDetails?.picturePath[0])
+                  : (postDetails?.picturePath?.[0] && postDetails?.picturePath?.[0])
               }
               style={{
                 objectFit: "contain",
