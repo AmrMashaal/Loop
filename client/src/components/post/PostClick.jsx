@@ -238,7 +238,7 @@ const PostClick = ({
         maxHeight="100%"
         height={isNonMobileScreens ? undefined : "100%"}
       >
-        {postDetails.picturePath.length !== 0 && (
+        {postDetails?.picturePath?.length !== 0 && (
           <Box
             bgcolor="black"
             sx={{
@@ -256,12 +256,12 @@ const PostClick = ({
               src={
                 typeof postDetails.picturePath === "string"
                   ? postDetails.picturePath
-                  : postDetails.picturePath[0]
+                  : (postDetails?.picturePath?.[0] && postDetails?.picturePath[0])
               }
               title={
                 typeof postDetails.picturePath === "string"
                   ? postDetails.picturePath
-                  : postDetails.picturePath[0]
+                  : (postDetails?.picturePath?.[0] && postDetails?.picturePath[0])
               }
               style={{
                 objectFit: "contain",
