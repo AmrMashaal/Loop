@@ -38,7 +38,7 @@ const compressImage = async (buffer) => {
   return await sharp(buffer)
     .rotate()
     .resize({ width: 800 })
-    .jpeg({ quality: 80 })
+    .jpeg({ quality: 90 })
     .withMetadata()
     .toBuffer();
 };

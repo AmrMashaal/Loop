@@ -657,7 +657,7 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                                 image={backgroundImagePreview}
                                 crop={crop}
                                 zoom={zoom}
-                                aspect={40 / 9}
+                                aspect={32 / 9}
                                 onCropChange={setCrop}
                                 onZoomChange={setZoom}
                                 onCropComplete={(_, croppedAreaPixels) => {
