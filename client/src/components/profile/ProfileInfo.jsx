@@ -336,16 +336,17 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
             userInfo?._id === user._id ? user.background : userInfo?.background
           }
           style={{
-            height: "300px",
+            height: isNonMobileScreens ? "300px" : "240px",
             maxWidth: "100%",
             objectFit: "cover",
             cursor: "pointer",
+            userSelect: "none"
           }}
         />
       ) : (
         <Box
           width="100%"
-          height="300px"
+          height={isNonMobileScreens ? "300px" : "240px"}
           bgcolor={mode === "light" ? "#f0f0f0" : "#1e1e1e"}
         />
       )}

@@ -153,7 +153,7 @@ const ChangePassword = ({ changePassword, setChangePassword }) => {
               }}
               onClick={handleSubmit}
             >
-              {loading ? "Loading..." : "Submit"}
+              {loading ? "Loading..." : "Save"}
             </Button>
           </form>
         )}

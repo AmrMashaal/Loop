@@ -13,29 +13,32 @@ import {
   Typography,
 } from "@mui/material";
 import Dropzone from "react-dropzone";
-import EditOutLinedIcon from "@mui/icons-material/EditOutlined";
 import { countriesWithFlags } from "../../../infoArrays";
 import { Box, useTheme } from "@mui/system";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from "../../../state";
 import { useState } from "react";
 import FlexBetween from "../FlexBetween";
-import { Facebook, Instagram, LinkedIn, X, YouTube } from "@mui/icons-material";
-// import Cropper from "react-easy-crop";
+import {
+  DeleteOutline,
+  Facebook,
+  Instagram,
+  LinkedIn,
+  X,
+  YouTube,
+} from "@mui/icons-material";
+import Cropper from "react-easy-crop";
+import { cropImage } from "../../frequentFunctions";
 
-const ProfileSettings = ({
-  setProfileSettings,
-  setChangePassword,
-  // isNonMobileScreens,
-}) => {
+const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
   const [usernameError, setUsernameError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
   const [backgroundImagePreview, setBackgroundImagePreview] = useState(null);
-  // const [crop, setCrop] = useState({ x: 0, y: 0 });
-  // const [zoom, setZoom] = useState(1);
-  // const [imagePreview, setImagePreview] = useState(null);
-  // const [cropComplete, setCropComplete] = useState(null);
+  const [isCropperOpen, setIsCropperOpen] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [cropComplete, setCropComplete] = useState(null);
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -139,7 +142,7 @@ const ProfileSettings = ({
     youtube: yup.string().url(),
   });
 
-  const handleFormSubmit = async (values) => {
+  const handleFormSubmit = async (values, formFunctions) => {
     setLoading(true);
     const formData = new FormData();
 
@@ -193,6 +196,7 @@ const ProfileSettings = ({
       setLoading(false);
       setProfileImagePreview(null);
       setBackgroundImagePreview(null);
+      formFunctions.resetForm();
     }
   };
 
@@ -426,7 +430,7 @@ const ProfileSettings = ({
                     setProfileImagePreview(
                       URL.createObjectURL(acceptedFiles[0])
                     );
-                    // setImagePreview(URL.createObjectURL(acceptedFiles[0]));
+                    setIsCropperOpen(true);
                   }}
                 >
                   {({ getRootProps, getInputProps }) => (
@@ -435,27 +439,136 @@ const ProfileSettings = ({
                       {!values.picturePath ? (
                         <p>Add Profile Picture Here</p>
                       ) : (
-                        <FlexBetween>
+                        <FlexBetween position="relative">
                           <Box>
                             <img
                               src={profileImagePreview}
                               alt="preview"
                               style={{
-                                height: "120px",
-                                width: "120px",
+                                height: "100px",
+                                width: "100px",
                                 objectFit: "cover",
+                                maxWidth: "100%",
                                 borderRadius: "50%",
                               }}
                             />
                           </Box>
-                          <IconButton>
-                            <EditOutLinedIcon />
+
+                          <IconButton
+                            sx={{
+                              position: "absolute",
+                              top: "10px",
+                              right: "10px",
+                              backgroundColor: palette.background.alt,
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFieldValue("picturePath", null);
+                              setProfileImagePreview(null);
+                              setCropComplete(null);
+                            }}
+                          >
+                            <DeleteOutline />
                           </IconButton>
                         </FlexBetween>
                       )}
                     </Box>
                   )}
                 </Dropzone>
+
+                {isCropperOpen && (
+                  <Box
+                    position="fixed"
+                    top="0"
+                    left="0"
+                    width="100vw"
+                    height="100vh"
+                    bgcolor={palette.background.alt}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    zIndex="1000"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <Cropper
+                      image={profileImagePreview}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1}
+                      cropShape="round"
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onCropComplete={(_, croppedAreaPixels) => {
+                        setCropComplete(croppedAreaPixels);
+                      }}
+                    />
+
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      width="100%"
+                      padding="20px"
+                      justifyContent="center"
+                      gap="14px"
+                      position="fixed"
+                      bottom="0"
+                      left="0"
+                    >
+                      <Button
+                        onClick={() => {
+                          setCropComplete(null);
+                          setIsCropperOpen(false);
+                        }}
+                        sx={{
+                          color: palette.neutral.medium,
+                          bgcolor: palette.background.alt,
+                          width: "140px",
+                          border: `1px solid ${palette.neutral.medium}`,
+                        }}
+                      >
+                        cansel
+                      </Button>
+
+                      <Button
+                        onClick={async () => {
+                          if (!cropComplete) return;
+                          try {
+                            const blob = await cropImage(
+                              profileImagePreview,
+                              cropComplete
+                            );
+                            if (blob) {
+                              const fileName =
+                                values.picturePath?.name || "profile.jpg";
+                              const file = new File([blob], fileName, {
+                                type: blob.type,
+                              });
+                              setFieldValue("picturePath", file);
+                              setProfileImagePreview(URL.createObjectURL(blob));
+                              setCropComplete(null);
+                              setIsCropperOpen(false);
+                            }
+                          } catch (error) {
+                            console.error("Error cropping image:", error);
+                          }
+                        }}
+                        sx={{
+                          color: "black",
+                          bgcolor: palette.primary.main,
+                          width: "140px",
+                          "&:hover": {
+                            color: palette.primary.main,
+                            backgroundColor: palette.primary.dark,
+                          },
+                        }}
+                      >
+                        Save
+                      </Button>
+                    </Box>
+                  </Box>
+                )}
               </Box>
               {touched.picturePath && errors.picturePath && (
                 <Typography color="error" variant="body2" m="-10px 0 -20px 0">
@@ -484,6 +597,7 @@ const ProfileSettings = ({
                     setBackgroundImagePreview(
                       URL.createObjectURL(acceptedFiles[0])
                     );
+                    setIsCropperOpen(true);
                   }}
                 >
                   {({ getRootProps, getInputProps }) => (
@@ -492,22 +606,139 @@ const ProfileSettings = ({
                       {!values.background ? (
                         <p>Add Background Here</p>
                       ) : (
-                        <FlexBetween>
+                        <FlexBetween position="relative">
                           <Box>
                             <img
                               src={backgroundImagePreview}
                               alt="preview"
                               style={{
                                 height: "140px",
-                                width: "450px",
+                                width: "100%",
                                 objectFit: "cover",
                                 maxWidth: "100%",
                               }}
                             />
                           </Box>
-                          <IconButton>
-                            <EditOutLinedIcon />
+
+                          <IconButton
+                            sx={{
+                              position: "absolute",
+                              top: "10px",
+                              right: "10px",
+                              backgroundColor: palette.background.alt,
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFieldValue("background", null);
+                              setBackgroundImagePreview(null);
+                              setCropComplete(null);
+                            }}
+                          >
+                            <DeleteOutline />
                           </IconButton>
+
+                          {isCropperOpen && (
+                            <Box
+                              position="fixed"
+                              top="0"
+                              left="0"
+                              width="100vw"
+                              height="100vh"
+                              bgcolor={palette.background.alt}
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              zIndex="1000"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
+                              <Cropper
+                                image={backgroundImagePreview}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={40 / 9}
+                                onCropChange={setCrop}
+                                onZoomChange={setZoom}
+                                onCropComplete={(_, croppedAreaPixels) => {
+                                  setCropComplete(croppedAreaPixels);
+                                }}
+                              />
+
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                width="100%"
+                                padding="20px"
+                                justifyContent="center"
+                                gap="14px"
+                                position="fixed"
+                                bottom="0"
+                                left="0"
+                              >
+                                <Button
+                                  onClick={() => {
+                                    setCropComplete(null);
+                                    setIsCropperOpen(false);
+                                  }}
+                                  sx={{
+                                    color: palette.neutral.medium,
+                                    bgcolor: palette.background.alt,
+                                    width: "140px",
+                                    border: `1px solid ${palette.neutral.medium}`,
+                                  }}
+                                >
+                                  cansel
+                                </Button>
+
+                                <Button
+                                  onClick={async () => {
+                                    if (!cropComplete) return;
+                                    try {
+                                      const blob = await cropImage(
+                                        backgroundImagePreview,
+                                        cropComplete
+                                      );
+                                      if (blob) {
+                                        const fileName =
+                                          values.background?.name ||
+                                          "profile.jpg";
+                                        const file = new File(
+                                          [blob],
+                                          fileName,
+                                          {
+                                            type: blob.type,
+                                          }
+                                        );
+                                        setFieldValue("background", file);
+                                        setBackgroundImagePreview(
+                                          URL.createObjectURL(blob)
+                                        );
+                                        setCropComplete(null);
+                                        setIsCropperOpen(false);
+                                      }
+                                    } catch (error) {
+                                      console.error(
+                                        "Error cropping image:",
+                                        error
+                                      );
+                                    }
+                                  }}
+                                  sx={{
+                                    color: "black",
+                                    bgcolor: palette.primary.main,
+                                    width: "140px",
+                                    "&:hover": {
+                                      color: palette.primary.main,
+                                      backgroundColor: palette.primary.dark,
+                                    },
+                                  }}
+                                >
+                                  Save
+                                </Button>
+                              </Box>
+                            </Box>
+                          )}
                         </FlexBetween>
                       )}
                     </Box>
@@ -655,55 +886,12 @@ const ProfileSettings = ({
                 }}
                 disabled={loading}
               >
-                {loading ? "loading..." : "Submit"}
+                {loading ? "loading..." : "Save"}
               </Button>
             </form>
           );
         }}
       </Formik>
-
-      {/* {imagePreview && (
-        <Box
-          position="fixed"
-          top="0"
-          left="0"
-          width="100vw"
-          height="100vh"
-          bgcolor="rgba(0, 0, 0, 0.5)"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          zIndex="1000"
-        >
-          <Cropper
-            image={imagePreview}
-            crop={crop}
-            zoom={zoom}
-            aspect={4 / 3}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={(_, croppedAreaPixels) => {
-              setCropComplete(croppedAreaPixels);
-              console.log(croppedAreaPixels);
-            }}
-          />
-
-          <Button
-            onClick={() => {
-              setCropComplete(null);
-              setImagePreview(null);
-            }}
-            sx={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              color: palette.background.alt,
-            }}
-          >
-            done
-          </Button>
-        </Box>
-      )} */}
     </TasksComponent>
   );
 };
