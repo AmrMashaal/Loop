@@ -205,6 +205,8 @@ const PostClick = ({
   const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const testArabic = regexArabic.test(postDetails.description);
 
+  console.log("postDetails", postDetails);
+
   return (
     <Box
       position="fixed"
@@ -238,7 +240,7 @@ const PostClick = ({
         maxHeight="100%"
         height={isNonMobileScreens ? undefined : "100%"}
       >
-        {postDetails?.picturePath?.length !== 0 && (
+        {postDetails?.picturePath && postDetails?.picturePath?.length > 0  && (
           <Box
             bgcolor="black"
             sx={{

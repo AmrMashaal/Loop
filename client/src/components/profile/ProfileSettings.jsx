@@ -21,7 +21,7 @@ import { setLogin } from "../../../state";
 import { useState } from "react";
 import FlexBetween from "../FlexBetween";
 import { Facebook, Instagram, LinkedIn, X, YouTube } from "@mui/icons-material";
-import Cropper from "react-easy-crop";
+// import Cropper from "react-easy-crop";
 
 const ProfileSettings = ({
   setProfileSettings,
@@ -32,9 +32,10 @@ const ProfileSettings = ({
   const [loading, setLoading] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState(null);
   const [backgroundImagePreview, setBackgroundImagePreview] = useState(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [cropComplete, setCropComplete] = useState(null);
+  // const [crop, setCrop] = useState({ x: 0, y: 0 });
+  // const [zoom, setZoom] = useState(1);
+  // const [imagePreview, setImagePreview] = useState(null);
+  // const [cropComplete, setCropComplete] = useState(null);
 
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
@@ -661,7 +662,7 @@ const ProfileSettings = ({
         }}
       </Formik>
 
-       {profileImagePreview && (
+      {/* {imagePreview && (
         <Box
           position="fixed"
           top="0"
@@ -675,7 +676,7 @@ const ProfileSettings = ({
           zIndex="1000"
         >
           <Cropper
-            image={profileImagePreview}
+            image={imagePreview}
             crop={crop}
             zoom={zoom}
             aspect={4 / 3}
@@ -690,7 +691,7 @@ const ProfileSettings = ({
           <Button
             onClick={() => {
               setCropComplete(null);
-              setProfileImagePreview(null);
+              setImagePreview(null);
             }}
             sx={{
               position: "absolute",
@@ -702,7 +703,7 @@ const ProfileSettings = ({
             done
           </Button>
         </Box>
-      )} 
+      )} */}
     </TasksComponent>
   );
 };
