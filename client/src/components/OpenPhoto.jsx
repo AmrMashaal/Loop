@@ -45,8 +45,13 @@ const OpenPhoto = ({ photo, setIsImagOpen, from = "" }) => {
       </IconButton>
 
       <Box
-        width={isNonMobileScreens ? "75%" : "100%"}
-        height="75%"
+        width={
+          from === "userImage" && isNonMobileScreens
+            ? "425px"
+            : from === "userImage" && !isNonMobileScreens
+            ? "325px"
+            : "100%"
+        }
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -56,18 +61,7 @@ const OpenPhoto = ({ photo, setIsImagOpen, from = "" }) => {
           style={{
             zIndex: "1",
             position: "relative",
-            width:
-              from === "userImage" && isNonMobileScreens
-                ? "425px"
-                : from === "userImage" && !isNonMobileScreens
-                ? "325px"
-                : undefined,
-            height:
-              from === "userImage" && isNonMobileScreens
-                ? "425px"
-                : from === "userImage" && !isNonMobileScreens
-                ? "325px"
-                : undefined,
+            width: "100%",
             objectFit: "cover",
             borderRadius: from === "userImage" ? "50%" : "0",
           }}

@@ -134,7 +134,7 @@ export const whoLikedPost = async (req, res) => {
       .skip((page - 1) * 10)
       .populate("userId", "firstName lastName picturePath verified _id");
 
-    const count = await Like.countDocuments({ postId });
+    const count = await Post.findById(postId);
 
     res.status(200).json({ likes, count });
   } catch (error) {
@@ -153,7 +153,7 @@ export const whoLikedComment = async (req, res) => {
       .skip((page - 1) * 10)
       .select("userId");
 
-    const count = await Like.countDocuments({ commentId });
+    const count = await Comment.findById(commentId);
 
     res.status(200).json({ likes, count });
   } catch (error) {
@@ -172,7 +172,7 @@ export const whoLikedReply = async (req, res) => {
       .skip((page - 1) * 10)
       .select("userId");
 
-    const count = await Like.countDocuments({ replyId });
+    const count = await Reply.findById(replyId);
 
     res.status(200).json({ likes, count });
   } catch (error) {
@@ -254,7 +254,7 @@ export const whoLikedRepost = async (req, res) => {
       .skip((page - 1) * 10)
       .populate("userId", "firstName lastName picturePath verified _id");
 
-    const count = await Like.countDocuments({ repostId });
+    const count = await Repost.findById(repostId).select("likesCount");
 
     res.status(200).json({ likes, count });
   } catch (error) {

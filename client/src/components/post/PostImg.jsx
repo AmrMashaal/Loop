@@ -32,13 +32,13 @@ const PostImg = ({
             alt="post"
             style={{
               width: "100%",
-              height: "100%",
-              objectFit: "cover",
+              maxHeight: "485px",
+              minHeight: "200px",
+              objectFit: "contain",
               gridColumn:
                 ele.picturePath.length === 3 && index === 0
                   ? "span 4"
                   : "span 2",
-              maxHeight: ele?.picturePath?.length > 2 ? "240px" : "485px",
               maxWidth: "100%",
               cursor: "pointer",
               zIndex: "1",

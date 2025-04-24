@@ -139,8 +139,6 @@ const Form = () => {
 
       const savedUser = await savedUserResponse.json();
 
-      console.log(savedUserResponse)
-
       if (
         savedUser?.message &&
         savedUser?.message?.includes("This Username Already Exists")

@@ -621,6 +621,7 @@ const PostWidget = ({
                           <Link
                             to={`/profile/${ele?.postId?.userId?._id}`}
                             style={{ width: "fit-content", display: "block" }}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <Box gap="10px" display="flex" alignItems="center">
                               <Box sx={{ cursor: "pointer" }}>
