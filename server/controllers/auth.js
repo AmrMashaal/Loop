@@ -10,7 +10,6 @@ const compressImage = async (buffer) => {
     .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 90 })
-    .withMetadata()
     .toBuffer();
 };
 
@@ -37,7 +36,7 @@ export const register = async (req, res) => {
       });
       picturePath = result.secure_url;
     } catch (error) {
-      res.status(500).json({ message: error });
+      return res.status(500).json({ message: error });
     }
   }
 
@@ -54,8 +53,6 @@ export const register = async (req, res) => {
 
     const usernameRegex = /^[a-zA-Z][a-zA-Z0-9._]*$/;
     const firstAndLastNameRegex = /^[a-zA-Z\u0600-\u06FF\s'-]+$/;
-
-    console.log(username, password);
 
     if (!username || !usernameRegex.test(username)) {
       return res.status(400).json({
@@ -91,11 +88,9 @@ export const register = async (req, res) => {
     const user = new User({
       firstName: firstName.replace(/\s+/g, " ").trim(),
       lastName: lastName?.replace(/\s+/g, " ").trim(),
-      username,
+      username: username.trim(),
       password: passwordHash,
-      picturePath:
-        picturePath ||
-        "https://res.cloudinary.com/dc3ta1xrf/image/upload/v1741039254/posts/feb4142e-fff3-4a0f-a2bd-d89bd563543c-loading-user.png.jpg",
+      picturePath: picturePath || process.env.DEFAULT_PROFILE_PICTURE,
       location,
       birthdate,
       gender,
@@ -119,9 +114,13 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ username });
 
+    if (!user) {
+      return res.status(400).json({ message: "Invalid user or password." });
+    }
+
     const realPassword = await bcrypt.compare(password, user.password);
 
-    if ((!realPassword && user) || user === null) {
+    if (!realPassword) {
       return res.status(400).json({ message: "Invalid user or password." });
     }
 

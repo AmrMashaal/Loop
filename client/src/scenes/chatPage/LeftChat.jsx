@@ -171,8 +171,10 @@ const LeftChat = ({
                   }`}
                   style={{ margin: "20px 0", display: "block" }}
                   onClick={() => {
-                    setMessages([]);
-                    setReplyMessage(null);
+                    if (userId === (ele?.senderId?._id || ele?._id)) {
+                      setMessages([]);
+                      setReplyMessage(null);
+                    }
                   }}
                 >
                   <Box

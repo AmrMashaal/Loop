@@ -494,7 +494,7 @@ const Form = () => {
                                       border: `1px solid ${palette.neutral.medium}`,
                                     }}
                                   >
-                                    cansel
+                                    cancel
                                   </Button>
 
                                   <Button

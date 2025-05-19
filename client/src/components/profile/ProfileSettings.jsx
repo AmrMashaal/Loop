@@ -528,7 +528,7 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                           border: `1px solid ${palette.neutral.medium}`,
                         }}
                       >
-                        cansel
+                        cancel
                       </Button>
 
                       <Button
@@ -688,7 +688,7 @@ const ProfileSettings = ({ setProfileSettings, setChangePassword }) => {
                                     border: `1px solid ${palette.neutral.medium}`,
                                   }}
                                 >
-                                  cansel
+                                  cancel
                                 </Button>
 
                                 <Button

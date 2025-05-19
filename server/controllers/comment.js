@@ -93,7 +93,6 @@ const compressImage = async (buffer) => {
     .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 80 })
-    .withMetadata()
     .toBuffer();
 };
 
@@ -431,7 +430,7 @@ export const repostComment = async (req, res) => {
       repost: true,
     });
 
-     await comment.save();
+    await comment.save();
 
     if (!comment) {
       return res.status(404).json({ message: "comment is not found" });

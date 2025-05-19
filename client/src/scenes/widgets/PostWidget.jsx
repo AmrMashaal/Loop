@@ -600,11 +600,12 @@ const PostWidget = ({
                         border="1px solid #4a366a"
                         p="10px"
                         sx={{
-                          cursor: "pointer",
+                          cursor: ele?.postId !== null ? "pointer" : undefined,
                         }}
                         onClick={() => {
-                          setIsPostClicked(true),
-                            setPostClickType("post"),
+                          if (ele?.postId !== null) {
+                            setIsPostClicked(true);
+                            setPostClickType("post");
                             setPostClickData({
                               firstName: ele?.postId?.userId?.firstName,
                               lastName: ele?.postId?.userId?.lastName,
@@ -615,6 +616,7 @@ const PostWidget = ({
                               userId: ele?.postId?.userId?._id,
                               verified: ele?.postId?.userId?.verified,
                             });
+                          }
                         }}
                       >
                         {ele?.postId !== null ? (
