@@ -632,10 +632,6 @@ export const countriesWithFlags = [
     flag: "\ud83c\uddee\ud83c\uddf2",
   },
   {
-    country: "Israel",
-    flag: "\ud83c\uddee\ud83c\uddf1",
-  },
-  {
     country: "Italy",
     flag: "\ud83c\uddee\ud83c\uddf9",
   },
@@ -876,7 +872,7 @@ export const countriesWithFlags = [
     flag: "\ud83c\uddf5\ud83c\uddfc",
   },
   {
-    country: "Palestine, State of",
+    country: "Palestine",
     flag: "\ud83c\uddf5\ud83c\uddf8",
   },
   {
