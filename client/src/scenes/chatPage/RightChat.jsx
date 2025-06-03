@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { IconButton, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import UserImage from "../../components/UserImage";
 import OpenPhoto from "../../components/OpenPhoto";
 import { setIsOverFlow } from "../../App";
@@ -51,14 +51,12 @@ const RightChat = ({
   }, [showImage]);
 
   // ----------------------------------------------------------
-
   const regexArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
   const testArabic = (text) => {
     return regexArabic.test(text);
   };
 
   // ----------------------------------------------------------
-
   const handleEmoji = async (emj, messageId) => {
     try {
       const response = await fetch(`/api/messages/${messageId}/emoji`, {
@@ -84,6 +82,476 @@ const RightChat = ({
     }
   };
 
+  // ----------------------------------------------------------
+  const ChatBubble = ({ msg, index }) => {
+    const isOwn = msg?.senderId?._id === user._id;
+
+    const [offsetX, setOffsetX] = useState(0);
+    const [transition, setTransition] = useState("none");
+
+    const touchStartX = useRef(0);
+    const touchStartY = useRef(0);
+    const touchHasMoved = useRef(false);
+    const longPressTimeout = useRef(null);
+
+    const onTouchStart = useCallback(
+      (e) => {
+        touchStartX.current = e.touches[0].clientX;
+        touchStartY.current = e.touches[0].clientY;
+        touchHasMoved.current = false;
+        setTransition("none");
+
+        longPressTimeout.current = setTimeout(() => {
+          if (!touchHasMoved.current) {
+            setDisplayEmojiPicker(true);
+            setMessageId(msg?._id);
+          }
+        }, 500);
+      },
+      [msg]
+    );
+
+    const onTouchMove = useCallback(
+      (e) => {
+        const currX = e.touches[0].clientX;
+        const currY = e.touches[0].clientY;
+        const dx = currX - touchStartX.current;
+        const dy = currY - touchStartY.current;
+
+        if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+          touchHasMoved.current = true;
+          clearTimeout(longPressTimeout.current);
+        }
+
+        if (isOwn) {
+          if (dx > 0 && Math.abs(dy) < 40) {
+            setOffsetX(dx);
+          }
+        } else {
+          if (dx < 0 && Math.abs(dy) < 40) {
+            setOffsetX(dx);
+          }
+        }
+      },
+      [isOwn]
+    );
+
+    const onTouchEnd = useCallback(() => {
+      clearTimeout(longPressTimeout.current);
+
+      if ((isOwn && offsetX > 50) || (!isOwn && offsetX < -50)) {
+        setReplyMessage(msg);
+      }
+
+      setTransition("transform 0.2s ease-out");
+      setOffsetX(0);
+    }, [offsetX, isOwn, msg]);
+
+    return (
+      <Box
+        sx={{
+          transform: `translateX(${offsetX}px)`,
+          transition: transition,
+        }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <Box
+          width="100%"
+          display="flex"
+          justifyContent={isOwn ? "end" : "start"}
+          alignItems="center"
+          position="relative"
+          sx={{
+            ":hover": {
+              ".replyIcon, .emojiIcon": {
+                display: isNonMobileScreens && "flex",
+              },
+            },
+          }}
+        >
+          {!isOwn && (
+            <Link to={`/profile/${msg?.senderId?._id}`}>
+              <UserImage size="45" image={msg?.senderId?.picturePath} />
+            </Link>
+          )}
+
+          <Reply
+            sx={{
+              cursor: "pointer",
+              ":hover": {
+                display: "flex",
+              },
+              bgcolor: "#2b2d3d",
+              borderRadius: "50%",
+              p: "2px",
+              width: "24px",
+              height: "24px",
+              display: isNonMobileScreens
+                ? index === messages.length - 1
+                  ? "flex"
+                  : "none"
+                : "none",
+              justifyContent: "center",
+              alignItems: "center",
+              border: "1px solid ##212121",
+              color: "#939393",
+              fontSize: "13px",
+              order: isOwn ? -1 : 2,
+              mx: "13px"
+            }}
+            onClick={() => setReplyMessage(msg)}
+            className="replyIcon"
+          />
+
+          <Box
+            m="15px 10px"
+            borderRadius="5px"
+            maxWidth="65%"
+            position="relative"
+            bgcolor={isOwn ? "#3168a2" : "#2b2d3d"}
+            color="white"
+            sx={{
+              wordBreak: "break-word",
+              ":before": {
+                content: "''",
+                position: "absolute",
+                borderTop: `9px solid ${isOwn ? "#3168a2" : "#2b2d3d"} `,
+                borderRight: "7px solid transparent",
+                borderLeft: "7px solid transparent",
+                borderBottom: "7px solid transparent",
+                transform: isOwn ? "rotate(-47deg)" : "rotate(40deg)",
+                bottom: isOwn ? "-8.1px" : "-9.1px",
+                left: isOwn ? undefined : "-6.4px",
+                right: isOwn ? "-7px" : undefined,
+              },
+            }}
+          >
+            <Box
+              className="emojiIcon"
+              p={
+                msg?.emoji && Object.values(msg?.emoji)?.length !== 0
+                  ? "2px"
+                  : "5px"
+              }
+              width={
+                msg?.emoji && Object.values(msg?.emoji)?.length !== 0
+                  ? "unset"
+                  : "24px"
+              }
+              height={
+                msg?.emoji && Object.values(msg?.emoji)?.length !== 0
+                  ? "unset"
+                  : "24px"
+              }
+              bgcolor="#2b2d3d"
+              borderRadius={
+                msg?.emoji && Object.values(msg?.emoji)?.length > 1
+                  ? "4px"
+                  : "50%"
+              }
+              display={
+                isNonMobileScreens
+                  ? index === messages.length - 1 ||
+                    Object.values(msg?.emoji)?.length !== 0
+                    ? "flex"
+                    : "none"
+                  : Object.values(msg?.emoji)?.length !== 0
+                  ? "flex"
+                  : "none"
+              }
+              justifyContent="center"
+              alignItems="center"
+              border="1px solid ##212121"
+              boxShadow="0px 0px 5px 0 #00000029"
+              sx={{
+                cursor: "pointer",
+                ":hover": {
+                  display: "flex",
+                },
+                order: isOwn ? -1 : 1,
+                position: "absolute",
+                bottom: msg?.emoji ? "-10px" : "0",
+                left: isOwn ? "-15px" : "unset",
+                right: isOwn ? "unset" : "-15px",
+                zIndex: 1,
+              }}
+              onClick={() => {
+                setDisplayEmojiPicker(!displayEmojiPicker);
+                setMessageId(msg?._id);
+              }}
+            >
+              {msg?.emoji && Object.values(msg?.emoji)?.length !== 0 ? (
+                msg?.emoji &&
+                Object.values(msg?.emoji)?.map((emj) => {
+                  return emj;
+                })
+              ) : (
+                <EmojiEmotions
+                  sx={{
+                    color: "#939393",
+                    fontSize: "13px",
+                  }}
+                />
+              )}
+            </Box>
+
+            {msg?.reply && (
+              <Box
+                width="100%"
+                bgcolor="#2b2d3d"
+                display="flex"
+                justifyContent="space-between"
+                borderRadius="5px 5px 0 0"
+                borderLeft={`5px solid ${
+                  user._id === msg?.reply?.senderId?._id
+                    ? "#3a65a5"
+                    : "lightgreen"
+                }`}
+              >
+                <Box
+                  display="flex"
+                  alignItems="start"
+                  gap="5px"
+                  flexDirection="column"
+                  p="7px"
+                  sx={{ userSelect: "none" }}
+                >
+                  <Typography
+                    color={
+                      user._id === msg?.reply?.senderId?._id
+                        ? "#527ec0"
+                        : "lightGreen"
+                    }
+                    fontSize="11px"
+                    maxWidth="85%"
+                    overflow="hidden"
+                    whiteSpace="nowrap"
+                    textOverflow="ellipsis"
+                  >
+                    {msg?.reply?.senderId?.firstName}{" "}
+                    {msg?.reply?.senderId?.lastName}
+                  </Typography>
+
+                  <Typography
+                    fontSize="12px"
+                    color="#939393"
+                    maxWidth="315px"
+                    className="truncated-text"
+                  >
+                    {msg?.reply?.text}
+                  </Typography>
+                </Box>
+
+                <Box display="flex" alignItems="center" gap="5px">
+                  {msg?.reply?.picturePath && (
+                    <img
+                      src={msg?.reply?.picturePath}
+                      width="64px"
+                      height="57px"
+                      style={{ objectFit: "cover" }}
+                      alt=""
+                    />
+                  )}
+                </Box>
+              </Box>
+            )}
+
+            {msg?.text && (
+              <Typography
+                p="10px 10px 3px"
+                sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(formatTextForDisplay(msg.text), {
+                    ADD_ATTR: ["target", "rel"],
+                  }),
+                }}
+              />
+            )}
+
+            {msg?.picturePath && (
+              <img
+                src={msg?.picturePath}
+                style={{
+                  maxWidth: "100%",
+                  width: "350px",
+                  marginTop: msg?.text ? "6px" : "0",
+                  maxHeight: "400px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+                alt=""
+                onClick={() => {
+                  setShowImage(true);
+                  setImageName(msg?.picturePath);
+                }}
+              />
+            )}
+
+            <Typography
+              color={isOwn ? "#c4c4c4" : "#939393"}
+              textAlign="right"
+              fontSize="11px"
+              sx={{ userSelect: "none" }}
+              p="7px 10px"
+            >
+              {realTime(msg?.createdAt)}
+            </Typography>
+
+            {displayEmojiPicker && msg?._id === messageId && (
+              <Box
+                border="1px solid #212121"
+                boxShadow="0px 0px 5px 0 #00000029"
+                borderRadius="40px"
+                position="absolute"
+                zIndex="9999"
+                bottom="15px"
+                left={isOwn ? undefined : "0"}
+                right={isOwn ? "0" : undefined}
+                p="6px"
+                bgcolor="#2b2d3d"
+                sx={{ userSelect: "none" }}
+                display="flex"
+                gap="5px"
+              >
+                {["💖", "😂", "😢", "😲", "😡", "🤙"].map((emj, idx) => {
+                  return (
+                    <Box
+                      key={idx}
+                      bgcolor={msg?.emoji[user._id] === emj ? "#8484846e" : ""}
+                      borderRadius="50%"
+                      p="2px"
+                    >
+                      <Typography
+                        fontSize="27px"
+                        sx={{
+                          cursor: "pointer",
+                          transition: ".3s",
+                          ":hover": {
+                            transform: "scale(1.2)",
+                          },
+                        }}
+                        onClick={() => {
+                          handleEmoji(emj, msg?._id);
+                          setDisplayEmojiPicker(false);
+                        }}
+                      >
+                        {emj}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
+
+            {displayEmojiPicker && (
+              <Box
+                position="fixed"
+                top="0"
+                left="0"
+                width="100%"
+                height="100%"
+                onClick={() => {
+                  setDisplayEmojiPicker(false);
+                  setMessageId(null);
+                }}
+              />
+            )}
+          </Box>
+
+          {isOwn && (
+            <Link to={`/profile/${user._id}`}>
+              <UserImage size="45" image={user.picturePath} />
+            </Link>
+          )}
+        </Box>
+
+        {isOwn && messages?.length - 1 === index && msg?.watched && (
+          <Box
+            display="flex"
+            alignItems="center"
+            gap="5px"
+            justifyContent="flex-end"
+            mr="33px"
+            mt="-8px"
+          >
+            <Typography
+              color="#939393"
+              textAlign="right"
+              fontSize="11px"
+              mt="-6px"
+              sx={{ userSelect: "none" }}
+            >
+              seen
+            </Typography>
+
+            <Box>
+              <Check
+                sx={{
+                  fontSize: "15px",
+                  mb: "2px",
+                  color: "#62aeff",
+                }}
+              />
+
+              <Check
+                sx={{
+                  fontSize: "15px",
+                  mb: "2px",
+                  color: "#62aeff",
+                  ml: "-9px",
+                }}
+              />
+            </Box>
+          </Box>
+        )}
+
+        {isOwn && messages?.length - 1 === index && !msg?.watched && (
+          <Box
+            display="flex"
+            alignItems="center"
+            gap="5px"
+            justifyContent="flex-end"
+            mr="33px"
+            mt="-8px"
+          >
+            <Typography
+              color="#939393"
+              textAlign="right"
+              fontSize="11px"
+              mt="-6px"
+              sx={{ userSelect: "none" }}
+            >
+              sent
+            </Typography>
+
+            <Box>
+              <Check
+                sx={{
+                  fontSize: "15px",
+                  mb: "2px",
+                  color: "#939393",
+                }}
+              />
+
+              <Check
+                sx={{
+                  fontSize: "15px",
+                  mb: "2px",
+                  color: "#939393",
+                  ml: "-9px",
+                }}
+              />
+            </Box>
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
+  // ----------------------------------------------------------
   return (
     <Box
       position="relative"
@@ -93,394 +561,9 @@ const RightChat = ({
       width="100%"
       mb="75px"
     >
-      {messages?.map((msg, index) => {
-        return (
-          <Box key={msg?._id}>
-            <Box
-              width="100%"
-              display="flex"
-              justifyContent={msg?.senderId?._id === user._id ? "end" : "start"}
-              alignItems="center"
-            >
-              {msg?.senderId?._id !== user._id && (
-                <Link to={`/profile/${msg?.senderId?._id}`}>
-                  {<UserImage size="45" image={msg?.senderId?.picturePath} />}
-                </Link>
-              )}
-
-              <Reply
-                sx={{
-                  cursor: "pointer",
-                  ":hover": {
-                    display: "flex",
-                  },
-                  bgcolor: "#2b2d3d",
-                  borderRadius: "50%",
-                  p: "2px",
-                  width: "24px",
-                  height: "24px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  border: "1px solid ##212121",
-                  color: "#939393",
-                  fontSize: "13px",
-                  mx: "5px",
-                  order: msg?.senderId?._id === user._id ? -1 : 2,
-                }}
-                onClick={() => setReplyMessage(msg)}
-              />
-
-              <Box
-                p={
-                  msg?.emoji && Object.values(msg?.emoji)?.length !== 0
-                    ? "2px"
-                    : "5px"
-                }
-                width={
-                  msg?.emoji && Object.values(msg?.emoji)?.length !== 0
-                    ? "unset"
-                    : "24px"
-                }
-                height={
-                  msg?.emoji && Object.values(msg?.emoji)?.length !== 0
-                    ? "unset"
-                    : "24px"
-                }
-                bgcolor="#2b2d3d"
-                borderRadius={
-                  msg?.emoji && Object.values(msg?.emoji)?.length > 1
-                    ? "4px"
-                    : "50%"
-                }
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                border="1px solid ##212121"
-                boxShadow="0px 0px 5px 0 #00000029"
-                sx={{
-                  cursor: "pointer",
-                  ":hover": {
-                    display: "flex",
-                  },
-                  order: msg?.senderId?._id === user._id ? -1 : 1,
-                }}
-                onClick={() => {
-                  setDisplayEmojiPicker(!displayEmojiPicker);
-                  setMessageId(msg?._id);
-                }}
-              >
-                {msg?.emoji && Object.values(msg?.emoji)?.length !== 0 ? (
-                  msg?.emoji &&
-                  Object.values(msg?.emoji)?.map((emj) => {
-                    return emj;
-                  })
-                ) : (
-                  <EmojiEmotions
-                    sx={{
-                      color: "#939393",
-                      fontSize: "13px",
-                    }}
-                  />
-                )}
-              </Box>
-
-              <Box
-                m="15px 10px"
-                borderRadius="5px"
-                maxWidth="65%"
-                position="relative"
-                bgcolor={
-                  msg?.senderId?._id === user._id ? "#3168a2" : "#2b2d3d"
-                }
-                color="white"
-                sx={{
-                  wordBreak: "break-word",
-                  ":before": {
-                    content: "''",
-                    position: "absolute",
-                    borderTop: `9px solid ${
-                      msg?.senderId?._id === user._id ? "#3168a2" : "#2b2d3d"
-                    } `,
-                    borderRight: "7px solid transparent",
-                    borderLeft: "7px solid transparent",
-                    borderBottom: "7px solid transparent",
-                    transform:
-                      msg?.senderId?._id === user._id
-                        ? "rotate(-47deg)"
-                        : "rotate(40deg)",
-                    bottom:
-                      msg?.senderId?._id === user._id ? "-8.1px" : "-9.1px",
-                    left:
-                      msg?.senderId?._id === user._id ? undefined : "-6.4px",
-                    right: msg?.senderId?._id === user._id ? "-7px" : undefined,
-                  },
-                  ":hover": {
-                    ".emojiIcon": {
-                      display: "flex",
-                    },
-                  },
-                }}
-              >
-                {msg?.reply && (
-                  <Box
-                    width="100%"
-                    bgcolor="#2b2d3d"
-                    display="flex"
-                    justifyContent="space-between"
-                    borderRadius="5px 5px 0 0"
-                    borderLeft={`5px solid ${
-                      user._id === msg?.reply?.senderId?._id
-                        ? "#3a65a5"
-                        : "lightgreen"
-                    }`}
-                  >
-                    <Box
-                      display="flex"
-                      alignItems="start"
-                      gap="5px"
-                      flexDirection="column"
-                      p="7px"
-                      sx={{ userSelect: "none" }}
-                    >
-                      <Typography
-                        color={
-                          user._id === msg?.reply?.senderId?._id
-                            ? "#527ec0"
-                            : "lightGreen"
-                        }
-                        fontSize="11px"
-                        maxWidth="85%"
-                        overflow="hidden"
-                        whiteSpace="nowrap"
-                        textOverflow="ellipsis"
-                      >
-                        {msg?.reply?.senderId?.firstName}{" "}
-                        {msg?.reply?.senderId?.lastName}
-                      </Typography>
-
-                      <Typography
-                        fontSize="12px"
-                        color="#939393"
-                        maxWidth="315px"
-                        className="truncated-text"
-                      >
-                        {msg?.reply?.text}
-                      </Typography>
-                    </Box>
-
-                    <Box display="flex" alignItems="center" gap="5px">
-                      {msg?.reply?.picturePath && (
-                        <img
-                          src={msg?.reply?.picturePath}
-                          width="64px"
-                          height="57px"
-                          style={{ objectFit: "cover" }}
-                          alt=""
-                        />
-                      )}
-                    </Box>
-                  </Box>
-                )}
-
-                {msg?.text && (
-                  <Typography
-                    p="10px 10px 3px"
-                    sx={{ direction: testArabic(msg.text) ? "rtl" : "ltr" }}
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(formatTextForDisplay(msg.text), {
-                        ADD_ATTR: ["target", "rel"],
-                      }),
-                    }}
-                  />
-                )}
-
-                {msg?.picturePath && msg?.picturePath && (
-                  <img
-                    src={msg?.picturePath}
-                    style={{
-                      maxWidth: "100%",
-                      width: "350px",
-                      marginTop: msg?.text ? "6px" : "0",
-                      maxHeight: "400px",
-                      objectFit: "cover",
-                      cursor: "pointer",
-                      userSelect: "none",
-                    }}
-                    alt=""
-                    onClick={() => {
-                      setShowImage(true), setImageName(msg?.picturePath);
-                    }}
-                  />
-                )}
-
-                <Typography
-                  color={
-                    msg?.senderId?._id === user._id ? "#c4c4c4" : "#939393"
-                  }
-                  textAlign="right"
-                  fontSize="11px"
-                  sx={{ userSelect: "none" }}
-                  p="7px 10px"
-                >
-                  {realTime(msg?.createdAt)}
-                </Typography>
-
-                {displayEmojiPicker && msg?._id === messageId && (
-                  <Box
-                    border="1px solid #212121"
-                    boxShadow="0px 0px 5px 0 #00000029"
-                    borderRadius="40px"
-                    position="absolute"
-                    zIndex="9999"
-                    bottom="15px"
-                    left={msg?.senderId?._id === user._id ? undefined : "0"}
-                    right={msg?.senderId?._id === user._id ? "0" : undefined}
-                    p="6px"
-                    bgcolor="#2b2d3d"
-                    sx={{ userSelect: "none" }}
-                    display="flex"
-                    gap="5px"
-                  >
-                    {["💖", "😂", "😢", "😲", "😡", "🤙"].map((emj, index) => {
-                      return (
-                        <Box
-                          key={index}
-                          bgcolor={
-                            msg?.emoji[user._id] === emj ? "#8484846e" : ""
-                          }
-                          borderRadius="50%"
-                          p="2px"
-                        >
-                          <Typography
-                            fontSize="27px"
-                            sx={{
-                              cursor: "pointer",
-                              transition: ".3s",
-                              ":hover": {
-                                transform: "scale(1.2)",
-                              },
-                            }}
-                            onClick={() => {
-                              handleEmoji(emj, msg?._id);
-                              setDisplayEmojiPicker(false);
-                            }}
-                          >
-                            {emj}
-                          </Typography>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                )}
-
-                {displayEmojiPicker && (
-                  <Box
-                    position="fixed"
-                    top="0"
-                    left="0"
-                    width="100%"
-                    height="100%"
-                    onClick={() => {
-                      setDisplayEmojiPicker(false);
-                      setMessageId(null);
-                    }}
-                  />
-                )}
-              </Box>
-
-              {msg?.senderId?._id === user._id && (
-                <Link to={`/profile/${user._id}`}>
-                  <UserImage size="45" image={user.picturePath} />
-                </Link>
-              )}
-            </Box>
-            {msg?.senderId?._id === user._id &&
-              messages?.length - 1 === index &&
-              msg?.watched && (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap="5px"
-                  justifyContent="flex-end"
-                  mr="33px"
-                  mt="-8px"
-                >
-                  <Typography
-                    color="#939393"
-                    textAlign="right"
-                    fontSize="11px"
-                    mt="-6px"
-                    sx={{ userSelect: "none" }}
-                  >
-                    seen
-                  </Typography>
-
-                  <Box>
-                    <Check
-                      sx={{
-                        fontSize: "15px",
-                        mb: "2px",
-                        color: "#62aeff",
-                      }}
-                    />
-
-                    <Check
-                      sx={{
-                        fontSize: "15px",
-                        mb: "2px",
-                        color: "#62aeff",
-                        ml: "-9px",
-                      }}
-                    />
-                  </Box>
-                </Box>
-              )}
-
-            {msg?.senderId?._id === user._id &&
-              messages?.length - 1 === index &&
-              !msg?.watched && (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap="5px"
-                  justifyContent="flex-end"
-                  mr="33px"
-                  mt="-8px"
-                >
-                  <Typography
-                    color="#939393"
-                    textAlign="right"
-                    fontSize="11px"
-                    mt="-6px"
-                    sx={{ userSelect: "none" }}
-                  >
-                    sent
-                  </Typography>
-
-                  <Box>
-                    <Check
-                      sx={{
-                        fontSize: "15px",
-                        mb: "2px",
-                        color: "#939393",
-                      }}
-                    />
-
-                    <Check
-                      sx={{
-                        fontSize: "15px",
-                        mb: "2px",
-                        color: "#939393",
-                        ml: "-9px",
-                      }}
-                    />
-                  </Box>
-                </Box>
-              )}
-          </Box>
-        );
-      })}
+      {messages?.map((msg, idx) => (
+        <ChatBubble key={msg?._id} msg={msg} index={idx} />
+      ))}
 
       <Box
         position="fixed"
@@ -492,6 +575,7 @@ const RightChat = ({
         sx={{
           width: isNonMobileScreens ? "80%" : "100%",
         }}
+        zIndex="1"
       >
         {replyMessage && (
           <Box
@@ -663,11 +747,7 @@ const RightChat = ({
             {!loading ? (
               <Send style={{ color: "black" }} />
             ) : (
-              <Box
-                className="loadingAnimation"
-                width="20px"
-                height="20px"
-              ></Box>
+              <Box className="loadingAnimation" width="20px" height="20px" />
             )}
           </IconButton>
         </form>

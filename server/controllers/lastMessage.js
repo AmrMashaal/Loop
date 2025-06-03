@@ -11,8 +11,8 @@ export const getLastMessages = async (req, res) => {
         "senderId receiverId",
         "_id firstName lastName picturePath verified"
       )
-      .limit(10)
-      .skip((page - 1) * 10)
+      .limit(20)
+      .skip((page - 1) * 20)
       .sort({
         updatedAt: -1,
       });

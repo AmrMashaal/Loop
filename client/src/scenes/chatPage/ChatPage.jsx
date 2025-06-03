@@ -16,6 +16,7 @@ const ChatPage = ({ socket, fromNav }) => {
   const [message, setMessage] = useState("");
   const [title, setTitle] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
+  const [lastMessagePage, setLastMessagePage] = useState(1);
   const [replyMessage, setReplyMessage] = useState(null);
   const [image, setImage] = useState(null);
   const [imageError, setImageError] = useState(false);
@@ -152,7 +153,7 @@ const ChatPage = ({ socket, fromNav }) => {
     setHistoryLoad(true);
 
     try {
-      const response = await fetch(`/api/lastMessages`, {
+      const response = await fetch(`/api/lastMessages?page=${lastMessagePage}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -168,6 +169,22 @@ const ChatPage = ({ socket, fromNav }) => {
       setHistoryLoad(false);
     }
   };
+
+  const getMoreLastMessages = () => {
+    setLastMessagePage((prevNum) => prevNum + 1);
+  };
+
+  useEffect(() => {
+    const chatHistory = document.getElementById("chatBox");
+    
+    if (chatHistory) {
+      chatHistory.addEventListener("scroll", () => {
+        if (chatHistory.scrollTop <= 3) {
+          getMoreLastMessages();
+        }
+      });
+    }
+  }, []);
 
   const getMoreMessages = () => {
     setPageNumber((prevNum) => prevNum + 1);

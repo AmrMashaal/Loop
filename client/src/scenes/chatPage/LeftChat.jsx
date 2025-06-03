@@ -155,7 +155,7 @@ const LeftChat = ({
             />
           </form>
 
-          <Box>
+          <Box id="chatHistory">
             {lastMessageData?.map((ele, index) => {
               if (!ele?.senderId?.firstName && !ele?.firstName) return;
 
@@ -173,8 +173,8 @@ const LeftChat = ({
                   onClick={() => {
                     if (userId === (ele?.senderId?._id || ele?._id)) {
                       setMessages([]);
-                      setReplyMessage(null);
                     }
+                    setReplyMessage(null);
                   }}
                 >
                   <Box
