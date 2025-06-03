@@ -199,7 +199,7 @@ const RightChat = ({
               color: "#939393",
               fontSize: "13px",
               order: isOwn ? -1 : 2,
-              mx: "13px"
+              mx: "13px",
             }}
             onClick={() => setReplyMessage(msg)}
             className="replyIcon"
@@ -560,6 +560,9 @@ const RightChat = ({
       p={isNonMobileScreens ? "0 75px" : "0 15px"}
       width="100%"
       mb="75px"
+      sx={{
+        overflowX: "hidden",
+      }}
     >
       {messages?.map((msg, idx) => (
         <ChatBubble key={msg?._id} msg={msg} index={idx} />
