@@ -5,71 +5,78 @@ import { IconButton } from "@mui/material";
 
 const OpenPhoto = ({ photo, setIsImagOpen, from = "" }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 550px)");
+
+  const handleContentClick = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <Box
       position="fixed"
-      top="0"
-      left="0"
-      width="100%"
-      height="100%"
+      top={0}
+      left={0}
+      width="100vw"
+      height="100vh"
       bgcolor="#000000d6"
-      zIndex="11111111111"
+      zIndex={1300}
       display="flex"
       alignItems="center"
       justifyContent="center"
     >
       <Box
         position="absolute"
-        top="0"
-        left="0"
+        top={0}
+        left={0}
         width="100%"
         height="100%"
-        onClick={() => {
-          setIsImagOpen(false);
-        }}
-      ></Box>
-
-      <IconButton
-        sx={{
-          position: "absolute",
-          top: "10px",
-          left: "10px",
-          zIndex: "111",
-          color: "white",
-        }}
-        onClick={() => {
-          setIsImagOpen(false);
-        }}
-      >
-        <Close sx={{ fontSize: "21px" }} />
-      </IconButton>
-
+        onClick={() => setIsImagOpen(false)}
+      />
       <Box
-        width={isNonMobileScreens ? "75%" : "100%"}
-        height="75%"
+        position="relative"
+        zIndex={2}
         display="flex"
         alignItems="center"
         justifyContent="center"
+        width={isNonMobileScreens ? "75vw" : "95vw"}
+        height={isNonMobileScreens ? "75vh" : "90vh"}
+        onClick={handleContentClick}
       >
+        <IconButton
+          sx={{
+            position: "absolute",
+            top: "10px",
+            left: "10px",
+            zIndex: "111",
+            color: "white",
+            background: "#00000088",
+          }}
+          onClick={() => {
+            setIsImagOpen(false);
+          }}
+        >
+          <Close sx={{ fontSize: "21px" }} />
+        </IconButton>
         <img
           src={photo}
+          alt="Opened"
           style={{
-            zIndex: "1",
-            position: "relative",
+            maxWidth: "100%",
+            maxHeight: "100%",
             width:
-              from === "userImage" && isNonMobileScreens
-                ? "425px"
-                : from === "userImage" && !isNonMobileScreens
-                ? "325px"
-                : undefined,
+              from === "userImage"
+                ? isNonMobileScreens
+                  ? "425px"
+                  : "325px"
+                : "100%",
             height:
-              from === "userImage" && isNonMobileScreens
-                ? "425px"
-                : from === "userImage" && !isNonMobileScreens
-                ? "325px"
-                : "80%",
-            objectFit: "cover",
-            borderRadius: from === "userImage" ? "50%" : "0",
+              from === "userImage"
+                ? isNonMobileScreens
+                  ? "425px"
+                  : "325px"
+                : "100%",
+            objectFit: from === "userImage" ? "cover" : "contain",
+            borderRadius: from === "userImage" ? "50%" : "8px",
+            boxShadow: "0 4px 32px rgba(0,0,0,0.5)",
           }}
         />
       </Box>
