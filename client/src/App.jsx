@@ -10,7 +10,7 @@ import LoginPage from "./scenes/loginPage";
 import ProfilePage from "./scenes/profilePage";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { Button, CssBaseline, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import SearchPage from "./scenes/searchPage/SearchPage";
@@ -30,6 +30,7 @@ const App = () => {
   const [newPosts, setNewPosts] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
   [posts, setPosts] = useState([]);
+  const [count, setCount] = useState(0);
   [isOverflow, setIsOverFlow] = useState(false);
 
   useEffect(() => {

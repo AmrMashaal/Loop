@@ -9,22 +9,26 @@ const PostImg = ({
 }) => {
   const { palette } = useTheme();
 
+  const pictures = Array.isArray(ele?.picturePath)
+    ? ele.picturePath
+    : ele?.picturePath
+    ? [ele.picturePath]
+    : [];
+
   return (
     <Box
       maxHeight="485px"
       bgcolor={
-        ele?.picturePath.length > 1
-          ? palette.background.alt
-          : palette.neutral.light
+        pictures.length > 1 ? palette.background.alt : palette.neutral.light
       }
       mt="10px"
       display="grid"
       gap="5px"
       gridTemplateColumns={
-        ele?.picturePath.length > 1 ? "repeat(4, minmax(0, 1fr))" : undefined
+        pictures.length > 1 ? "repeat(4, minmax(0, 1fr))" : undefined
       }
     >
-      {ele?.picturePath?.map((mg, index) => {
+      {pictures?.map((mg, index) => {
         return (
           <img
             key={mg}
@@ -43,7 +47,7 @@ const PostImg = ({
               cursor: "pointer",
               zIndex: "1",
             }}
-            className={ele?.picturePath.length > 1 && "opacityBox"}
+            className={pictures.length > 1 && "opacityBox"}
             onClick={() => {
               setIsPostClicked(true),
                 setPostClickType("post"),

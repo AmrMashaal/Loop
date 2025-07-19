@@ -284,14 +284,14 @@ const RightChat = ({
             >
               {msg?.emoji && Object.values(msg?.emoji)?.length !== 0 ? (
                 msg?.emoji &&
-                Object.values(msg?.emoji)?.map((emj) => {
-                  return emj;
+                Object.values(msg?.emoji)?.map((emj, index) => {
+                  return <Typography key={index} fontSize="16px">{emj}</Typography>;
                 })
               ) : (
                 <EmojiEmotions
                   sx={{
                     color: "#939393",
-                    fontSize: "13px",
+                    fontSize: "15px",
                   }}
                 />
               )}

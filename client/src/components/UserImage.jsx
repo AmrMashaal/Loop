@@ -15,9 +15,6 @@ const UserImage = ({
 }) => {
   const theme = useTheme();
 
-  const user = useSelector((state) => state.user);
-  const { userId } = useParams();
-
   return (
     <Box
       width={size}
@@ -48,7 +45,7 @@ const UserImage = ({
         alt="user img"
       />
 
-      {isOnline && user?._id !== userId && (
+      {/* {isOnline && user?._id !== userId && (
         <Tooltip arrow placement="top" title="Online">
           <Box
             bgcolor="lightgreen"
@@ -61,7 +58,7 @@ const UserImage = ({
             border="2px solid white"
           ></Box>
         </Tooltip>
-      )}
+      )} */}
     </Box>
   );
 };

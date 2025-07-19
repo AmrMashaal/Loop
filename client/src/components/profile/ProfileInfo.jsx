@@ -340,7 +340,7 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
             maxWidth: "100%",
             objectFit: "cover",
             cursor: "pointer",
-            userSelect: "none"
+            userSelect: "none",
           }}
         />
       ) : (
@@ -391,7 +391,6 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
                 }
                 size="200px"
                 isProfile={true}
-                isOnline={userInfo?.online}
               />
             </Box>
           ) : (

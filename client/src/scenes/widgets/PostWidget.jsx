@@ -406,6 +406,7 @@ const PostWidget = ({
       setFollowLoadingId(null);
     }
   };
+
   // eslint-disable-next-line react/prop-types
   return (
     <Box>

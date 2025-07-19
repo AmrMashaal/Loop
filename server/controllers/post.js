@@ -17,7 +17,7 @@ const compressImage = async (buffer) => {
     .rotate()
     .resize({ width: 800 })
     .jpeg({ quality: 80 })
-     .toBuffer();
+    .toBuffer();
 };
 
 export const createPost = async (req, res) => {
@@ -198,77 +198,62 @@ export const createPost = async (req, res) => {
 };
 
 export const getFeedPosts = async (req, res) => {
-  const { page, limit = 5 } = req.query;
-  const id = req.user.id;
-
-  let posts;
+  const { page = 1, limit = 10 } = req.query;
+  const userId = req.user.id;
 
   try {
-    const friendsPromise = await Friend.find({
-      $or: [
-        { sender: id, status: "accepted" },
-        { receiver: id, status: "accepted" },
-      ],
-    });
-
-    const friendsIds = friendsPromise.map((fr) => {
-      return new mongoose.Types.ObjectId(fr.sender).toString() === id
-        ? new mongoose.Types.ObjectId(fr.receiver)
-        : new mongoose.Types.ObjectId(fr.sender);
-    });
-
-    const following = await Follow.find({ follower: id }).select("following");
-
-    const followingIds = following.map(
-      (f) => new mongoose.Types.ObjectId(f.following.toString())
+    const friends = await Friend.find({
+      status: "accepted",
+      $or: [{ sender: userId }, { receiver: userId }],
+    }).lean();
+    const friendIds = friends.map((f) =>
+      f.sender.toString() === userId
+        ? f.receiver.toString()
+        : f.sender.toString()
     );
 
-    if (followingIds.length > 0 || friendsIds.length > 0) {
-      posts = await Post.find({
-        $or: [
-          { privacy: "friends", userId: { $in: friendsIds } },
-          {
-            privacy: "public",
-            userId: { $in: [...friendsIds, ...followingIds] },
-          },
-        ],
-      })
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .populate("userId", "_id firstName lastName picturePath verified");
-    } else {
-      posts = await Post.find({
-        _id: "67c0e95cc6489e642bf59fee",
-      })
-        .sort({ createdAt: -1 })
-        .populate("userId", "_id firstName lastName picturePath verified");
-    }
+    const followingDocs = await Follow.find({ follower: userId })
+      .select("following")
+      .lean();
+    const followingIds = followingDocs.map((f) => f.following.toString());
 
-    const postsWithIsLiked = await Promise.all(
-      posts.map(async (post) => {
-        const isLiked = await Like.findOne({
-          userId: id,
-          postId: post._id,
-        });
-
-        return { ...post._doc, isLiked: Boolean(isLiked) };
-      })
+    const fofRels = await Friend.find({
+      status: "accepted",
+      $or: [{ sender: { $in: friendIds } }, { receiver: { $in: friendIds } }],
+    }).lean();
+    let fofIds = fofRels.map((f) => {
+      const other = friendIds.includes(f.sender.toString())
+        ? f.receiver
+        : f.sender;
+      return other.toString();
+    });
+    fofIds = [...new Set(fofIds)].filter(
+      (id) => id !== userId && !friendIds.includes(id)
     );
 
-    let reposts = await Repost.find({
+    const chronoPosts = await Post.find({
       $or: [
-        { privacy: "friends", userId: { $in: friendsIds } },
-        {
-          privacy: "public",
-          userId: { $in: [...friendsIds, ...followingIds] },
-        },
+        { userId: userId },
+        { userId: { $in: friendIds }, privacy: { $in: ["friends", "public"] } },
+        { userId: { $in: followingIds }, privacy: "public" },
       ],
     })
       .sort({ createdAt: -1 })
-      .skip((page - 1) * 4)
-      .limit(4)
-      .populate("userId", "firstName lastName picturePath verified _id")
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate("userId", "_id firstName lastName picturePath verified")
+      .lean();
+
+    const chronoReposts = await Repost.find({
+      $or: [
+        { userId: { $in: friendIds }, privacy: { $in: ["friends", "public"] } },
+        { userId: { $in: followingIds }, privacy: "public" },
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .populate("userId", "_id firstName lastName picturePath verified")
       .populate({
         path: "postId",
         select: "_id userId description picturePath privacy createdAt",
@@ -276,52 +261,95 @@ export const getFeedPosts = async (req, res) => {
           path: "userId",
           select: "_id firstName lastName picturePath verified",
         },
-      });
-
-    const repostsWithIsLiked = await Promise.all(
-      reposts.map(async (rep) => {
-        const isLiked = await Like.findOne({
-          userId: id,
-          repostId: rep._id,
-        });
-
-        const postId =
-          (rep?.postId?.privacy === "private" &&
-            rep.postId.userId._id.toString() !== id) ||
-          (rep?.postId?.privacy === "friends" &&
-            !friendsIds.includes(rep.postId.userId._id.toString()) &&
-            rep.postId.userId._id.toString() !== id)
-            ? null
-            : rep.postId;
-
-        return { ...rep._doc, isLiked: Boolean(isLiked), postId };
       })
+      .lean();
+
+    const [fofPosts, fofReposts] = await Promise.all([
+      Post.find({ userId: { $in: fofIds }, privacy: "public" })
+        .populate("userId", "_id firstName lastName picturePath verified")
+        .lean(),
+      Repost.find({ userId: { $in: fofIds }, privacy: "public" })
+        .populate("userId", "_id firstName lastName picturePath verified")
+        .populate({
+          path: "postId",
+          select: "_id userId description picturePath privacy createdAt",
+          populate: {
+            path: "userId",
+            select: "_id firstName lastName picturePath verified",
+          },
+        })
+        .lean(),
+    ]);
+
+    const scoreItems = (arr) =>
+      arr.map((item) => {
+        const hoursOld = (Date.now() - new Date(item.createdAt)) / 36e5;
+        const recency = 1 / (1 + hoursOld);
+        const base = recency * 3 + 1;
+        return { item, score: base + Math.random() * 0.5 };
+      });
+    const weightedPosts = scoreItems(fofPosts).sort(
+      (a, b) => b.score - a.score
+    );
+    const weightedReposts = scoreItems(fofReposts).sort(
+      (a, b) => b.score - a.score
     );
 
-    posts = [...postsWithIsLiked, ...repostsWithIsLiked];
+    const recLimit = Math.floor(limit / 2);
+    const recPosts = weightedPosts.slice(0, recLimit).map((w) => w.item);
+    const recReposts = weightedReposts.slice(0, recLimit).map((w) => w.item);
 
-    if (followingIds.length > 0 || friendsIds.length > 0) {
-      posts = posts.sort((a, b) => b.createdAt - a.createdAt);
+    const attachLikes = async (arr) =>
+      Promise.all(
+        arr.map(async (obj) => {
+          const liked =
+            (await Like.exists({ userId, postId: obj._id })) ||
+            (await Like.exists({ userId, repostId: obj._id }));
+          return { ...obj, isLiked: Boolean(liked) };
+        })
+      );
+    const [cp, cr, rp, rr] = await Promise.all([
+      attachLikes(chronoPosts),
+      attachLikes(chronoReposts),
+      attachLikes(recPosts),
+      attachLikes(recReposts),
+    ]);
+
+    const merged = [];
+    let iP = 0,
+      iR = 0,
+      jP = 0,
+      jR = 0;
+    while (
+      merged.length < limit &&
+      (iP < cp.length || iR < cr.length || jP < rp.length || jR < rr.length)
+    ) {
+      const rand = Math.random();
+      if (rand < 0.25 && jP < rp.length) merged.push(rp[jP++]);
+      else if (rand < 0.5 && jR < rr.length) merged.push(rr[jR++]);
+      else if (rand < 0.75 && iP < cp.length) merged.push(cp[iP++]);
+      else if (iR < cr.length) merged.push(cr[iR++]);
+      else if (iP < cp.length) merged.push(cp[iP++]);
+      else if (jP < rp.length) merged.push(rp[jP++]);
     }
 
-    if (page === "1") {
-      const followSuggestion = await User.find({
-        _id: { $nin: [id, ...friendsIds, ...followingIds] },
+    let result;
+    if (page == 1) {
+      const suggestions = await User.find({
+        _id: { $nin: [userId, ...friendIds, ...followingIds] },
       })
         .sort({ verified: -1, followersCount: -1 })
-        .limit(30);
-
-      posts = {
-        suggestions: followSuggestion,
-        posts: posts,
-      };
+        .limit(30)
+        .lean();
+      result = { suggestions, posts: merged };
     } else {
-      posts = { posts };
+      result = { posts: merged };
     }
 
-    res.status(200).json(posts);
+    return res.status(200).json(result);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    console.error("getFeedPosts error:", err);
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -507,7 +535,10 @@ export const getPost = async (req, res) => {
         });
     }
 
-    if (post.userId._id.toString() !== req.user.id && post.privacy === "private") {
+    if (
+      post.userId._id.toString() !== req.user.id &&
+      post.privacy === "private"
+    ) {
       res.status(403).json({ message: "Forbidden!" });
     } else {
       if (!post) {

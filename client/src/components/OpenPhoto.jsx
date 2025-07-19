@@ -76,7 +76,7 @@ const OpenPhoto = ({ photo, setIsImagOpen, from = "" }) => {
                 : "100%",
             objectFit: from === "userImage" ? "cover" : "contain",
             borderRadius: from === "userImage" ? "50%" : "8px",
-           }}
+          }}
         />
       </Box>
     </Box>
