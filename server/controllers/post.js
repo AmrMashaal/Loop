@@ -233,8 +233,7 @@ export const getFeedPosts = async (req, res) => {
 
     const chronoPosts = await Post.find({
       $or: [
-        { userId: userId },
-        { userId: { $in: friendIds }, privacy: { $in: ["friends", "public"] } },
+         { userId: { $in: friendIds }, privacy: { $in: ["friends", "public"] } },
         { userId: { $in: followingIds }, privacy: "public" },
       ],
     })
