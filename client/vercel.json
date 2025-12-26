@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://loop-backend-theta.vercel.app/:path*"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
