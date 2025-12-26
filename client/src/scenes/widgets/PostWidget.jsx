@@ -448,18 +448,6 @@ const PostWidget = ({
                               {ele?.userId?.verified && (
                                 <VerifiedOutlined sx={{ color: "#15a1ed" }} />
                               )}
-                              {ele?.userId?.isDuolingoStreak &&
-                                !ele?.userId?.verified && (
-                                  <img
-                                    src="/assets/duolingo-streak.png"
-                                    alt="Duolingo Streak"
-                                    width={30}
-                                    style={{
-                                      pointerEvents: "none",
-                                      userSelect: "none",
-                                    }}
-                                  />
-                                )}
                             </Box>
 
                             <Typography
@@ -666,19 +654,6 @@ const PostWidget = ({
                                       sx={{ color: "#15a1ed" }}
                                     />
                                   )}
-
-                                  {ele?.postId?.userId?.isDuolingoStreak &&
-                                    !ele?.postId?.userId?.verified && (
-                                      <img
-                                        src="/assets/duolingo-streak.png"
-                                        alt="Duolingo Streak"
-                                        width={30}
-                                        style={{
-                                          pointerEvents: "none",
-                                          userSelect: "none",
-                                        }}
-                                      />
-                                    )}
                                 </Box>
 
                                 <Typography

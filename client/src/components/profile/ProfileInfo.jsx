@@ -444,27 +444,9 @@ const ProfileInfo = ({ userInfo, userId, isLoading }) => {
                           right: isNonMobileScreens ? "-40px" : "-39px",
                           top: "50%",
                           transform: "translateY(-50%)",
-                          filter: mode !== "light" && "drop-shadow(1px 1px 9px #15a1ed)",
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-
-                  {userInfo?.isDuolingoStreak && (
-                    <Tooltip arrow placement="top" title="Duolingo Streak">
-                      <img
-                        src="/assets/duolingo-streak.png"
-                        alt="Duolingo Streak"
-                        width={30}
-                        style={{
-                          userSelect: "none",
-                          position: "absolute",
-                          right: isNonMobileScreens ? "-90px" : undefined,
-                          left: isNonMobileScreens ? undefined : "-50px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          width: "45px",
-                          filter: "drop-shadow(1px 1px 9px #fddb058c)",
+                          filter:
+                            mode !== "light" &&
+                            "drop-shadow(1px 1px 9px #15a1ed)",
                         }}
                       />
                     </Tooltip>

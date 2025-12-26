@@ -65,7 +65,7 @@ export const createPost = async (req, res) => {
 
     await newPost.populate(
       "userId",
-      "_id firstName lastName picturePath verified isDuolingoStreak"
+      "_id firstName lastName picturePath verified "
     );
 
     const postsCount = await Post.countDocuments({
@@ -240,10 +240,7 @@ export const getFeedPosts = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate(
-        "userId",
-        "_id firstName lastName picturePath verified isDuolingoStreak"
-      )
+      .populate("userId", "_id firstName lastName picturePath verified ")
       .lean();
 
     const chronoReposts = await Repost.find({
@@ -255,40 +252,29 @@ export const getFeedPosts = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate(
-        "userId",
-        "_id firstName lastName picturePath verified isDuolingoStreak"
-      )
+      .populate("userId", "_id firstName lastName picturePath verified ")
       .populate({
         path: "postId",
         select: "_id userId description picturePath privacy createdAt",
         populate: {
           path: "userId",
-          select:
-            "_id firstName lastName picturePath verified isDuolingoStreak",
+          select: "_id firstName lastName picturePath verified ",
         },
       })
       .lean();
 
     const [fofPosts, fofReposts] = await Promise.all([
       Post.find({ userId: { $in: fofIds }, privacy: "public" })
-        .populate(
-          "userId",
-          "_id firstName lastName picturePath verified isDuolingoStreak"
-        )
+        .populate("userId", "_id firstName lastName picturePath verified ")
         .lean(),
       Repost.find({ userId: { $in: fofIds }, privacy: "public" })
-        .populate(
-          "userId",
-          "_id firstName lastName picturePath verified isDuolingoStreak"
-        )
+        .populate("userId", "_id firstName lastName picturePath verified ")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         })
         .lean(),
@@ -392,10 +378,7 @@ export const getUserPosts = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ pinned: -1, createdAt: -1 })
-        .populate(
-          "userId",
-          "_id firstName lastName picturePath verified isDuolingoStreak"
-        );
+        .populate("userId", "_id firstName lastName picturePath verified ");
 
       let reposts = await Repost.find({
         userId,
@@ -408,17 +391,13 @@ export const getUserPosts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
         .limit(4)
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
 
@@ -436,10 +415,7 @@ export const getUserPosts = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ pinned: -1, createdAt: -1 })
-        .populate(
-          "userId",
-          "_id firstName lastName picturePath verified isDuolingoStreak"
-        );
+        .populate("userId", "_id firstName lastName picturePath verified ");
 
       let reposts = await Repost.find({
         userId,
@@ -448,17 +424,13 @@ export const getUserPosts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
         .limit(4)
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
 
@@ -473,10 +445,7 @@ export const getUserPosts = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ pinned: -1, createdAt: -1 })
-        .populate(
-          "userId",
-          "_id firstName lastName picturePath verified isDuolingoStreak"
-        );
+        .populate("userId", "_id firstName lastName picturePath verified ");
 
       let reposts = await Repost.find({
         userId,
@@ -485,17 +454,13 @@ export const getUserPosts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * 4)
         .limit(4)
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
 
@@ -553,22 +518,18 @@ export const getPost = async (req, res) => {
   try {
     post = await Post.findById(postId).populate(
       "userId",
-      "_id firstName lastName picturePath verified isDuolingoStreak"
+      "_id firstName lastName picturePath verified "
     );
 
     if (!post) {
       post = await Repost.findById(postId)
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
     }
@@ -653,7 +614,7 @@ export const editPost = async (req, res) => {
   try {
     post = await Post.findById(postId).populate(
       "userId",
-      "_id firstName lastName picturePath verified isDuolingoStreak"
+      "_id firstName lastName picturePath verified "
     );
 
     if (post && post.userId._id.toString() !== req.user.id) {
@@ -687,17 +648,13 @@ export const editPost = async (req, res) => {
       const result = await post.save();
 
       const populatedResult = await Repost.findById(result._id)
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
 
@@ -725,7 +682,7 @@ export const pinPost = async (req, res) => {
   try {
     post = await Post.findById(postId).populate(
       "userId",
-      "_id firstName lastName picturePath verified isDuolingoStreak"
+      "_id firstName lastName picturePath verified "
     );
 
     if (post && post.userId._id.toString() !== req.user.id) {
@@ -746,17 +703,13 @@ export const pinPost = async (req, res) => {
       res.status(200).json(postWithIsLiked);
     } else {
       post = await Repost.findById(postId)
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
 
@@ -788,10 +741,7 @@ export const getPostClickInfo = async (req, res) => {
   try {
     const post = await Post.findById(postId)
       .select("likesCount commentCount userId")
-      .populate(
-        "userId",
-        "_id firstName lastName picturePath verified isDuolingoStreak"
-      );
+      .populate("userId", "_id firstName lastName picturePath verified ");
 
     const repost = await Repost.findById(postId);
 
@@ -825,7 +775,7 @@ export const changePrivacy = async (req, res) => {
   try {
     post = await Post.findById(postId).populate(
       "userId",
-      "_id firstName lastName picturePath verified isDuolingoStreak"
+      "_id firstName lastName picturePath verified "
     );
 
     if (post && post.userId._id.toString() !== req.user.id) {
@@ -851,17 +801,13 @@ export const changePrivacy = async (req, res) => {
         },
         { new: true }
       )
-        .populate(
-          "userId",
-          "firstName lastName picturePath verified isDuolingoStreak _id"
-        )
+        .populate("userId", "firstName lastName picturePath verified  _id")
         .populate({
           path: "postId",
           select: "_id userId description picturePath privacy createdAt",
           populate: {
             path: "userId",
-            select:
-              "_id firstName lastName picturePath verified isDuolingoStreak",
+            select: "_id firstName lastName picturePath verified ",
           },
         });
 
